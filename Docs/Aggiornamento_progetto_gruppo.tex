@@ -1,0 +1,118 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{parskip}
+
+\definecolor{accent}{HTML}{1A5FB4}
+\titleformat{\section}{\large\bfseries\color{accent}}{\thesection}{0.5em}{}
+\titleformat{\subsection}{\bfseries\color{accent}}{\thesubsection}{0.5em}{}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=accent,
+    urlcolor=accent,
+    citecolor=accent,
+    pdftitle={Aggiornamento progetto LHCb Open Data},
+    pdfauthor={Giacomo Moretti, Marco}
+}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{\color{accent}\textbf{Aggiornamento della proposta di progetto}\\[0.3em]
+\Large Estensione frequentista, bayesiana e machine learning di un'analisi LHCb Open Data sui decadimenti a tre corpi dei mesoni B}
+\author{Giacomo Moretti \and Marco}
+\date{14 settembre 2026}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Nota.} Questo documento aggiorna la proposta originale (\url{Proposta_progetto_LHCb_OpenData_Giacomo_Moretti.pdf}) recependo due cambiamenti: il progetto è ora svolto in coppia, e sono state concordate alcune estensioni metodologiche aggiuntive emerse in fase di revisione. La research question e l'impianto generale restano quelli della proposta originale.
+
+\section{Research question (invariata)}
+In che misura fit frequentisti di likelihood, inferenza bayesiana e selezioni assistite da machine learning producono stime consistenti e controllate dell'asimmetria grezza $A_{raw}$ nei decadimenti $B^{\pm} \to h^{\pm} h^{+} h^{-}$ di LHCb Open Data?
+
+\section{Composizione del gruppo e responsabilità}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{3.5cm} L{10cm}}
+\toprule
+\textbf{Membro} & \textbf{Responsabilità principale} \\
+\midrule
+Marco & Completamento del notebook ufficiale (baseline) ed estensione frequentista: fit di massa signal + background, fit simultaneo parametrizzato su $A$, profile likelihood e confidence interval. \\
+\addlinespace
+Giacomo Moretti & Estensione bayesiana: definizione di prior/likelihood/posterior sullo stesso modello fisico, campionamento MCMC, credible interval, confronto con i risultati frequentisti. \\
+\addlinespace
+Entrambi & Phase-space MC per gli altri canali, modulo ML, confronto finale delle stime di $A_{raw}$, stesura del report. \\
+\bottomrule
+\end{tabular}
+\caption{Divisione dei compiti concordata.}
+\end{table}
+
+\noindent\textbf{Nota operativa.} Perch\'e i risultati dei due filoni (frequentista e bayesiano) restino confrontabili a fine progetto, \`e importante che Marco e Giacomo condividano fin da subito lo stesso modulo di lettura dati e preselezione (stesse variabili, stessi tagli PID/muon veto) e la stessa parametrizzazione del modello di massa $f(m) = N_s\,S(m;\theta_s) + N_b\,B(m;\theta_b)$: la parte bayesiana riusa il modello fisico della parte frequentista, cambia solo il trattamento dei parametri.
+
+\section{Pipeline operativa aggiornata}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{0.8cm} L{4.2cm} L{5.5cm} L{2.3cm}}
+\toprule
+\textbf{\#} & \textbf{Blocco} & \textbf{Output principale} & \textbf{Responsabile} \\
+\midrule
+0 & Baseline notebook & Lettura dati, ricostruzione massa, selezione KKK, $A_{raw}$ globale, Dalitz plot & Marco \\
+1 & Fit frequentista & Modello massa signal + background, fitted yields & Marco \\
+2 & Profile likelihood & $A_{raw}$ da fit simultaneo, confidence interval & Marco \\
+3 & Analisi bayesiana & Prior, posterior, MCMC, credible interval & Giacomo \\
+4 & Phase-space MC & Campioni truth-level KKK, K$\pi\pi$, $\pi$KK, $\pi\pi\pi$ & Entrambi \\
+5 & Modulo ML & Weak label da sidebands, classificatori, ROC, stabilit\`a di $A_{raw}$ & Entrambi \\
+6 & Confronto finale & Tabella $A_{raw}$: conteggio, fit, bayes, ML-assisted & Entrambi \\
+\bottomrule
+\end{tabular}
+\caption{Pipeline della proposta originale con responsabile assegnato per blocco.}
+\end{table}
+
+\section{Estensioni metodologiche aggiuntive}
+
+Rispetto alla proposta originale, sono state concordate le seguenti aggiunte, a basso costo implementativo e coerenti con gli argomenti del corso:
+
+\begin{enumerate}[leftmargin=1.4em]
+    \item \textbf{Bayes factor per il test $A=0$ vs $A$ libero.} La proposta originale usa MCMC/credible interval ma non i Bayes factor, argomento esplicito di Week 4. Aggiungere questo test d\`a un secondo confronto di ipotesi bayesiano da affiancare al p-value frequentista. \emph{(Sezione bayesiana, Giacomo)}
+
+    \item \textbf{Cross-check Magnet Up vs Magnet Down.} I due file \url{B2HHH_MagnetUp.root} e \url{B2HHH_MagnetDown.root} permettono di calcolare $A_{raw}$ separatamente per le due polarit\`a del magnete e verificarne la consistenza: la pratica standard LHCb cancella parzialmente l'asimmetria di rivelazione sommando le due polarit\`a. Check a costo quasi nullo, dati gi\`a disponibili. \emph{(Sistematiche)}
+
+    \item \textbf{Confronto con i valori pubblicati.} Il paper di riferimento (arXiv:2403.19921, LHCb Collaboration) riporta gli $A_{CP}$ misurati per gli stessi quattro canali. Il confronto qualitativo tra il nostro $A_{raw}$ e i valori pubblicati (gi\`a corretti per efficienza e asimmetria di produzione) illustra concretamente perch\'e $A_{raw} \neq A_{CP}$, punto gi\`a segnalato come rischio nella proposta originale. \emph{(Discussione nel report)}
+
+    \item \textbf{Toy-MC coverage check.} Generare pseudo-dataset con phase-space MC iniettando un valore noto di $A$, ripetere fit e posterior su molte repliche, verificare la copertura reale dei confidence/credible interval. Rende esplicito e quantitativo quanto gi\`a previsto genericamente nella sezione ``toy studies'' della proposta originale. \emph{(Validazione, entrambi)}
+
+    \item \textbf{Cross-validation e regolarizzazione nel modulo ML.} Split train/validation/test esplicito e tuning via cross-validation per BDT/FFNN, con eventuale analisi PCA/correlazione esplorativa sulle feature cinematiche prima della classificazione. Introduce minimamente Lecture 10, non coperta altrimenti dal progetto. \emph{(Modulo ML)}
+
+    \item \textbf{(Opzionale) ML-assisted Dalitz regions.} Se il tempo lo permette: usare un classificatore o un clustering per definire regioni del Dalitz plot in modo adattivo, invece del binning fisso, e verificare se emergono zone di asimmetria non catturate dal binning manuale. Risponde alla domanda 13 gi\`a posta al docente nella proposta originale. \emph{(Stretch goal)}
+\end{enumerate}
+
+\section{Toolchain concordato}
+
+Per coerenza con le esercitazioni del corso (verificato sui notebook di \texttt{Statistics\_exe/}):
+
+\begin{itemize}[leftmargin=1.4em]
+    \item Fit MLE / frequentisti: \textbf{iminuit} (\texttt{Minuit}, \texttt{iminuit.cost.UnbinnedNLL})
+    \item MCMC bayesiano: \textbf{emcee} + \textbf{corner} per i corner plot
+    \item Machine learning classico: \textbf{scikit-learn}
+    \item Reti neurali: \textbf{Keras/TensorFlow}
+\end{itemize}
+
+\section{Prossimi passi immediati}
+
+\begin{itemize}[leftmargin=1.4em]
+    \item \textbf{Marco:} eseguire \texttt{LHCb\_Open\_Data\_Project.ipynb} end-to-end per ottenere la baseline (lettura dati, massa invariante, $A_{raw}$ da conteggio, Dalitz plot), poi costruire il modello di massa signal+background con iminuit.
+    \item \textbf{Giacomo:} definire il modello statistico bayesiano (parametri $\theta = (N_s, N_b, A, \mu, \sigma, \lambda_{bkg})$ e prior) sullo stesso modello di massa concordato con Marco, e preparare il setup emcee.
+\end{itemize}
+
+\end{document}

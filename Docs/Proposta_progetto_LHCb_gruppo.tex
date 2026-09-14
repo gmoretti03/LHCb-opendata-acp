@@ -1,0 +1,354 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{amsmath}
+
+\definecolor{accent}{HTML}{1A5FB4}
+\titleformat{\section}{\large\bfseries\color{accent}}{\thesection}{0.5em}{}
+\titleformat{\subsection}{\bfseries\color{accent}}{\thesubsection}{0.5em}{}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=accent,
+    urlcolor=accent,
+    citecolor=accent,
+    pdftitle={Proposta di progetto LHCb Open Data (gruppo)},
+    pdfauthor={Giacomo Moretti, Marco Belotti}
+}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{\color{accent}\textbf{Proposta di progetto}\\[0.3em]
+\Large Estensione frequentista, bayesiana e machine learning di un'analisi LHCb Open Data sui decadimenti a tre corpi dei mesoni B}
+\author{Giacomo Moretti \and Marco Belotti}
+\date{14 settembre 2026}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Idea centrale.} Partire dal notebook ufficiale CERN Open Data sulle differenze materia-antimateria nei decadimenti $B^{\pm} \to h^{\pm} h^{+} h^{-}$, riprodurre l'analisi guidata, e trasformarla in un progetto metodologico completo: fit frequentista della massa, stima di $A_{raw}$ con profile likelihood, riformulazione bayesiana con MCMC e modulo ML per signal/background e studi di stabilità. Proposta operativa per progetto di gruppo basato sul corso di Statistics \& Machine Learning applicato alla fisica delle alte energie.
+
+\emph{Dataset reale LHCb ROOT/TTree $\cdot$ CP asymmetry $\cdot$ Dalitz plot $\cdot$ MLE/Profile likelihood $\cdot$ MCMC $\cdot$ ML selection}
+
+\section{Composizione del gruppo e responsabilità}
+
+Il progetto è svolto in coppia. La divisione dei compiti concordata è la seguente:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{3.5cm} L{10cm}}
+\toprule
+\textbf{Membro} & \textbf{Responsabilità principale} \\
+\midrule
+Marco Belotti & Completamento del notebook ufficiale (baseline) ed estensione frequentista: fit di massa signal + background, fit simultaneo parametrizzato su $A$, profile likelihood e confidence interval. \\
+\addlinespace
+Giacomo Moretti & Estensione bayesiana: definizione di prior/likelihood/posterior sullo stesso modello fisico, campionamento MCMC, credible interval, confronto con i risultati frequentisti. \\
+\addlinespace
+Entrambi & Toy-MC coverage check, modulo ML, confronto finale delle stime di $A_{raw}$, stesura del report. \\
+\bottomrule
+\end{tabular}
+\caption{Divisione dei compiti.}
+\end{table}
+
+\noindent\textbf{Nota operativa.} Perché i risultati dei due filoni (frequentista e bayesiano) restino confrontabili, Marco e Giacomo condividono fin da subito lo stesso modulo di lettura dati e preselezione (stesse variabili, stessi tagli PID/muon veto) e la stessa parametrizzazione del modello di massa $f(m) = N_s\,S(m;\theta_s) + N_b\,B(m;\theta_b)$: la parte bayesiana riusa il modello fisico della parte frequentista, cambia solo il trattamento dei parametri. Questo permette di lavorare in parallelo senza dover attendere il completamento reciproco.
+
+\section{Contesto e motivazione}
+
+Il progetto si colloca nell'ambito dell'analisi statistica dei decadimenti adronici a tre corpi dei mesoni B carichi, con particolare attenzione alle differenze fra materia e antimateria. Nei decadimenti $B^{\pm} \to h^{\pm} h^{+} h^{-}$ lo spazio delle fasi a tre corpi permette non solo una misura globale dell'asimmetria, ma anche uno studio locale tramite Dalitz plot, dove eventuali differenze possono essere concentrate in regioni cinematiche specifiche.
+
+L'obiettivo non è produrre una misura competitiva con una pubblicazione LHCb completa, ma usare dati reali e un notebook pubblico validato come base per un progetto didattico avanzato: riproducibile, statisticamente rigoroso e coerente con il programma del corso.
+
+\subsection*{Research question}
+\noindent\emph{In che misura fit frequentisti di likelihood, inferenza bayesiana e selezioni assistite da machine learning producono stime consistenti e controllate dell'asimmetria grezza $A_{raw}$ nei decadimenti $B^{\pm} \to h^{\pm} h^{+} h^{-}$ di LHCb Open Data?}
+
+\section{Argomenti del corso utilizzati}
+
+Il progetto è disegnato per usare in modo esplicito i blocchi principali del corso di Statistics \& Machine Learning applicato alla HEP: inferenza frequentista, likelihood, covariance, profile likelihood, inferenza bayesiana, MCMC, supervised learning, tree-based methods, neural networks e uncertainty estimation.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{3.6cm} L{4cm} L{5.3cm}}
+\toprule
+\textbf{Modulo del corso} & \textbf{Strumento} & \textbf{Uso nel progetto} \\
+\midrule
+Frequentist inference & Hypothesis testing, p-value, MLE & Fit di massa, stima di yield e test $A_{raw}=0$ \\
+Covariance / confidence regions & Hessian, Wilks, profile likelihood & Intervalli di confidenza e profiling sui nuisance \\
+Bayesian inference & Prior, posterior, MCMC, credible intervals, \textbf{Bayes factor} & Posterior su yield e $A_{raw}$; test $A=0$ vs $A$ libero \\
+Statistical learning & Classification, bias-variance, regularization & ML signal/background con sidebands, cross-validation \\
+Tree/NN methods & BDT, random forest, FFNN & Confronto fra baseline classiche e rete neurale \\
+Uncertainty in ML & Bootstrap, ensemble, calibration & Stabilità dell'asimmetria al variare del modello e della soglia ML \\
+\bottomrule
+\end{tabular}
+\caption{Mappatura tra argomenti del corso e uso nel progetto.}
+\end{table}
+
+\section{Dataset, notebook di partenza e software}
+
+\subsection*{Dataset principale}
+Il dataset principale è il record CERN Open Data ``Matter Antimatter Differences - B meson decays to three hadrons''. I dati sono stati raccolti da LHCb nel 2011 a $\sqrt{s}=7$~TeV, ricostruiti con il software dell'esperimento, selezionati dal trigger e da una selezione offline, e contengono candidati per decadimenti di un mesone B carico in tre particelle cariche. I file sono ROOT TTree e includono solo le variabili ricostruite più importanti. Il record riporta circa 8.55 milioni di eventi, 3 file e 1.0 GiB totali.
+
+Lo stesso record include anche una simulazione semplificata del decadimento $B^{\pm} \to K^{\pm} K^{+} K^{-}$, non passata attraverso una simulazione della risposta del detector: utile come riferimento cinematico phase-space, ma non da trattare come full simulation detector-level.
+
+\subsection*{Notebook di partenza}
+Il notebook ufficiale ``Matter Antimatter Differences - Project Notebook'' fornisce un'analisi guidata: simulazione, ricostruzione della massa invariante, dati reali, preselezione, asimmetria globale, Dalitz plot, asimmetrie locali e una sezione finale di possibili estensioni (``Further analyses''), punto naturale da cui parte il presente progetto.
+
+\subsection*{Ambiente tecnico}
+\begin{itemize}[leftmargin=1.4em]
+    \item Python/Jupyter come ambiente principale; \texttt{uproot} per la lettura dei file ROOT/TTree (niente installazione ROOT necessaria).
+    \item \texttt{numpy}, \texttt{pandas}, \texttt{scipy}, \texttt{matplotlib} per analisi e visualizzazione.
+    \item \textbf{iminuit} (\texttt{Minuit}, \texttt{iminuit.cost.UnbinnedNLL}) per i fit frequentisti.
+    \item \textbf{emcee} + \textbf{corner} per il campionamento MCMC bayesiano e i corner plot.
+    \item \textbf{scikit-learn} per il machine learning classico; \textbf{Keras/TensorFlow} per le reti neurali.
+\end{itemize}
+\noindent Questo toolchain è stato scelto per coerenza con le esercitazioni del corso (verificato sui notebook di \texttt{Statistics\_exe/}), non solo per convenienza tecnica.
+
+\section{Obiettivi scientifici e metodologici}
+\begin{enumerate}[leftmargin=1.4em]
+    \item Riprodurre e completare il notebook ufficiale LHCb Open Data, mantenendo piena tracciabilità rispetto alla baseline.
+    \item Passare da una stima per conteggio di $A_{raw}$ a una stima da fit di massa con segnale e fondo.
+    \item Implementare una stima frequentista con MLE, covariance matrix, profile likelihood e confidence interval.
+    \item Riformulare lo stesso problema in modo bayesiano, con posterior su yield e asimmetria e credible intervals.
+    \item Applicare ML in modo controllato per separazione signal/background tramite sidebands, senza usare la massa come feature di input.
+    \item Confrontare conteggio, fit frequentista, fit bayesiano e selezione ML-assisted in termini di stabilità, incertezza e interpretabilità.
+\end{enumerate}
+
+\section{Pipeline operativa proposta}
+
+La pipeline è pensata come estensione progressiva del notebook esistente, non come sostituzione. Ogni blocco produce output diagnostici e può essere discusso separatamente con il docente.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{1cm} L{3.6cm} L{5.2cm} L{2.2cm}}
+\toprule
+\textbf{\#} & \textbf{Blocco} & \textbf{Output principale} & \textbf{Responsabile} \\
+\midrule
+0 & Baseline notebook & Lettura dati, ricostruzione massa, selezione KKK, $A_{raw}$ globale, Dalitz plot & Marco \\
+1 & Fit frequentista & Modello massa signal + background, fitted yields & Marco \\
+2 & Profile likelihood & $A_{raw}$ da fit simultaneo, confidence interval & Marco \\
+3 & Analisi bayesiana & Prior, posterior, MCMC, credible interval, Bayes factor & Giacomo \\
+4 & Toy-MC / validazione & Coverage check dei confidence/credible interval, campionando dal modello di massa fittato & Entrambi \\
+5 & Modulo ML & Weak label da sidebands, classificatori, ROC, stabilità di $A_{raw}$, CV/regolarizzazione & Entrambi \\
+6 & Comparison & Confrontare $A_{raw}$ baseline, fit, bayes e ML-assisted; cross-check Magnet Up/Down; confronto con valori pubblicati & Entrambi \\
+\bottomrule
+\end{tabular}
+\caption{Pipeline operativa con responsabile per blocco.}
+\end{table}
+
+\section{Analisi baseline dal notebook}
+
+La baseline riproduce il notebook originale. In questa fase la stima dell'asimmetria è ottenuta principalmente da conteggi dopo preselezione e selezione di massa: riferimento semplice, confrontabile e vicino al materiale ufficiale.
+
+\subsection*{Quantità principali}
+\begin{itemize}[leftmargin=1.4em]
+    \item Massa invariante del candidato B, ricostruita sommando i quadrimomenti delle tre tracce finali sotto ipotesi di massa K/$\pi$.
+    \item Carica del candidato B, ottenuta dalla somma delle cariche delle particelle finali.
+    \item Asimmetria globale $A_{raw} = \dfrac{N(B^-) - N(B^+)}{N(B^-) + N(B^+)}$.
+    \item Dalitz variables $m^2(h_i h_j)$, usate per evidenziare strutture risonanti e possibili asimmetrie locali.
+    \item Mappe binned di asimmetria locale $A_i$ e significatività $S_i$.
+\end{itemize}
+
+\section{Estensione frequentista \textnormal{\small(responsabile: Marco)}}
+
+\subsection*{Fit di massa}
+La prima estensione sostituisce il conteggio in finestra con un fit del picco di massa. Il modello minimale è una miscela di segnale e background:
+\[
+f(m) = N_s\, S(m;\theta_s) + N_b\, B(m;\theta_b)
+\]
+dove $S$ può essere inizialmente una gaussiana o doppia gaussiana e $B$ un esponenziale o un polinomio di basso grado. Si parte da un fit semplice e si aumenta la complessità solo se giustificato dai residui. Il paper di riferimento LHCb (arXiv:2403.19921, si veda Sez.~14) usa un modello più realistico --- Gaussiana + due Crystal Ball a media condivisa per il segnale, esponenziale per il fondo combinatorio, ARGUS convoluto con una gaussiana per il fondo da decadimenti parzialmente ricostruiti --- utile come riferimento per valutare quanto raffinare il modello.
+
+\subsection*{Fit separato e fit simultaneo}
+\begin{itemize}[leftmargin=1.4em]
+    \item \textbf{Fit separato:} si fittano $B^+$ e $B^-$ separatamente, ottenendo $N_s^+$ e $N_s^-$; poi si calcola $A_{raw}$ dai fitted yields.
+    \item \textbf{Fit simultaneo:} si usa una parametrizzazione comune $N_s^+ = N_s(1-A)/2$ e $N_s^- = N_s(1+A)/2$, stimando direttamente $A$.
+    \item \textbf{Nuisance parameters:} massa centrale, risoluzione e parametri di background sono trattati come nuisance e profilati quando si studia $A$.
+\end{itemize}
+
+\subsection*{Profile likelihood e test $A=0$}
+La statistica di profilo è definita come
+\[
+q(A) = -2\log\!\left[\frac{L(A, \hat{\hat\theta})}{L(\hat A, \hat\theta)}\right].
+\]
+Sotto condizioni regolari, la forma di $q(A)$ permette di ricavare intervalli di confidenza tramite Wilks. Il valore $A=0$ fornisce un test naturale dell'ipotesi di assenza di asimmetria grezza.
+
+\section{Estensione bayesiana \textnormal{\small(responsabile: Giacomo)}}
+
+La riformulazione bayesiana riprende lo stesso modello fisico-statistico del fit, ma considera i parametri come variabili aleatorie. L'obiettivo è confrontare confidence intervals frequentisti e credible intervals bayesiani su $A_{raw}$.
+
+\subsection*{Modello proposto}
+Parametri: $\theta = (N_s, N_b, A, \mu, \sigma, \lambda_{bkg})$. Posterior: $p(\theta \mid m, q) \propto p(m, q \mid \theta)\, p(\theta)$, dove $q$ rappresenta la carica del candidato B.
+
+\subsection*{Prior iniziali}
+\begin{itemize}[leftmargin=1.4em]
+    \item $N_s, N_b$ positivi: prior uniformi larghe o HalfNormal.
+    \item $A \in [-1,1]$: prior uniforme, eventualmente ristretta in una seconda analisi di robustezza.
+    \item $\mu$ vicino alla massa del B: prior gaussiana larga o uniforme in una finestra fisicamente sensata.
+    \item $\sigma$ positivo: HalfNormal o log-uniform debole.
+    \item Parametri di background: prior larghe ma vincolate a forme normalizzabili.
+\end{itemize}
+
+\subsection*{Output bayesiani}
+\begin{itemize}[leftmargin=1.4em]
+    \item Posterior marginale di $A_{raw}$; credible interval 68\% e 95\%.
+    \item \textbf{Diagnostica di convergenza MCMC:} autocorrelation time (\texttt{get\_autocorr\_time} di emcee), acceptance fraction e trace plot delle chain, prima di fidarsi dei campioni per gli output successivi.
+    \item Corner plot dei parametri principali (via \textbf{emcee} + \textbf{corner}).
+    \item Posterior predictive check della distribuzione di massa.
+    \item Confronto diretto con MLE/profile likelihood.
+    \item \textbf{Bayes factor} per il test $A=0$ vs $A$ libero: argomento esplicito di Week~4 del corso, non altrimenti usato nel progetto --- affianca un secondo tipo di test d'ipotesi bayesiano al p-value frequentista.
+\end{itemize}
+
+\section{Validazione: toy-MC coverage check \textnormal{\small(entrambi)}}
+
+\emph{Nota: l'estensione a simulazioni phase-space truth-level per gli altri canali ($K\pi\pi$, $\pi$KK, $\pi\pi\pi$), presente in una versione precedente della proposta, è stata abbandonata per contenere lo scope del progetto. Resta solo l'uso del file \texttt{PhaseSpaceSimulation.root} (canale KKK) già incluso nel notebook ufficiale per la baseline.}
+
+Una volta disponibile il modello di massa fittato (blocchi 1--3), la validazione più utile non richiede nuove simulazioni phase-space: si generano pseudo-dataset campionando direttamente dal modello $f(m)$ fittato (parametric bootstrap), iniettando un valore noto di $A$ (es. $A=0$), si ripetono fit frequentista e posterior bayesiano su molte repliche, e si verifica che la copertura reale dei confidence/credible interval sia coerente con quella nominale (68\%/95\%). Questo è l'unico modo rigoroso per sapere se l'approssimazione di Wilks è affidabile su questo dataset, ed è a basso costo implementativo una volta che i fit dei blocchi 1--3 funzionano.
+
+\section{Modulo machine learning \textnormal{\small(entrambi)}}
+
+Il ML verrà introdotto come strumento ausiliario per migliorare o confrontare la selezione signal/background, non come sostituto del fit fisico. Idea centrale: usare le sidebands di massa per costruire weak label.
+
+\subsection*{Costruzione delle label}
+\begin{itemize}[leftmargin=1.4em]
+    \item Signal-like: eventi in una finestra attorno al picco di massa del B.
+    \item Background-like: eventi nelle sidebands laterali.
+    \item La massa del candidato B non viene usata come feature di input, per ridurre il rischio di mass sculpting.
+    \item Il classificatore produce uno score $s(x)$ interpretato come probabilità o discriminante signal/background.
+    \item \textbf{Class imbalance:} controllare il rapporto tra eventi signal-like e background-like dopo la costruzione delle label ed eventualmente correggere con class weights o resampling --- argomento esplicito di Lecture 12--13 (``gestione di dati reali e class imbalance''), rilevante perché le sidebands possono restituire un numero di eventi molto diverso dalla finestra di segnale.
+\end{itemize}
+
+\subsection*{Modelli}
+\begin{itemize}[leftmargin=1.4em]
+    \item Logistic regression come baseline lineare e interpretabile.
+    \item Random forest o gradient boosting/BDT come modello tabellare forte.
+    \item Feed-forward neural network come estensione coerente con il corso.
+    \item Ensemble o bootstrap per stimare la variabilità del risultato ML.
+\end{itemize}
+
+\subsection*{Validazione}
+\begin{itemize}[leftmargin=1.4em]
+    \item Split esplicito train/validation/test e tuning via cross-validation per BDT/FFNN, con eventuale analisi PCA/correlazione esplorativa sulle feature cinematiche prima della classificazione.
+    \item Feature importance (o permutation importance) sul BDT/RF, per rendere misurabile il criterio di ``interpretabilità'' del confronto finale.
+    \item ROC curve e AUC; background rejection vs signal efficiency.
+    \item Controllo della distribuzione di massa dopo taglio sullo score.
+    \item Stabilità di $A_{raw}$ al variare della soglia ML.
+    \item \textbf{Calibrazione dello score:} reliability diagram (o Brier score) per verificare che $s(x)$ sia davvero interpretabile come probabilità e non solo come discriminante ordinale --- argomento esplicito di Lecture 18 (``tipologie di incertezza nei modelli ML''), altrimenti implicito ma non verificato.
+    \item Confronto fra $A_{raw}$ baseline, $A_{raw}$ da fit e $A_{raw}$ dopo selezione ML-assisted.
+\end{itemize}
+
+\noindent\emph{Stretch goal (opzionale, se il tempo lo permette):} MC Dropout sulla FFNN per un'incertezza epistemica sullo score (Lecture 18) --- nessuna modifica architetturale, solo inferenza ripetuta con dropout attivo a predict-time.
+
+\section{Dalitz plot e asimmetrie locali}
+
+La parte Dalitz non va considerata secondaria. Nei decadimenti a tre corpi le asimmetrie CP possono essere localizzate in regioni specifiche dello spazio delle fasi. Per ogni bin $i$ si definisce
+\[
+A_i = \frac{N_i^- - N_i^+}{N_i^- + N_i^+}, \qquad S_i = \frac{A_i}{\sigma(A_i)},
+\]
+con opportuni controlli statistici quando i conteggi sono bassi. Il campione phase-space KKK già disponibile (\texttt{PhaseSpaceSimulation.root}) permette di testare la procedura in assenza di asimmetria vera.
+
+\noindent\emph{Stretch goal (opzionale, se il tempo lo permette):} usare un classificatore o un clustering per definire regioni del Dalitz plot in modo adattivo, invece del binning fisso, e verificare se emergono zone di asimmetria non catturate dal binning manuale.
+
+\section{Estensioni esplicite della sezione ``Further analyses''}
+
+Il notebook ufficiale termina con una sezione di possibili analisi ulteriori: systematic uncertainties, mass sidebands e fitting distributions. Il progetto nasce precisamente da questa sezione finale.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{3.2cm} L{5.6cm} L{4.3cm}}
+\toprule
+\textbf{Voce nel notebook} & \textbf{Estensione proposta} & \textbf{Output} \\
+\midrule
+Systematic Uncertainties & Variazione finestre di massa, modelli di background, binning Dalitz, soglia ML; cross-check $A_{raw}$ Magnet Up vs Magnet Down (dati già disponibili) & Tabella di stabilità/sistematica \\
+Using mass sidebands & Sideband subtraction e weak label per ML & Confronto sideband vs fit \\
+Fitting distributions & Fit di massa frequentista e bayesiano & Yield, $A_{raw}$, CI/credible intervals \\
+Further analyses & Toy-MC coverage check; confronto qualitativo con gli $A_{CP}$ pubblicati (arXiv:2403.19921) per illustrare perché $A_{raw} \neq A_{CP}$ & Discussione nel report \\
+\bottomrule
+\end{tabular}
+\caption{Mappa di espansione della sezione ``Further analyses''.}
+\end{table}
+
+\section{Deliverable previsti}
+\begin{itemize}[leftmargin=1.4em]
+    \item Report finale con descrizione fisica, dataset, metodi, risultati e confronto.
+    \item Notebook o set di notebook modulari con codice riproducibile.
+    \item Grafici: massa invariante, fit, residui/pull, profile likelihood, posterior, corner plot, Bayes factor, Dalitz plot, mappe locali, ROC curve, feature importance.
+    \item Tabella finale con $A_{raw}$ stimata tramite conteggio, fit frequentista, fit bayesiano e analisi ML-assisted, più cross-check Magnet Up/Down.
+    \item Script riproducibile per il toy-MC coverage check (campionamento dal modello di massa fittato).
+    \item Sezione finale di limiti: assenza di detector-level simulation completa, efficienze non corrette, uso di weak labels per ML.
+\end{itemize}
+
+\section{Piano di lavoro}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{1cm} L{1.6cm} L{4.4cm} L{3.2cm} L{2cm}}
+\toprule
+\textbf{Fase} & \textbf{Ore} & \textbf{Attività} & \textbf{Output} & \textbf{Chi} \\
+\midrule
+1 & 6--8 & Riproduzione notebook e controllo dati/path & Baseline funzionante & Marco \\
+2 & 6--8 & Massa, selezioni, $A_{raw}$ globale e Dalitz plot & Grafici base & Marco \\
+3 & 8--10 & Fit frequentista e profile likelihood & $A_{raw}$ fit + CI & Marco \\
+4 & 8--10 & Bayesian/MCMC + Bayes factor & Posterior + credible interval & Giacomo \\
+5 & 4--6 & Toy-MC coverage check & Validazione copertura CI/credible interval & Entrambi \\
+6 & 8--12 & ML sideband-based + CV/feature importance & ROC + confronto score cut & Entrambi \\
+7 & 6--8 & Report, rifinitura grafici e discussione & Deliverable finale & Entrambi \\
+\bottomrule
+\end{tabular}
+\caption{Piano di lavoro con ore indicative e responsabile.}
+\end{table}
+
+\section{Rischi e mitigazioni}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{L{5.5cm} L{7.5cm}}
+\toprule
+\textbf{Rischio} & \textbf{Mitigazione} \\
+\midrule
+Fit troppo instabile o modello non adeguato & Partire da un modello minimale; usare range di massa limitato; confrontare modelli solo se giustificato. \\
+Interpretazione errata di $A_{raw}$ come CP asymmetry corretta & Chiamarla esplicitamente $A_{raw}$; discutere produzione, detector asymmetry ed efficienze come limiti; confrontare con gli $A_{CP}$ pubblicati. \\
+ML introduce bias o mass sculpting & Non usare la massa come feature; controllare massa post-selection; studiare stabilità vs soglia. \\
+Analisi troppo ampia & Definire versione minima: notebook + fit frequentista + confronto con conteggio. Bayes/ML come livelli successivi; niente simulazioni phase-space multicanale (abbandonate). \\
+Le due parti (frequentista/bayesiana) divergono nella preselezione o nel modello di massa & Modulo di lettura dati e parametrizzazione $f(m)$ condivisi fin dall'inizio tra Marco e Giacomo (si veda Sez.~1). \\
+\bottomrule
+\end{tabular}
+\caption{Rischi identificati e relative mitigazioni.}
+\end{table}
+
+\section{Domande da discutere con il professore}
+\begin{enumerate}[leftmargin=1.4em]
+    \item L'asimmetria da riportare deve rimanere $A_{raw}$ o si vuole discutere almeno qualitativamente la correzione a CP asymmetry?
+    \item Quale livello di complessità è appropriato per il modello di massa: gaussiana+esponenziale o forme più realistiche (es. Crystal Ball + ARGUS, come nel paper di riferimento)?
+    \item La parte bayesiana deve essere centrale o presentata come confronto metodologico?
+    \item Il ML deve essere usato solo per signal/background o anche per studi sul Dalitz plot?
+    \item Quanto spazio dare a sistematiche, sidebands e stabilità del risultato?
+\end{enumerate}
+
+\section{Prossimi passi immediati}
+\begin{itemize}[leftmargin=1.4em]
+    \item \textbf{Marco:} eseguire \texttt{LHCb\_Open\_Data\_Project.ipynb} end-to-end per ottenere la baseline (lettura dati, massa invariante, $A_{raw}$ da conteggio, Dalitz plot), poi costruire il modello di massa signal + background con \textbf{iminuit}.
+    \item \textbf{Giacomo:} definire il modello statistico bayesiano (parametri $\theta = (N_s, N_b, A, \mu, \sigma, \lambda_{bkg})$ e prior) sullo stesso modello di massa concordato con Marco, e preparare il setup \textbf{emcee}.
+\end{itemize}
+
+\section{Conclusione}
+
+La proposta è robusta perché parte da un notebook ufficiale e da dati reali pubblici, ma introduce un chiaro avanzamento metodologico. Il progetto, ora svolto in coppia con compiti chiaramente divisi ma coordinati su un modello condiviso, permette di mostrare competenze in analisi dati HEP, fit statistici, inferenza bayesiana, simulazione Monte Carlo e machine learning, mantenendo un legame diretto con un problema fisico interpretabile: la misura di differenze materia-antimateria nei decadimenti a tre corpi dei mesoni B carichi.
+
+\section*{Riferimenti}
+\begin{enumerate}[leftmargin=1.4em]
+    \item CERN Open Data, \emph{Matter Antimatter Differences -- B meson decays to three hadrons}, record 4900. \url{https://opendata.cern.ch/record/4900}
+    \item CERN Open Data, \emph{Matter Antimatter Differences -- Project Notebook}, record 4902. \url{https://opendata.cern.ch/record/4902}
+    \item CERN, \emph{Largest matter-antimatter asymmetry observed}, 18 marzo 2022. \url{https://home.cern/largest-matter-antimatter-asymmetry-observed/}
+    \item L. Falcão on behalf of the LHCb Collaboration, \emph{CP violation measurements in three-body charmless B decays}, CKM2023 proceedings, arXiv:2403.19921 [hep-ex].
+    \item \emph{Statistics \& Machine Learning Course Overview}, documento del corso.
+    \item \texttt{LHCb\_Open\_Data\_Project.ipynb}, notebook ufficiale usato come base operativa.
+\end{enumerate}
+
+\end{document}
