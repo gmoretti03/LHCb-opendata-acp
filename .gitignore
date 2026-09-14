@@ -1,2 +1,7 @@
-fededegu_martiborsa/LHCb/Statistics
-fededegu_martiborsa/LHCb/opendata-project
+Statistics/
+opendata-project/
+
+# OS / editor junk
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
