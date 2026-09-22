@@ -1,0 +1,138 @@
+\documentclass[%
+ reprint,
+ nofootinbib,
+ amsmath,amssymb,
+ aps,
+ floatfix,
+]{revtex4-2}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{comment}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{colorlinks = false}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{xspace}
+
+\renewcommand{\thefigure}{\Roman{figure}}
+
+% unit / symbol macros, mirroring the style used in lhc_anomaly_detection/main.tex
+\newcommand{\GeV}{\ensuremath{\,\text{Ge\hspace{-.08em}V}}\xspace}
+\newcommand{\MeV}{\ensuremath{\,\text{Me\hspace{-.08em}V}}\xspace}
+\newcommand{\Araw}{\ensuremath{A_{\mathrm{raw}}}\xspace}
+\newcommand{\ACP}{\ensuremath{A_{CP}}\xspace}
+
+% TODO markers -- remove once every section has real content
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+\begin{document}
+\pagestyle{plain}
+
+\title{Frequentist, Bayesian and Machine Learning Analysis of the Matter--Antimatter Asymmetry in $B^{\pm} \to K^{\pm} K^{+} K^{-}$ Decays at LHCb\\[2.0ex]
+\small Final project for the \textit{Statistics and Data Analysis} course\\
+\small Academic Year 2025--2026}
+
+\author{Giacomo Moretti}
+\author{Marco Belotti}
+\affiliation{Università degli Studi di Milano-Bicocca}
+
+\begin{abstract}
+\todo{Giacomo + Marco, write last. 3--5 sentences: dataset (LHCb Open Data, $B^{\pm} \to K^{\pm} K^{+} K^{-}$), the three methodological approaches compared (frequentist MLE/profile likelihood, Bayesian MCMC, ML-assisted selection), the headline result ($\Araw$ estimate + consistency across methods), one sentence on what's new/interesting (e.g. goodness-of-fit model comparison, local Dalitz asymmetries). Don't give every number here -- see \S\ref{sec:conclusions} guidance.}
+\end{abstract}
+\maketitle
+
+\section{Introduction}
+\label{sec:intro}
+\todo{Shared. Physics motivation: CP violation, matter-antimatter asymmetry, why three-body charmless B decays are interesting (Dalitz structure allows both global and local asymmetry studies). Cite the LHCb Open Data record and the reference paper (arXiv:2403.19921). State the research question (see \texttt{Docs/Proposta\_progetto\_LHCb\_gruppo.tex}, already written) and preview the three-way methodological comparison.}
+
+\section{Data}
+\label{sec:data}
+\todo{Shared -- this section can largely reuse material already written/verified: dataset description (record 4900, 2011 data, $\sqrt{s}=7$\,TeV), branch schema, and the shared preselection. See \texttt{Docs/Proposta\_progetto\_LHCb\_gruppo.tex} \S4 and \texttt{lhcb\_bayesian\_coding\_notes} memory for the exact preselection cut and the real-data mass distribution findings (peak $\sim$5284\,\MeV, background rise below 5150\,\MeV).}
+
+\subsection{Dataset and Preselection}
+\todo{Describe the B2HHH ntuples, the shared preselection cut, and the H1-is-always-bachelor convention discovered while implementing the Dalitz analysis.}
+
+\subsection{Invariant Mass Reconstruction}
+\todo{Kaon-mass-hypothesis four-vector sum, fit window choice [5150,5450]\,\MeV and why (background rise below 5150\,\MeV).}
+
+\subsection{Data Exploration}
+\todo{Mass spectrum plot (already have this, generated in \texttt{bayes} notebook), magnet up/down split, class balance for the ML labels.}
+
+\section{Frequentist Analysis}
+\label{sec:frequentist}
+\todo{Marco. Mass model $f(m)=N_s S(m) + N_b B(m)$, simultaneous fit parametrized on $A$, MLE via iminuit, profile likelihood $q(A)$, confidence interval, systematic uncertainties. See \texttt{Code\_general/Frequentist/} on branch \texttt{freq} once populated.}
+
+\subsection{Mass Model and Fit Strategy}
+\subsection{Profile Likelihood and Confidence Interval}
+\subsection{Systematic Uncertainties}
+
+\section{Bayesian Analysis}
+\label{sec:bayesian}
+\todo{Giacomo -- this section is the most ready to draft for real, branch \texttt{bayes} is complete. Pull directly from \texttt{Code\_general/Bayesian/bayesian\_model.py} and \texttt{results/posterior\_summary.json}: model/priors, emcee sampling + convergence diagnostics, posterior results ($\Araw=-0.0497$, 68\% CI $[-0.058,-0.041]$), Savage-Dickey Bayes factor (with the bandwidth-sensitivity caveat), goodness-of-fit model comparison (Gaussian $\chi^2$/ndof=2.36 $\to$ Crystal Ball fixed=4.50 $\to$ Crystal Ball free=2.00), magnet up/down cross-check, toy-MC coverage check, systematic variations, Dalitz local asymmetry.}
+
+\subsection{Model and Priors}
+\subsection{MCMC Sampling and Convergence Diagnostics}
+\subsection{Posterior Results and Credible Intervals}
+\subsection{Bayes Factor: $A=0$ vs $A$ Free}
+\subsection{Goodness-of-Fit and Signal Model Comparison}
+\subsection{Systematic Checks: Mass Window, Background Model, Magnet Polarity}
+\subsection{Toy-MC Coverage Validation}
+
+\section{Machine Learning Module}
+\label{sec:ml}
+\todo{Shared -- branch \texttt{mach\_lear} is complete. Pull from \texttt{Code\_general/Machine\_Learning/ML\_Analysis.ipynb} and \texttt{results/ml\_summary.json}: weak-label construction from sidebands, feature set, model comparison (LogReg/Tree/RF/GBM/FFNN, AUC table), regularization study, bias-variance curve, calibration (+ isotonic recalibration result), uncertainty quantification (MC Dropout vs RF ensemble-variance, and why they disagree), hyperparameter/architecture search, $\Araw$ vs threshold stability with bootstrap errors, K-means on the Dalitz plot.}
+
+\subsection{Weak Labels and Feature Set}
+\subsection{Model Comparison}
+\subsection{Regularization, Bias-Variance, and Calibration}
+\subsection{Uncertainty Quantification}
+\subsection{K-means on the Dalitz Plot}
+\subsection{Stability of $A_{\mathrm{raw}}$ under ML Selection}
+
+\section{Comparison and Discussion}
+\label{sec:comparison}
+\todo{Shared, written last once \S\ref{sec:frequentist} exists -- the one section that genuinely can't be finished without Marco. Headline comparison table: $\Araw$ (counting, frequentist, Bayesian, ML-assisted) with uncertainties, side by side. Comparison with the published $\ACP$(KKK) value from arXiv:2403.19921 and discussion of why $\Araw \neq \ACP$. Local Dalitz-plot asymmetry: fixed binning vs K-means, and whether the frequentist local significance study (if Marco does one) agrees.}
+
+\section{Limitations and Future Work}
+\label{sec:limitations}
+\todo{Shared. This section can be drafted almost entirely NOW by condensing the already-written "Limiti noti" lists -- don't re-derive, translate/tighten what's already there:
+\begin{itemize}
+    \item From \texttt{bayes}: background assumed symmetric between charges (not validated independently of the magnet cross-check); Savage-Dickey Bayes factor's exact value is bandwidth-fragile (only the qualitative conclusion is robust); toy-MC coverage used a limited number of replicas and showed a mild (${\sim}1.3\sigma$) hint of undercoverage, not fully resolved; even the best signal model (Crystal Ball, floated shape) gives $\chi^2$/ndof$\,{\approx}\,2$, not $\approx 1$; Dalitz local-asymmetry binning is coarse.
+    \item From \texttt{mach\_lear}: severe class imbalance in the weak labels (1217 background-like vs 15119 signal-like); MC Dropout and RF ensemble-variance uncertainty estimates disagree by ${\sim}18\times$ in absolute scale (only weakly correlated per-event, $\rho\approx0.24$); hyperparameter/architecture search used a non-exhaustive grid; the $\Araw$-vs-threshold check is simple post-cut counting, not a full mass refit on the ML-selected sample.
+    \item Cross-cutting: the mass window, background model, and signal-region definition were chosen from the Bayesian fit alone and still need to be reconciled with Marco's frequentist choices; no detector-level systematic (efficiency, production asymmetry) correction is applied anywhere -- $\Araw$ is explicitly NOT $\ACP$.
+\end{itemize}
+Future work: sWeight-based (not simple-cut) local Dalitz asymmetry; full mass refit after ML selection instead of counting; extend the toy-MC coverage study with more replicas.}
+
+\section{Conclusions}
+\label{sec:conclusions}
+\todo{Shared. Short -- synthesize ONE key message per method (does not need to restate every number from the Results sections), following the reference report's style: state what was learned methodologically (e.g. "a minimal Gaussian+exponential model is insufficient, a Crystal Ball with floated shape parameters improves the fit without moving $\Araw$"), not just what was measured.}
+
+\section{Author Contributions}
+\label{sec:contributions}
+Marco Belotti led the frequentist analysis (Sec.~\ref{sec:frequentist}): completion of the baseline notebook, mass model, and profile-likelihood confidence interval. Giacomo Moretti led the Bayesian analysis (Sec.~\ref{sec:bayesian}): model definition, MCMC sampling, convergence diagnostics, Bayes factor, and the associated systematic/goodness-of-fit studies. The machine learning module (Sec.~\ref{sec:ml}), the phase-space/toy-MC validation work, the Dalitz-plot analyses, and the final cross-method comparison (Sec.~\ref{sec:comparison}) were carried out jointly. Both authors contributed to the manuscript.
+
+\section{Code and Data Availability}
+\label{sec:code}
+All code is written in Python $\geq$3.12, run in a dedicated \texttt{conda} environment (\texttt{cern}). Key package versions: \texttt{uproot 5.7}, \texttt{iminuit 2.32} \todo{Marco confirm}, \texttt{emcee 3.1.6}, \texttt{corner 2.3.0}, \texttt{scikit-learn 1.9}, \texttt{tensorflow 2.21.0}, \texttt{keras 3.15.1}, \texttt{scipy 1.18}, \texttt{numpy 2.4}, \texttt{pandas 3.0}.
+
+The dataset is the CERN Open Data record \href{https://opendata.cern.ch/record/4900}{4900} ("Matter Antimatter Differences -- B meson decays to three hadrons"). Analysis code is organized per branch in the project git repository: \texttt{Code\_general/Frequentist/}, \texttt{Code\_general/Bayesian/}, \texttt{Code\_general/Machine\_Learning/}.
+
+\appendix
+\section{Full results tables}
+\label{sec:appendix}
+\todo{Shared. Mirror the reference report's appendix style: every tested variant in one table, chosen/final result highlighted. Needs (a) Bayesian systematic-variation table (5 rows: nominal + 4 variants, already in \texttt{results/posterior\_summary.json} on \texttt{bayes}), (b) ML model-comparison table (all 6 classifiers x AUC/Brier, already in \texttt{results/ml\_summary.json}), (c) ML hyperparameter/architecture search table (RF/GBM grid + FFNN architecture search top results), (d) frequentist fit results once Marco has them.}
+
+\bibliography{biblio}
+
+\end{document}
