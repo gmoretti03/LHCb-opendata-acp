@@ -1,7 +1,7 @@
 Statistics_exe/
 Statistics_pdf/
 opendata-project/
-
+lhc_anomaly_detection/
 # OS / editor junk
 .DS_Store
 .ipynb_checkpoints/
