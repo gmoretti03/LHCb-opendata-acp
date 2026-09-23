@@ -5,11 +5,8 @@
     "n_sideband": 1217,
     "n_plus": 637,
     "n_minus": 580,
-    "A_sideband": -0.046835661463434674,
-    "sigma_A_sideband": 0.02863519671848665,
-    "low_mass_sideband": {"n": 689, "n_plus": 359, "n_minus": 330, "A": -0.0420899854862119, "sigma_A": 0.03806320526758154},
-    "high_mass_sideband": {"n": 528, "n_plus": 278, "n_minus": 250, "A": -0.05303030303030303, "sigma_A": 0.043458177974689205},
-    "note": "direct empirical check of the N_b+ = N_b- = N_b/2 assumption; result is compatible with zero at 1.64 sigma (not significant), but the point estimate has the same sign and similar magnitude as the measured signal-region A_raw -- the check has limited statistical power given the small sideband sample (n=1217), so it does not fully resolve the concern, only adds a genuine empirical data point"
+    "A_sideband": -0.04683648315529992,
+    "sigma_A_sideband": 0.028633724447151496
   },
   "n_events_fit_window": 17839,
   "mass_window_MeV": [
@@ -54,10 +51,10 @@
     ]
   },
   "toy_mc_coverage": {
-    "n_toys": 60,
-    "nsteps_toy": 3000,
-    "empirical_coverage_68": 0.6,
-    "empirical_coverage_95": 0.9333333333333333,
+    "n_toys": 100,
+    "nsteps_toy": 3500,
+    "empirical_coverage_68": 0.63,
+    "empirical_coverage_95": 0.95,
     "nominal_68": 0.68,
     "nominal_95": 0.95
   },
