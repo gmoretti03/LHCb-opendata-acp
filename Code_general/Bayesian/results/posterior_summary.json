@@ -51,10 +51,10 @@
     ]
   },
   "toy_mc_coverage": {
-    "n_toys": 100,
+    "n_toys": 500,
     "nsteps_toy": 3500,
-    "empirical_coverage_68": 0.63,
-    "empirical_coverage_95": 0.95,
+    "empirical_coverage_68": 0.664,
+    "empirical_coverage_95": 0.962,
     "nominal_68": 0.68,
     "nominal_95": 0.95
   },
