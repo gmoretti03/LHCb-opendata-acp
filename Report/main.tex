@@ -90,11 +90,27 @@ Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit 
 
 \section{Frequentist Analysis}
 \label{sec:frequentist}
-\todo{Marco. Mass model $f(m)=N_s S(m) + N_b B(m)$, simultaneous fit parametrized on $A$, MLE via iminuit, profile likelihood $q(A)$, confidence interval, systematic uncertainties. See \texttt{Code\_general/Frequentist/} on branch \texttt{freq} once populated.}
+As of this draft, branch \texttt{freq} (Marco's) still holds only the pristine official starting notebook plus a TODO checklist -- none of the numerical results below have been produced yet. The subsections are laid out now, following the shared plan (\texttt{Docs/Proposta\_progetto\_LHCb\_gruppo.tex}, \S ``Estensione frequentista''), so results can be dropped in directly once available, with the same structure and cross-references as the parallel Bayesian analysis (Sec.~\ref{sec:bayesian}).
 
 \subsection{Mass Model and Fit Strategy}
+\label{sec:freq_model}
+The frequentist fit reuses the same physical mass model as the Bayesian analysis (Sec.~\ref{sec:bayes_model}), $f(m)=N_s\,S(m;\theta_s)+N_b\,B(m;\theta_b)$, estimated by unbinned maximum likelihood (\texttt{iminuit}, \texttt{iminuit.cost.UnbinnedNLL}) rather than by MCMC. The plan is to start from the same minimal shapes as the Bayesian baseline (Gaussian signal, exponential background) and increase model complexity only if the residuals justify it -- mirroring the Bayesian goodness-of-fit finding (Sec.~\ref{sec:bayes_gof}) that the minimal model is not fully adequate ($\chi^2/\text{ndof}=2.36$) and that a Crystal Ball with floated tail parameters improves it. \todo{Marco -- fill in once the mass fit is run: final signal/background shapes chosen, fitted yields $N_s,N_b$, and any residual-based justification for departing from the minimal model.}
+
+\subsection{Separate vs.\ Simultaneous Fit}
+\label{sec:freq_simfit}
+Two parametrizations are planned: a \emph{separate} fit of $B^+$ and $B^-$ independently, giving $N_s^+$ and $N_s^-$ from which $\Araw$ is computed post hoc, and a \emph{simultaneous} fit using the shared parametrization $N_s^+=N_s(1-A)/2$, $N_s^-=N_s(1+A)/2$ (the same parametrization already used on the Bayesian side, Sec.~\ref{sec:bayes_model}) that estimates $A$ directly as a fit parameter. Mass, resolution, and background-shape parameters are treated as nuisance parameters, profiled out when reporting the uncertainty on $A$. \todo{Marco -- report $\Araw$ from both parametrizations (should agree if the model is well-specified) and flag any disagreement as a modeling issue rather than a physics result.}
+
 \subsection{Profile Likelihood and Confidence Interval}
+\label{sec:freq_ci}
+The profile likelihood ratio,
+\[
+q(A) = -2\log\frac{L(A,\hat{\hat\theta})}{L(\hat A,\hat\theta)},
+\]
+is used to derive a confidence interval on $A$ via Wilks' theorem, and to test the null hypothesis $A=0$ -- the frequentist counterpart of the Bayesian Savage-Dickey test of Sec.~\ref{sec:bayes_factor}. \todo{Marco -- report the MLE $\hat A$, the 68\%/95\% profile-likelihood confidence intervals, and the $p$-value/significance against $A=0$; compare directly against the Bayesian credible interval of Sec.~\ref{sec:bayes_posterior} ($\Araw=-0.0497$, 68\% CI $[-0.058,-0.041]$) once available.}
+
 \subsection{Systematic Uncertainties}
+\label{sec:freq_syst}
+\todo{Marco -- systematic-uncertainty study, analogous in spirit to the Bayesian systematic-variation table of Sec.~\ref{sec:bayes_syst} (Table~\ref{tab:bayes_systematics}: mass window, background shape, signal-model choice), so the two can be placed side by side in Sec.~\ref{sec:comparison} and in Appendix~\ref{sec:appendix}.}
 
 \section{Bayesian Analysis}
 \label{sec:bayesian}
