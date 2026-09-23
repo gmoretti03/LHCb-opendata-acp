@@ -54,20 +54,39 @@
 
 \section{Introduction}
 \label{sec:intro}
-\todo{Shared. Physics motivation: CP violation, matter-antimatter asymmetry, why three-body charmless B decays are interesting (Dalitz structure allows both global and local asymmetry studies). Cite the LHCb Open Data record and the reference paper (arXiv:2403.19921). State the research question (see \texttt{Docs/Proposta\_progetto\_LHCb\_gruppo.tex}, already written) and preview the three-way methodological comparison.}
+Charge-parity (CP) violation -- the small observed asymmetry between the behavior of matter and antimatter -- is one of the necessary ingredients for the matter-dominated universe we observe, yet the CP violation built into the Standard Model is far too small to account for it. Studying CP violation in the decays of $B$ mesons, where it is comparatively large and experimentally accessible, is one of the main ways to test the Standard Model's CKM description of the effect and search for physics beyond it. Charmless three-body decays such as $B^{\pm}\to h^{\pm}h^{+}h^{-}$ ($h=K,\pi$) are especially interesting in this respect: unlike a two-body decay, the three-body phase space (the Dalitz plot) allows the raw asymmetry $\Araw$ to be studied not only as a single global number, but also \emph{locally}, since interference between intermediate resonances can concentrate CP-violating effects in specific kinematic regions rather than spreading them uniformly~\cite{lhcb_cpv_paper}.
+
+This project uses the LHCb Open Data record for $B^{\pm}\to K^{\pm}K^{+}K^{-}$~\cite{opendata_record} to address the research question: \emph{to what extent do frequentist likelihood fits, Bayesian inference, and machine-learning-assisted event selection produce consistent, well-controlled estimates of the raw asymmetry $\Araw$ in this decay?} The goal is not to reproduce a competitive LHCb-quality measurement, but to build, on top of a validated public dataset and starting notebook~\cite{opendata_notebook}, a methodologically rigorous project that puts these three inference frameworks -- covered separately in the course -- side by side on the exact same data and the exact same physical question. Section~\ref{sec:data} describes the dataset and the preselection shared by all three modules; Secs.~\ref{sec:frequentist}--\ref{sec:ml} present the frequentist, Bayesian, and machine-learning analyses respectively; Sec.~\ref{sec:comparison} brings the three together.
 
 \section{Data}
 \label{sec:data}
-\todo{Shared -- this section can largely reuse material already written/verified: dataset description (record 4900, 2011 data, $\sqrt{s}=7$\,TeV), branch schema, and the shared preselection. See \texttt{Docs/Proposta\_progetto\_LHCb\_gruppo.tex} \S4 and \texttt{lhcb\_bayesian\_coding\_notes} memory for the exact preselection cut and the real-data mass distribution findings (peak $\sim$5284\,\MeV, background rise below 5150\,\MeV).}
 
 \subsection{Dataset and Preselection}
-\todo{Describe the B2HHH ntuples, the shared preselection cut, and the H1-is-always-bachelor convention discovered while implementing the Dalitz analysis.}
+\label{sec:data_presel}
+The dataset is the CERN Open Data record 4900, ``Matter Antimatter Differences -- B meson decays to three hadrons''~\cite{opendata_record}: candidates for $B^{\pm}\to h^{\pm}h^{+}h^{-}$ decays collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, reconstructed with the LHCb software and already passed through trigger and offline selection. The data are distributed as ROOT \texttt{TTree}s (\texttt{DecayTree}) containing only the most relevant reconstructed branches, split across two files by magnet polarity (magnet up/down), for a combined $8{,}556{,}118$ candidates. The same record also includes a simplified, detector-response-free phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$, used in this project only as a kinematic cross-check, never as a stand-in for full detector-level simulation.
+
+For each of the three final-state tracks ($H1$, $H2$, $H3$) the analysis reads momentum components (\texttt{PX}, \texttt{PY}, \texttt{PZ}), PID likelihoods (\texttt{ProbK}, \texttt{ProbPi}), a muon flag (\texttt{isMuon}), and the track charge -- 18 kinematic/PID branches plus 3 charges. All three analysis modules (frequentist, Bayesian, machine learning) share the same preselection, agreed at the start of the project so results stay comparable: a kaon-PID cut and a muon veto applied to all three tracks,
+\[
+\texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
+\]
+which retains $23{,}895$ of the $8{,}556{,}118$ read candidates ($0.28\%$) -- the PID requirement, applied on all three tracks simultaneously, is by far the dominant reduction, consistent with selecting a comparatively pure $KKK$ final state out of a much larger, PID-unconstrained sample.
+
+While implementing the Dalitz-plot analysis (Sec.~\ref{sec:ml_kmeans}), it was found that in this dataset $H1$ is, by construction, always the track of opposite charge to the other two: only the charge combinations $(+1,-1,-1)$ and $(-1,+1,+1)$ occur for $(H1,H2,H3)$. Equivalently, $H2$ and $H3$ are always the same-sign, interchangeable pair (the two kaons sharing the sign of the $B$), while $H1$ is the unique ``bachelor'' track of the opposite sign -- a labeling convention that matters when constructing unambiguous Dalitz-plot variables from the two same-sign-pair invariant masses.
 
 \subsection{Invariant Mass Reconstruction}
-\todo{Kaon-mass-hypothesis four-vector sum, fit window choice [5150,5450]\,\MeV and why (background rise below 5150\,\MeV).}
+\label{sec:data_mass}
+The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K=493.677\,\MeV$) regardless of their PID likelihoods, and their four-momenta are summed to reconstruct the $B$ candidate, $m(KKK)=\sqrt{(\sum_i E_i)^2-|\sum_i \vec{p}_i|^2}$. A first look at the full reconstructed mass range showed a rise in combinatorial background below $\sim$5150\,\MeV, consistent with a partially-reconstructed contribution that a single exponential background shape cannot describe; the fit window used throughout this project -- by both the frequentist and Bayesian modules, and to build the ML weak labels (Sec.~\ref{sec:ml_labels}) -- was therefore set to $[5150,5450]\,\MeV$. This leaves $17{,}839$ preselected candidates in the fit window: $9358$ with $B$-charge $+1$ and $8481$ with $B$-charge $-1$, split $10{,}500$ (magnet down) / $7339$ (magnet up).
 
 \subsection{Data Exploration}
-\todo{Mass spectrum plot (already have this, generated in \texttt{bayes} notebook), magnet up/down split, class balance for the ML labels.}
+\label{sec:data_exploration}
+Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit window, split by $B$ charge (left) and by magnet polarity (right). The spectrum peaks at $m\approx5284\,\MeV$ with a visible signal excess over a falling combinatorial background, and its shape is qualitatively similar for the two charges and the two magnet polarities -- as expected, since a large raw asymmetry would already be visible by eye at this level. The simple charge-counting asymmetry on the full fit-window sample, $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.049$, is consistent with every fit-based estimate obtained later in the project (Secs.~\ref{sec:bayes_posterior}, \ref{sec:ml_stability}) and serves as a useful, assumption-free sanity check throughout. For the ML module, the corresponding weak-label class balance ($15{,}119$ signal-like vs.\ $1217$ background-like events, Sec.~\ref{sec:ml_labels}) reflects the same high-purity signal region, seen here from the sideband side rather than the counting side.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/mass_spectrum.pdf}
+\caption{Reconstructed $B\to KKK$ invariant mass in the fit window $[5150,5450]\,\MeV$, split by $B$ charge (left) and by magnet polarity (right). Both splits show a consistent peak at $m\approx5284\,\MeV$ over a falling combinatorial background.}
+\label{fig:mass_spectrum}
+\end{figure*}
 
 \section{Frequentist Analysis}
 \label{sec:frequentist}
@@ -79,26 +98,128 @@
 
 \section{Bayesian Analysis}
 \label{sec:bayesian}
-\todo{Giacomo -- this section is the most ready to draft for real, branch \texttt{bayes} is complete. Pull directly from \texttt{Code\_general/Bayesian/bayesian\_model.py} and \texttt{results/posterior\_summary.json}: model/priors, emcee sampling + convergence diagnostics, posterior results ($\Araw=-0.0497$, 68\% CI $[-0.058,-0.041]$), Savage-Dickey Bayes factor (with the bandwidth-sensitivity caveat), goodness-of-fit model comparison (Gaussian $\chi^2$/ndof=2.36 $\to$ Crystal Ball fixed=4.50 $\to$ Crystal Ball free=2.00), magnet up/down cross-check, toy-MC coverage check, systematic variations, Dalitz local asymmetry.}
 
 \subsection{Model and Priors}
+\label{sec:bayes_model}
+The Bayesian analysis reuses the same physical mass model as the frequentist fit (Sec.~\ref{sec:frequentist}): a signal-plus-background mixture
+\[
+f(m) = N_s\, S(m;\mu,\sigma) + N_b\, B(m;\lambda),
+\]
+with $S$ a truncated Gaussian and $B$ a truncated exponential, both normalized on the fit window $[5150,5450]\,\MeV$. The window was narrowed from the full simulation range to avoid a rise in background below $5150\,\MeV$, consistent with a partially-reconstructed contribution that a single exponential cannot describe (Sec.~\ref{sec:data}). The signal yield is split between the two $B$-meson charges through a simultaneous parametrization, $N_s^+ = N_s(1-A)/2$ and $N_s^- = N_s(1+A)/2$, so that $A$ is fit directly rather than derived from two independent yields; the background is assumed to be shared equally between charges, $N_b^{\pm}=N_b/2$.
+
+The full parameter vector is $\theta=(N_s,N_b,A,\mu,\sigma,\lambda)$, with independent bounded-uniform priors (returning a flat log-density inside the bound and $-\infty$ outside), following the convention used throughout the course's own MCMC exercises: $N_s,N_b\in(0,5N)$ with $N=17839$ the number of selected events, $A\in(-1,1)$, $\mu\in(5260,5310)\,\MeV$, $\sigma\in(3,40)\,\MeV$, $\lambda\in(10^{-5},0.05)\,\MeV^{-1}$. Bounds and the walker starting point were set from a first look at the real preselected mass spectrum (peak at $\mu\approx5283\,\MeV$).
+
 \subsection{MCMC Sampling and Convergence Diagnostics}
+\label{sec:bayes_mcmc}
+The posterior was sampled with \texttt{emcee} using an ensemble of 32 walkers initialized in a narrow ball around the data-driven starting point, run for 9000 steps with the first 1500 ($\sim$1/6) discarded as burn-in. The mean acceptance fraction was $0.52$. Convergence was checked via the integrated autocorrelation time $\tau$ for each parameter ($\tau\in[58,79]$ steps), giving $N/\tau\gtrsim110$ post-burn-in samples per walker for every parameter -- comfortably above the rule-of-thumb threshold of 50 recommended for a reliable $\tau$ estimate. This diagnostic is not part of the course material (no exercise notebook computes it) and was added as a deliberate methodological addition, since neither posterior summaries nor credible intervals are trustworthy without first checking the chains have mixed.
+
 \subsection{Posterior Results and Credible Intervals}
+\label{sec:bayes_posterior}
+The marginal posterior on the raw asymmetry is
+\[
+\Araw = -0.0497,
+\]
+with $68\%$ CI $[-0.058,-0.041]$ and $95\%$ CI $[-0.066,-0.033]$,
+consistent with the naive counting asymmetry on the same sample ($-0.049$) and with the same sign and order of magnitude as the published $\ACP(KKK)=-0.037\pm0.003$ from Ref.~\cite{lhcb_cpv_paper} -- a sanity check only, since $\Araw$ is not corrected for selection efficiency or production asymmetry and is therefore not directly comparable to $\ACP$ (Sec.~\ref{sec:comparison}).
+
 \subsection{Bayes Factor: $A=0$ vs $A$ Free}
+\label{sec:bayes_factor}
+The course's own worked example (Week 4) computes a Bayes factor by direct numerical integration of the evidence on a 1D grid, which does not scale to our 6-parameter posterior. We instead use the Savage-Dickey density ratio,
+\[
+BF_{01} = \frac{p(A=0\mid\text{data})}{\pi(A=0)},
+\]
+estimating the posterior density at $A=0$ with a Gaussian KDE on the flattened $A$ chain and using the analytically known uniform prior density $\pi(A=0)=1/2$; equal prior odds between $H_0$ ($A=0$) and $H_1$ ($A$ free) are assumed, so $BF_{01}$ equals the posterior odds directly. At the default (Silverman) bandwidth, $BF_{01}\approx3\times10^{-59}$, overwhelming evidence against $A=0$. However, $BF_{01}$ is extremely sensitive to the KDE bandwidth -- varying it by a factor 0.5--3 changes the estimate by more than 200 orders of magnitude ($2.5\times10^{-228}$ to $1.7\times10^{-9}$), because $A=0$ lies roughly $6\sigma$ into the tail of a posterior that is many bandwidths wide. The exact value of $BF_{01}$ is therefore not meaningful, but the qualitative conclusion -- decisive evidence against $A=0$ -- is robust across the entire tested bandwidth range.
+
 \subsection{Goodness-of-Fit and Signal Model Comparison}
+\label{sec:bayes_gof}
+A binned pull comparison ($\chi^2=\sum(\text{obs}-\text{exp})^2/\text{exp}$ over 30 mass bins per charge) shows the minimal Gaussian signal model does not fully describe the data: $\chi^2/\text{ndof}=2.36$ (54 dof). Table~\ref{tab:gof} compares three signal-shape choices. Fixing the Crystal Ball tail parameters to literature-typical values ($\beta=1.5$, $m=3$) makes the fit \emph{worse}, not better -- the fixed tail shape does not match this dataset. Letting $\beta,m$ float (an 8-parameter fit) improves $\chi^2/\text{ndof}$ to $2.00$, converging to $\beta=1.83$, $m=12.4$ -- far from the literature guess, indicating a dataset-specific tail rather than a universal one. Across all three signal models $\Araw$ stays consistent within uncertainties, so the physics conclusion does not depend on the choice of signal shape, even though none of the three models reaches $\chi^2/\text{ndof}\approx1$.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Signal model & $\Araw$ & 68\% CI & $\chi^2$/ndof \\
+\midrule
+Gaussian & $-0.0497$ & $[-0.058,-0.041]$ & $2.36$ \\
+Crystal Ball (fixed $\beta,m$) & $-0.0512$ & $[-0.059,-0.043]$ & $4.50$ \\
+Crystal Ball (free $\beta,m$) & $-0.0504$ & $[-0.059,-0.042]$ & $2.00$ \\
+\bottomrule
+\end{tabular}
+\caption{Signal-model comparison. $\Araw$ is stable; goodness-of-fit is not, and improves only once the Crystal Ball tail parameters are fitted rather than fixed.}
+\label{tab:gof}
+\end{table}
+
 \subsection{Systematic Checks: Mass Window, Background Model, Magnet Polarity}
+\label{sec:bayes_syst}
+Four variations of the nominal fit were repeated with shorter chains to probe sensitivity to modeling choices: a narrower window ($[5200,5450]\,\MeV$), a window without the sparse high-mass tail ($[5150,5400]\,\MeV$), a linear background shape instead of the exponential, and a narrower prior on $A$ ($[-0.3,0.3]$). All four give $\Araw\in[-0.0503,-0.0497]$ -- differences smaller than the fourth decimal digit, well inside the statistical uncertainty ($\pm0.008$) -- so the result is robust to every modeling choice tested.
+
+As an additional, purely experimental cross-check, the fit was repeated separately on the two magnet polarities, which have opposite detector left-right asymmetries that (partially) cancel when the data are combined: $\Araw(\text{down})=-0.055$ ($[-0.065,-0.044]$, $n=10500$) and $\Araw(\text{up})=-0.043$ ($[-0.056,-0.030]$, $n=7339$). The two credible intervals overlap substantially, giving no indication that the measured asymmetry is an artifact of a single magnet polarity.
+
 \subsection{Toy-MC Coverage Validation}
+\label{sec:bayes_toymc}
+To check whether the reported credible intervals actually have the claimed frequentist coverage, pseudo-datasets of the same size as the real data were generated directly from the fitted model (parametric bootstrap, injecting the observed posterior-median $\theta$ as ground truth), each refit with a shorter chain, and the fraction of replicas whose 68\%/95\% credible interval contains the injected $A$ was recorded. With 60 replicas, the empirical 68\% coverage is $0.60$ against a nominal $0.68$ -- within $\sim$1$\sigma$ of the expected binomial fluctuation for this replica count, but a hint of mild undercoverage that is not fully resolved with the current statistics. \todo{Giacomo -- update this paragraph with the 100-replica, longer-chain result once the rerun (queued 2026-09-23, see [[project-lhcb-opendata-goal]] memory) finishes; report whether the tighter estimate confirms or resolves the $\sim$1.3$\sigma$ hint.}
+
+\subsection{Local Dalitz-Plot Asymmetry (Fixed Binning)}
+\label{sec:bayes_dalitz}
+As a first, fixed-binning look at whether the raw asymmetry is concentrated in specific regions of phase space (as opposed to the single global $\Araw$ of Sec.~\ref{sec:bayes_posterior}), the two same-sign-pair invariant masses $m^2(H1,H2)$ and $m^2(H1,H3)$ were computed using the $H1$-is-bachelor convention (Sec.~\ref{sec:data_presel}) and sorted into $m^2_{\mathrm{lo}}$/$m^2_{\mathrm{hi}}$ to remove the $H2/H3$ labeling ambiguity, following the same approach as the official starting notebook. The Dalitz plane was divided into an $8\times8$ grid; in each bin with at least 20 events the local asymmetry $A_i=(N_i^--N_i^+)/N_i^{\mathrm{tot}}$ and its binomial-type uncertainty $\sigma(A_i)=\sqrt{(1-A_i^2)/N_i^{\mathrm{tot}}}$ were computed, giving a local significance $S_i=A_i/\sigma(A_i)$.
+
+Using all events in the fit window, 29 of the 64 bins are populated above the 20-event threshold, and $4$ of those $29$ show $|S_i|>3$ -- a hint of localized structure beyond the single global asymmetry, though with an $8\times8$ binning this is only a coarse, exploratory look (Sec.~\ref{sec:limitations}). Repeating the same binning and threshold on the signal-window-only subsample ($|m-\mu|<2\sigma$, $n=15{,}119$, $>$95\% signal purity by sideband counting) gives an identical result -- $29$ populated bins, $4$ significant at $3\sigma$ -- so this local structure is not an artifact of combinatorial background diluting the fit-window sample, though a fixed cut is not a substitute for a proper sideband/sWeight-based background subtraction (Sec.~\ref{sec:limitations}). Section~\ref{sec:ml_kmeans} revisits the same question with an adaptive, data-driven binning ($K$-means) instead of this fixed grid.
 
 \section{Machine Learning Module}
 \label{sec:ml}
-\todo{Shared -- branch \texttt{mach\_lear} is complete. Pull from \texttt{Code\_general/Machine\_Learning/ML\_Analysis.ipynb} and \texttt{results/ml\_summary.json}: weak-label construction from sidebands, feature set, model comparison (LogReg/Tree/RF/GBM/FFNN, AUC table), regularization study, bias-variance curve, calibration (+ isotonic recalibration result), uncertainty quantification (MC Dropout vs RF ensemble-variance, and why they disagree), hyperparameter/architecture search, $\Araw$ vs threshold stability with bootstrap errors, K-means on the Dalitz plot.}
+As a complementary, purely data-driven approach to the signal/background separation used in the mass fits (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}), a supervised classifier was trained on weak labels derived from the mass sidebands and applied to study whether an ML-assisted event selection biases $\Araw$, and whether it can resolve local Dalitz-plot structure that a fixed binning would miss.
 
 \subsection{Weak Labels and Feature Set}
+\label{sec:ml_labels}
+Weak labels were built from the same mass model as the Bayesian fit (Sec.~\ref{sec:bayes_model}, $\mu=5284.4$, $\sigma=17.95\,\MeV$), without ever using the reconstructed $B$ mass itself as an input feature, to avoid mass sculpting. Events with $|m-\mu|<2\sigma$ (i.e.\ $m\in[5248.5,5320.3]\,\MeV$) are labeled signal-like; events with $|m-\mu|>4\sigma$ (outside $[5212.6,5356.2]\,\MeV$, within the fit window) are labeled background-like; the intermediate $2$--$4\sigma$ gap is left unlabeled and excluded, to keep the two classes cleanly separated. This gives $n_{\mathrm{labeled}}=16336$ events, of which $15119$ are signal-like and only $1217$ background-like (imbalance ratio $0.080$) -- a severe class imbalance, handled downstream with \texttt{class\_weight='balanced'} for the scikit-learn models, a sample-weight approximation for GBM (which has no native \texttt{class\_weight} support), and explicit class weights in the Keras loss for the FFNN.
+
+The feature set consists of the 6 per-track kinematic/PID variables (\texttt{PX}, \texttt{PY}, \texttt{PZ}, \texttt{ProbK}, \texttt{ProbPi}, \texttt{IPChi2}) for each of the 3 final-state tracks, for $18$ features total. An exploratory PCA on the standardized features shows $14$ of $18$ components are needed to reach $90\%$ explained variance -- the features carry mostly independent information, so no dimensionality reduction is applied to the models used downstream (PCA is kept as a diagnostic only). The labeled sample was split $60/20/20$ into train/validation/test, stratified on the label, with the scaler fit on the training set only.
+
 \subsection{Model Comparison}
+\label{sec:ml_models}
+Five classifier families were trained: logistic regression (linear baseline), a single decision tree, Random Forest, Gradient Boosting, and a feed-forward neural network (two hidden layers, 32--16 units, dropout $0.2$). Table~\ref{tab:ml_models} summarizes 5-fold cross-validated AUC on the training set (not computed for the FFNN, evaluated on the held-out validation set instead) and AUC on the untouched test set.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Model & CV AUC (train) & Test AUC \\
+\midrule
+Logistic Regression       & $0.7046 \pm 0.0099$ & $0.7048$ \\
+Logistic Regression (L1)  & --                   & $0.7054$ \\
+Decision Tree             & $0.7487 \pm 0.0228$ & $0.7614$ \\
+Random Forest             & $0.8158 \pm 0.0168$ & $\mathbf{0.8103}$ \\
+Gradient Boosting         & $0.8154 \pm 0.0209$ & $0.8092$ \\
+FFNN                      & --                   & $0.7574$ \\
+\bottomrule
+\end{tabular}
+\caption{Cross-validated and test-set AUC for all six models. The two tree ensembles clearly outperform the linear and single-tree baselines; Random Forest is marginally best on both metrics and is used as the reference model for Secs.~\ref{sec:ml_uncertainty}--\ref{sec:ml_stability}.}
+\label{tab:ml_models}
+\end{table}
+
+Both ensembles (Random Forest, GBM) improve test AUC by $\sim$0.05--0.06 over the single decision tree and by $\sim$0.10 over plain logistic regression, consistent with the mild non-linearity expected in a PID/kinematics-based classifier. Random Forest was selected as the reference model for all downstream analyses (Secs.~\ref{sec:ml_uncertainty}--\ref{sec:ml_stability}) based on its (marginally) best CV and test AUC.
+
 \subsection{Regularization, Bias-Variance, and Calibration}
+\label{sec:ml_regcal}
+An $L1$/$L2$ regularization sweep on the logistic regression (log-spaced grid on $C=1/\alpha$, with CV) finds essentially identical optimal AUC for both penalties ($C_{L1}=0.117$, AUC $=0.7048$; $C_{L2}=20.4$, AUC $=0.7046$), and only a single feature driven to exactly zero by the $L1$ penalty -- the linear model is not overfitting and gains little from aggressive regularization, consistent with its comparatively low AUC ceiling in Table~\ref{tab:ml_models}.
+
+A bias-variance complexity curve was built for GBM using \texttt{staged\_predict} (train/test AUC as a function of the number of boosting stages). The train/test AUC gap grows from $0.012$ at $20$ trees to $0.031$ at the final iteration -- mild but measurable overfitting as complexity increases, though the gap stays small relative to the overall AUC scale ($\sim$0.81).
+
+Calibration was assessed via the Brier score for all six models (Table~\ref{tab:ml_models} companion metric): Logistic Regression $0.219$, Logistic Regression (L1) $0.220$, Decision Tree $0.153$, Random Forest $0.133$, Gradient Boosting $0.126$, FFNN $0.072$. Notably the FFNN, despite the lowest AUC of the four non-linear models, has by far the best-calibrated raw score -- a model can rank events well (high AUC) without its output being a trustworthy probability, and vice versa. Applying isotonic recalibration (\texttt{CalibratedClassifierCV}) to the reference Random Forest model reduces its Brier score from $0.133$ to $0.053$ (a $60\%$ reduction): the RF score is a good \emph{ranking} but, uncalibrated, a poor \emph{probability} estimate.
+
 \subsection{Uncertainty Quantification}
+\label{sec:ml_uncertainty}
+Two independent estimates of epistemic (model) uncertainty were computed per event: MC Dropout on the FFNN (dropout kept active at inference, repeated forward passes, uncertainty = std across passes) and ensemble-variance on the Random Forest (uncertainty = std of the individual trees' predictions, following the bagging-uncertainty prescription from Lecture~18). The two give mean uncertainties of $0.0102$ (MC Dropout) and $0.180$ (RF ensemble) -- a factor $\sim$18 apart in absolute scale.
+
+Two checks were run to understand the discrepancy. First, whether the class imbalance (Sec.~\ref{sec:ml_labels}) inflates RF tree-to-tree variance on the rare background-like class: the mean RF std is $0.188$ on background-like test events vs.\ $0.179$ on signal-like -- only a $\sim$5\% relative difference, too small to explain an 18$\times$ gap. The same comparison for MC Dropout shows a much larger relative effect ($0.0180$ background vs.\ $0.0096$ signal, nearly $2\times$), suggesting the FFNN's epistemic uncertainty is more sensitive to the scarcity of background-like training examples than the RF's is. Second, whether the two methods at least agree on \emph{which} events are most uncertain, independent of absolute scale: the Spearman correlation between per-event MC-Dropout and RF-ensemble uncertainty is $\rho=0.237$ ($p=4.3\times10^{-43}$) -- highly significant but weak, meaning the two epistemic-uncertainty estimates are only partially consistent event-by-event and should not be treated as interchangeable.
+
 \subsection{K-means on the Dalitz Plot}
+\label{sec:ml_kmeans}
+As an adaptive alternative to the fixed Dalitz-plot binning, $K$-means clustering ($K=8$, matching the fixed-binning granularity for direct comparison, not chosen via an elbow/silhouette criterion) was run on the standardized kinematic features. Repeating the clustering with different random seeds gives an adjusted Rand index of $0.996$ between runs, indicating a highly stable partition. Cluster sizes range from $n=1216$ to $n=4007$, and the local raw asymmetry $A_{\mathrm{local}}$ per cluster ranges from $-0.139$ to $+0.035$. Of the 8 clusters, exactly one shows a local deviation from zero exceeding $3\sigma$: cluster 2 ($n=3341$, $A_{\mathrm{local}}=-0.139$). Restricting that cluster to the high-purity signal window ($|m-\mu|<2\sigma$, $n_{\mathrm{purified}}=2880$, $\sim$85\% purity) gives $A_{\mathrm{local}}=-0.147$ -- the asymmetry survives, and if anything strengthens slightly, after purification, disfavoring background contamination as its origin.
+
 \subsection{Stability of $A_{\mathrm{raw}}$ under ML Selection}
+\label{sec:ml_stability}
+The reference Random Forest score was applied to \emph{all} events in the fit window (not only the labeled subsample used for training), and the counting asymmetry $\Araw$ was recomputed after cutting at score thresholds from $0.1$ to $0.9$, with non-parametric bootstrap uncertainties (resampling the full selected sample and repeating cut+count) at each threshold. Across thresholds $0.1$--$0.8$, $\Araw$ stays in a narrow band, $[-0.055,-0.041]$, consistent within uncertainty with the nominal Bayesian fit result ($-0.0497$, Sec.~\ref{sec:bayes_posterior}) and with bootstrap errors that are small and stable ($0.007$--$0.023$). At threshold $0.9$, $\Araw$ jumps to $-0.20$, but the bootstrap uncertainty at that same threshold blows up to $0.25$ -- consistent with zero drift once the shrinking sample size (very few events survive a 90\%-score cut on an already $\sim$90\%-pure signal region) is accounted for. Over the range where the selection retains a usable sample size, the ML-based event selection does not introduce a detectable bias on $\Araw$.
 
 \section{Comparison and Discussion}
 \label{sec:comparison}
@@ -106,13 +227,15 @@
 
 \section{Limitations and Future Work}
 \label{sec:limitations}
-\todo{Shared. This section can be drafted almost entirely NOW by condensing the already-written "Limiti noti" lists -- don't re-derive, translate/tighten what's already there:
-\begin{itemize}
-    \item From \texttt{bayes}: background assumed symmetric between charges (not validated independently of the magnet cross-check); Savage-Dickey Bayes factor's exact value is bandwidth-fragile (only the qualitative conclusion is robust); toy-MC coverage used a limited number of replicas and showed a mild (${\sim}1.3\sigma$) hint of undercoverage, not fully resolved; even the best signal model (Crystal Ball, floated shape) gives $\chi^2$/ndof$\,{\approx}\,2$, not $\approx 1$; Dalitz local-asymmetry binning is coarse.
-    \item From \texttt{mach\_lear}: severe class imbalance in the weak labels (1217 background-like vs 15119 signal-like); MC Dropout and RF ensemble-variance uncertainty estimates disagree by ${\sim}18\times$ in absolute scale (only weakly correlated per-event, $\rho\approx0.24$); hyperparameter/architecture search used a non-exhaustive grid; the $\Araw$-vs-threshold check is simple post-cut counting, not a full mass refit on the ML-selected sample.
-    \item Cross-cutting: the mass window, background model, and signal-region definition were chosen from the Bayesian fit alone and still need to be reconciled with Marco's frequentist choices; no detector-level systematic (efficiency, production asymmetry) correction is applied anywhere -- $\Araw$ is explicitly NOT $\ACP$.
-\end{itemize}
-Future work: sWeight-based (not simple-cut) local Dalitz asymmetry; full mass refit after ML selection instead of counting; extend the toy-MC coverage study with more replicas.}
+Several modeling choices and known weaknesses limit how far the results of Secs.~\ref{sec:bayesian}--\ref{sec:ml} can be pushed, and are collected here rather than scattered through the results sections.
+
+On the Bayesian side (Sec.~\ref{sec:bayesian}): the background is assumed to split equally between $B$ charges, an assumption not validated independently of the (reassuring, but not conclusive) magnet-polarity cross-check of Sec.~\ref{sec:bayes_syst}; the exact value of the Savage-Dickey Bayes factor of Sec.~\ref{sec:bayes_factor} is bandwidth-fragile by many orders of magnitude, and only its qualitative conclusion (decisive evidence against $A=0$) should be trusted; the toy-MC coverage check of Sec.~\ref{sec:bayes_toymc} used a limited number of replicas and showed a mild ($\sim$1$\sigma$) hint of undercoverage that is not yet fully resolved; even the best-fitting signal model (Crystal Ball with floated tail parameters) leaves $\chi^2/\mathrm{ndof}\approx2$, not $\approx1$ (Sec.~\ref{sec:bayes_gof}); and the fixed-binning Dalitz analysis of Sec.~\ref{sec:bayes_dalitz} uses a coarse $8\times8$ grid and a simple mass-window cut rather than a proper background subtraction.
+
+On the machine-learning side (Sec.~\ref{sec:ml}): the weak labels suffer from severe class imbalance ($1217$ background-like vs.\ $15{,}119$ signal-like events, Sec.~\ref{sec:ml_labels}); the two epistemic-uncertainty estimators (MC Dropout, RF ensemble-variance) disagree by a factor $\sim$18 in absolute scale and are only weakly correlated event-by-event ($\rho\approx0.24$, Sec.~\ref{sec:ml_uncertainty}); the hyperparameter search of Table~\ref{tab:ml_hyperparams} used a moderate, non-exhaustive grid; and the $\Araw$-vs-threshold stability check (Sec.~\ref{sec:ml_stability}) is a simple post-cut counting exercise, not a full mass refit on the ML-selected sample.
+
+Cross-cutting the whole project: the mass window, background shape, and signal-region definition were fixed from the Bayesian fit alone and still need to be reconciled against Marco's frequentist choices before the comparison of Sec.~\ref{sec:comparison} can be considered final; and no detector-level systematic correction (selection efficiency, production asymmetry) is applied anywhere in this work, so $\Araw$ as reported throughout is explicitly \emph{not} a measurement of $\ACP$ (Sec.~\ref{sec:comparison}).
+
+The most natural next steps, in rough priority order, are: replacing the fixed-cut local Dalitz asymmetries (both binned, Sec.~\ref{sec:bayes_dalitz}, and $K$-means, Sec.~\ref{sec:ml_kmeans}) with a proper sWeight-based background subtraction; running a full post-selection mass refit (frequentist or Bayesian) on the ML-selected sample instead of simple counting; and extending the toy-MC coverage study with more replicas and a full-length chain per replica to resolve the mild undercoverage hint.
 
 \section{Conclusions}
 \label{sec:conclusions}
@@ -131,7 +254,57 @@ The dataset is the CERN Open Data record \href{https://opendata.cern.ch/record/4
 \appendix
 \section{Full results tables}
 \label{sec:appendix}
-\todo{Shared. Mirror the reference report's appendix style: every tested variant in one table, chosen/final result highlighted. Needs (a) Bayesian systematic-variation table (5 rows: nominal + 4 variants, already in \texttt{results/posterior\_summary.json} on \texttt{bayes}), (b) ML model-comparison table (all 6 classifiers x AUC/Brier, already in \texttt{results/ml\_summary.json}), (c) ML hyperparameter/architecture search table (RF/GBM grid + FFNN architecture search top results), (d) frequentist fit results once Marco has them.}
+\todo{Shared. Still needed: frequentist fit results (Table, once Marco has them) alongside the Bayesian nominal row below, for a direct side-by-side comparison.}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Variant & $n$ & $\Araw$ (median) & 68\% CI \\
+\midrule
+Nominal ($[5150,5450]$, exp.\ bkg) & $17839$ & $-0.0497$ & $[-0.0579,-0.0413]$ \\
+Narrower window ($[5200,5450]$) & $17267$ & $-0.0497$ & $[-0.0578,-0.0415]$ \\
+Shorter high-mass tail ($[5150,5400]$) & $17590$ & $-0.0499$ & $[-0.0582,-0.0415]$ \\
+Linear background & $17839$ & $-0.0497$ & $[-0.0579,-0.0414]$ \\
+Narrow prior, $A\in[-0.3,0.3]$ & $17839$ & $-0.0503$ & $[-0.0585,-0.0418]$ \\
+\bottomrule
+\end{tabular}
+\caption{Bayesian systematic-variation study (Sec.~\ref{sec:bayes_syst}): $\Araw$ under four alternative modeling choices, each refit with a shorter (2500-step) chain relative to the nominal fit. All five results agree to within the fourth decimal digit, well inside the statistical uncertainty.}
+\label{tab:bayes_systematics}
+\end{table*}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccl}
+\toprule
+Model & Test AUC & Brier score & Notes \\
+\midrule
+Logistic Regression      & $0.7048$ & $0.219$ & \\
+Logistic Regression (L1) & $0.7054$ & $0.220$ & \\
+Decision Tree            & $0.7614$ & $0.153$ & \\
+Random Forest            & $0.8103$ & $0.133$ & best AUC \\
+Gradient Boosting        & $0.8092$ & $0.126$ & \\
+FFNN                     & $0.7574$ & $0.072$ & best Brier \\
+\bottomrule
+\end{tabular}
+\caption{Full model comparison, test-set AUC and (uncalibrated) Brier score, for all six classifiers of Sec.~\ref{sec:ml_models}. Isotonic recalibration of the Random Forest score reduces its Brier score to $0.053$ (Sec.~\ref{sec:ml_regcal}).}
+\label{tab:ml_full_comparison}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{lll}
+\toprule
+Model & Best configuration (repeated-CV grid search) & CV AUC / Test AUC \\
+\midrule
+Random Forest     & \texttt{max\_depth}$=8$, \texttt{min\_samples\_leaf}$=20$, \texttt{n\_estimators}$=200$ & $0.8164$ / $0.8080$ \\
+Gradient Boosting & \texttt{learning\_rate}$=0.1$, \texttt{max\_depth}$=2$, \texttt{n\_estimators}$=100$ & $0.8146$ / $0.8063$ \\
+\bottomrule
+\end{tabular}
+\caption{Hyperparameter search results (\texttt{RepeatedStratifiedKFold} CV, moderate non-exhaustive grid; Sec.~\ref{sec:limitations}). Neither tuned configuration improves test AUC over the untuned defaults of Table~\ref{tab:ml_models} by more than $\sim$0.002 -- the untuned defaults were already close to the CV optimum on this grid.}
+\label{tab:ml_hyperparams}
+\end{table*}
+\todo{Giacomo -- append the FFNN architecture-search table (depth/width/dropout/learning-rate grid, \texttt{Ricerca architetturale sulla FFNN} cell) once the overnight run finishes and \texttt{ml\_summary.json} is updated with an \texttt{ffnn\_architecture\_search} entry.}
 
 \bibliography{biblio}
 
