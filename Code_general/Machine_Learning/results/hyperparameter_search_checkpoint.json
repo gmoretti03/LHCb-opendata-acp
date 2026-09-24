@@ -1,0 +1,16 @@
+{
+  "rf_best_params": {
+    "max_depth": 10,
+    "min_samples_leaf": 10,
+    "n_estimators": 800
+  },
+  "rf_best_cv_auc": 0.8168755904042144,
+  "rf_best_test_auc": 0.8170171415560761,
+  "gbm_best_params": {
+    "learning_rate": 0.03,
+    "max_depth": 2,
+    "n_estimators": 300
+  },
+  "gbm_best_cv_auc": 0.8144806308557005,
+  "gbm_best_test_auc": 0.8104399774481741
+}

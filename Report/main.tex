@@ -191,7 +191,7 @@ As a complementary, purely data-driven approach to the signal/background separat
 \label{sec:ml_labels}
 Weak labels were built from the same mass model as the Bayesian fit (Sec.~\ref{sec:bayes_model}, $\mu=5284.4$, $\sigma=17.95\,\MeV$), without ever using the reconstructed $B$ mass itself as an input feature, to avoid mass sculpting. Events with $|m-\mu|<2\sigma$ (i.e.\ $m\in[5248.5,5320.3]\,\MeV$) are labeled signal-like; events with $|m-\mu|>4\sigma$ (outside $[5212.6,5356.2]\,\MeV$, within the fit window) are labeled background-like; the intermediate $2$--$4\sigma$ gap is left unlabeled and excluded, to keep the two classes cleanly separated. This gives $n_{\mathrm{labeled}}=16336$ events, of which $15119$ are signal-like and only $1217$ background-like (imbalance ratio $0.080$) -- a severe class imbalance, handled downstream with \texttt{class\_weight='balanced'} for the scikit-learn models, a sample-weight approximation for GBM (which has no native \texttt{class\_weight} support), and explicit class weights in the Keras loss for the FFNN.
 
-The feature set consists of the 6 per-track kinematic/PID variables (\texttt{PX}, \texttt{PY}, \texttt{PZ}, \texttt{ProbK}, \texttt{ProbPi}, \texttt{IPChi2}) for each of the 3 final-state tracks, for $18$ features total. An exploratory PCA on the standardized features shows $14$ of $18$ components are needed to reach $90\%$ explained variance -- the features carry mostly independent information, so no dimensionality reduction is applied to the models used downstream (PCA is kept as a diagnostic only). The labeled sample was split $60/20/20$ into train/validation/test, stratified on the label, with the scaler fit on the training set only.
+The feature set consists of the 6 per-track kinematic/PID variables (\texttt{PX}, \texttt{PY}, \texttt{PZ}, \texttt{ProbK}, \texttt{ProbPi}, \texttt{IPChi2}) for each of the 3 final-state tracks (18 features), plus two $B$-candidate-level variables found unused in the shared preselection and worth checking as classifier inputs: \texttt{B\_FlightDistance} and \texttt{B\_VertexChi2}, both standard LHCb combinatorial-background discriminants (a genuine $B$ flies further before decaying and has a better-reconstructed vertex than a random track combination). An exploratory check confirmed both separate the weak-label classes significantly (Kolmogorov-Smirnov $p<10^{-35}$ for each) and are not redundant with the existing features (Spearman $|\rho|<0.52$ with every one of the 18), so both were adopted, for $20$ features total. An exploratory PCA on the standardized features shows $15$ of $20$ components are needed to reach $90\%$ explained variance -- the features carry mostly independent information, so no dimensionality reduction is applied to the models used downstream (PCA is kept as a diagnostic only). The labeled sample was split $60/20/20$ into train/validation/test, stratified on the label, with the scaler fit on the training set only.
 
 \subsection{Model Comparison}
 \label{sec:ml_models}
@@ -203,33 +203,33 @@ Five classifier families were trained: logistic regression (linear baseline), a 
 \toprule
 Model & CV AUC (train) & Test AUC \\
 \midrule
-Logistic Regression       & $0.7046 \pm 0.0099$ & $0.7048$ \\
-Logistic Regression (L1)  & --                   & $0.7054$ \\
-Decision Tree             & $0.7487 \pm 0.0228$ & $0.7614$ \\
-Random Forest             & $0.8158 \pm 0.0168$ & $\mathbf{0.8103}$ \\
-Gradient Boosting         & $0.8154 \pm 0.0209$ & $0.8092$ \\
-FFNN                      & --                   & $0.7574$ \\
+Logistic Regression       & $0.7273 \pm 0.0180$ & $0.7326$ \\
+Logistic Regression (L1)  & --                   & $0.7333$ \\
+Decision Tree             & $0.7470 \pm 0.0213$ & $0.7575$ \\
+Random Forest             & $0.8136 \pm 0.0189$ & $\mathbf{0.8127}$ \\
+Gradient Boosting         & $0.8154 \pm 0.0192$ & $0.8127$ \\
+FFNN                      & --                   & $0.7681$ \\
 \bottomrule
 \end{tabular}
-\caption{Cross-validated and test-set AUC for all six models. The two tree ensembles clearly outperform the linear and single-tree baselines; Random Forest is marginally best on both metrics and is used as the reference model for Secs.~\ref{sec:ml_uncertainty}--\ref{sec:ml_stability}.}
+\caption{Cross-validated and test-set AUC for all six models, 20-feature classifier. The two tree ensembles clearly outperform the linear and single-tree baselines; Random Forest and GBM are statistically tied on test AUC, Random Forest is used as the reference model for Secs.~\ref{sec:ml_uncertainty}--\ref{sec:ml_stability}.}
 \label{tab:ml_models}
 \end{table}
 
-Both ensembles (Random Forest, GBM) improve test AUC by $\sim$0.05--0.06 over the single decision tree and by $\sim$0.10 over plain logistic regression, consistent with the mild non-linearity expected in a PID/kinematics-based classifier. Random Forest was selected as the reference model for all downstream analyses (Secs.~\ref{sec:ml_uncertainty}--\ref{sec:ml_stability}) based on its (marginally) best CV and test AUC.
+Both ensembles (Random Forest, GBM) improve test AUC by $\sim$0.05--0.06 over the single decision tree and by $\sim$0.08 over plain logistic regression, consistent with the mild non-linearity expected in a PID/kinematics-based classifier. Adding the two $B$-level vertex-quality features (Sec.~\ref{sec:ml_labels}) improved every model's AUC over the 18-feature baseline, most visibly for the linear models ($+0.03$ for logistic regression) and more modestly for the tree ensembles ($+0.001$--$0.002$) -- consistent with the linear model previously being unable to exploit the (nonlinear) discriminating power that the trees already partly captured indirectly. Random Forest was selected as the reference model for all downstream analyses (Secs.~\ref{sec:ml_uncertainty}--\ref{sec:ml_stability}) based on its best CV AUC, essentially tied with GBM on test AUC.
 
 \subsection{Regularization, Bias-Variance, and Calibration}
 \label{sec:ml_regcal}
-An $L1$/$L2$ regularization sweep on the logistic regression (log-spaced grid on $C=1/\alpha$, with CV) finds essentially identical optimal AUC for both penalties ($C_{L1}=0.117$, AUC $=0.7048$; $C_{L2}=20.4$, AUC $=0.7046$), and only a single feature driven to exactly zero by the $L1$ penalty -- the linear model is not overfitting and gains little from aggressive regularization, consistent with its comparatively low AUC ceiling in Table~\ref{tab:ml_models}.
+An $L1$/$L2$ regularization sweep on the logistic regression (log-spaced grid on $C=1/\alpha$, with CV) finds essentially identical optimal AUC for both penalties ($C_{L1}=0.024$, AUC $=0.7280$; $C_{L2}=45.2$, AUC $=0.7273$), with 3 of the 20 features driven to exactly zero by the $L1$ penalty (only 1 with 18 features) -- the linear model is still not meaningfully overfitting and gains little from aggressive regularization, consistent with its comparatively low AUC ceiling in Table~\ref{tab:ml_models}, though the larger feature set gives $L1$ slightly more to prune.
 
-A bias-variance complexity curve was built for GBM using \texttt{staged\_predict} (train/test AUC as a function of the number of boosting stages). The train/test AUC gap grows from $0.012$ at $20$ trees to $0.031$ at the final iteration -- mild but measurable overfitting as complexity increases, though the gap stays small relative to the overall AUC scale ($\sim$0.81).
+A bias-variance complexity curve was built for GBM using \texttt{staged\_predict} (train/test AUC as a function of the number of boosting stages). The train/test AUC gap grows from $0.014$ at $20$ trees to $0.033$ at the final iteration -- mild but measurable overfitting as complexity increases, though the gap stays small relative to the overall AUC scale ($\sim$0.81).
 
-Calibration was assessed via the Brier score for all six models (Table~\ref{tab:ml_models} companion metric): Logistic Regression $0.219$, Logistic Regression (L1) $0.220$, Decision Tree $0.153$, Random Forest $0.133$, Gradient Boosting $0.126$, FFNN $0.072$. Notably the FFNN, despite the lowest AUC of the four non-linear models, has by far the best-calibrated raw score -- a model can rank events well (high AUC) without its output being a trustworthy probability, and vice versa. Applying isotonic recalibration (\texttt{CalibratedClassifierCV}) to the reference Random Forest model reduces its Brier score from $0.133$ to $0.053$ (a $60\%$ reduction): the RF score is a good \emph{ranking} but, uncalibrated, a poor \emph{probability} estimate.
+Calibration was assessed via the Brier score for all six models (Table~\ref{tab:ml_models} companion metric): Logistic Regression $0.208$, Logistic Regression (L1) $0.212$, Decision Tree $0.153$, Random Forest $0.132$, Gradient Boosting $0.125$, FFNN $0.071$. Notably the FFNN, despite the lowest AUC of the four non-linear models, has by far the best-calibrated raw score -- a model can rank events well (high AUC) without its output being a trustworthy probability, and vice versa. Applying isotonic recalibration (\texttt{CalibratedClassifierCV}) to the reference Random Forest model reduces its Brier score from $0.132$ to $0.053$ (a $60\%$ reduction): the RF score is a good \emph{ranking} but, uncalibrated, a poor \emph{probability} estimate.
 
 \subsection{Uncertainty Quantification}
 \label{sec:ml_uncertainty}
-Two independent estimates of epistemic (model) uncertainty were computed per event: MC Dropout on the FFNN (dropout kept active at inference, repeated forward passes, uncertainty = std across passes) and ensemble-variance on the Random Forest (uncertainty = std of the individual trees' predictions, following the bagging-uncertainty prescription from Lecture~18). The two give mean uncertainties of $0.0102$ (MC Dropout) and $0.180$ (RF ensemble) -- a factor $\sim$18 apart in absolute scale.
+Two independent estimates of epistemic (model) uncertainty were computed per event: MC Dropout on the FFNN (dropout kept active at inference, $300$ repeated forward passes, uncertainty = std across passes) and ensemble-variance on the Random Forest (uncertainty = std of the individual trees' predictions, following the bagging-uncertainty prescription from Lecture~18). The two give mean uncertainties of $0.0112$ (MC Dropout) and $0.185$ (RF ensemble) -- a factor $\sim$16.5 apart in absolute scale.
 
-Two checks were run to understand the discrepancy. First, whether the class imbalance (Sec.~\ref{sec:ml_labels}) inflates RF tree-to-tree variance on the rare background-like class: the mean RF std is $0.188$ on background-like test events vs.\ $0.179$ on signal-like -- only a $\sim$5\% relative difference, too small to explain an 18$\times$ gap. The same comparison for MC Dropout shows a much larger relative effect ($0.0180$ background vs.\ $0.0096$ signal, nearly $2\times$), suggesting the FFNN's epistemic uncertainty is more sensitive to the scarcity of background-like training examples than the RF's is. Second, whether the two methods at least agree on \emph{which} events are most uncertain, independent of absolute scale: the Spearman correlation between per-event MC-Dropout and RF-ensemble uncertainty is $\rho=0.237$ ($p=4.3\times10^{-43}$) -- highly significant but weak, meaning the two epistemic-uncertainty estimates are only partially consistent event-by-event and should not be treated as interchangeable.
+Two checks were run to understand the discrepancy. First, whether the class imbalance (Sec.~\ref{sec:ml_labels}) inflates RF tree-to-tree variance on the rare background-like class: the mean RF std is $0.196$ on background-like test events vs.\ $0.185$ on signal-like -- only a $\sim$6\% relative difference, too small to explain a 16.5$\times$ gap. The same comparison for MC Dropout shows a much larger relative effect ($0.0224$ background vs.\ $0.0103$ signal, $\sim$2.2$\times$), suggesting the FFNN's epistemic uncertainty is more sensitive to the scarcity of background-like training examples than the RF's is. Second, whether the two methods at least agree on \emph{which} events are most uncertain, independent of absolute scale: the Spearman correlation between per-event MC-Dropout and RF-ensemble uncertainty is $\rho=0.368$ ($p=2.1\times10^{-105}$) -- highly significant and moderate, meaning the two epistemic-uncertainty estimates agree on relative event-level ranking more than with the 18-feature set ($\rho=0.24$ previously), but are still far from interchangeable.
 
 \subsection{K-means on the Dalitz Plot}
 \label{sec:ml_kmeans}
@@ -239,11 +239,11 @@ $K=8$ was chosen for direct comparability with the fixed binning, not from a clu
 
 \subsection{Stability of $A_{\mathrm{raw}}$ under ML Selection}
 \label{sec:ml_stability}
-The reference Random Forest score was applied to \emph{all} events in the fit window (not only the labeled subsample used for training), and the counting asymmetry $\Araw$ was recomputed after cutting at score thresholds from $0.1$ to $0.9$, with non-parametric bootstrap uncertainties (resampling the full selected sample and repeating cut+count) at each threshold. Across thresholds $0.1$--$0.8$, $\Araw$ stays in a narrow band, $[-0.055,-0.041]$, consistent within uncertainty with the nominal Bayesian fit result ($-0.0497$, Sec.~\ref{sec:bayes_posterior}) and with bootstrap errors that are small and stable ($0.007$--$0.023$). At threshold $0.9$, $\Araw$ jumps to $-0.20$, but the bootstrap uncertainty at that same threshold blows up to $0.25$ -- consistent with zero drift once the shrinking sample size (very few events survive a 90\%-score cut on an already $\sim$90\%-pure signal region) is accounted for. Over the range where the selection retains a usable sample size, the ML-based event selection does not introduce a detectable bias on $\Araw$.
+The reference Random Forest score was applied to \emph{all} events in the fit window (not only the labeled subsample used for training), and the counting asymmetry $\Araw$ was recomputed after cutting at score thresholds from $0.1$ to $0.9$, with non-parametric bootstrap uncertainties (resampling the full selected sample and repeating cut+count) at each threshold. Across thresholds $0.1$--$0.7$, $\Araw$ stays in a narrow band, $[-0.054,-0.049]$, consistent within uncertainty with the nominal Bayesian fit result ($-0.0497$, Sec.~\ref{sec:bayes_posterior}) and with bootstrap errors that are small and stable ($0.007$--$0.010$). At threshold $0.8$, $\Araw$ drifts to $-0.014$, but the bootstrap uncertainty there is also much larger ($0.026$), so the drift is only $\sim$1.4$\sigma$ from nominal -- suggestive but not significant. At threshold $0.9$ the selection becomes fully degenerate ($\Araw=-1$, every surviving event has the same charge, bootstrap uncertainty undefined) -- with 20 features the classifier is even more aggressive at extreme thresholds than with 18, leaving too few events to say anything statistically. Over the range where the selection retains a usable sample size, the ML-based event selection does not introduce a detectable bias on $\Araw$.
 
-The threshold sweep above is simple post-cut counting, previously flagged as a limitation (Sec.~\ref{sec:limitations}) since it does not test whether the ML selection biases a genuine \emph{fit}-based estimate rather than just a count. This was addressed directly: the Bayesian mass model (Sec.~\ref{sec:bayes_model}) was refit -- same parametrization, same MCMC settings (32 walkers, 9000 steps) -- on the RF-selected subsample alone (score $>0.5$, $n=15109$), instead of counting. The result, $\Araw=-0.0505$ (68\% CI $[-0.059,-0.042]$), is consistent with both the nominal full-sample fit ($-0.0497$, Sec.~\ref{sec:bayes_posterior}) and the simple-counting estimate on the same subsample ($-0.0512$) -- the ML selection does not bias a proper mass-fit estimate either, closing this limitation on the Bayesian side (the analogous frequentist-side comparison remains blocked on Sec.~\ref{sec:frequentist}).
+The threshold sweep above is simple post-cut counting, previously flagged as a limitation (Sec.~\ref{sec:limitations}) since it does not test whether the ML selection biases a genuine \emph{fit}-based estimate rather than just a count. This was addressed directly: the Bayesian mass model (Sec.~\ref{sec:bayes_model}) was refit -- same parametrization, same MCMC settings (32 walkers, 9000 steps) -- on the RF-selected subsample alone (score $>0.5$, $n=15204$), instead of counting. The result, $\Araw=-0.0493$ (68\% CI $[-0.058,-0.041]$), is consistent with both the nominal full-sample fit ($-0.0497$, Sec.~\ref{sec:bayes_posterior}) and the simple-counting estimate on the same subsample ($-0.0499$) -- the ML selection does not bias a proper mass-fit estimate either, closing this limitation on the Bayesian side (the analogous frequentist-side comparison remains blocked on Sec.~\ref{sec:frequentist}).
 
-As with the Bayesian fit (Sec.~\ref{sec:bayes_syst}), the ML-selected sample was also cross-checked by magnet polarity, to test whether the RF cut interacts with the detector's left-right instrumental asymmetry (Sec.~\ref{sec:bayes_syst}) rather than tracking a genuine physical effect. At the representative RF-score threshold of $0.5$: $\Araw(\text{down})=-0.062\pm0.011$ ($n=8818$) and $\Araw(\text{up})=-0.035\pm0.013$ ($n=6291$). The two are individually somewhat more separated than in the Bayesian check ($\sim$1.6$\sigma$ apart here, vs.\ fully overlapping there), but follow the same sign pattern (down more negative than up) and their 68\% intervals still overlap -- consistent with the same underlying physical asymmetry seen through a smaller, ML-selected sample, not with a polarity-dependent artifact of the classifier.
+As with the Bayesian fit (Sec.~\ref{sec:bayes_syst}), the ML-selected sample was also cross-checked by magnet polarity, to test whether the RF cut interacts with the detector's left-right instrumental asymmetry (Sec.~\ref{sec:bayes_syst}) rather than tracking a genuine physical effect. At the representative RF-score threshold of $0.5$: $\Araw(\text{down})=-0.062\pm0.011$ ($n=8871$) and $\Araw(\text{up})=-0.032\pm0.013$ ($n=6333$). The two are individually somewhat more separated than in the Bayesian check ($\sim$1.8$\sigma$ apart here, vs.\ fully overlapping there), but follow the same sign pattern (down more negative than up) and their 68\% intervals still overlap -- consistent with the same underlying physical asymmetry seen through a smaller, ML-selected sample, not with a polarity-dependent artifact of the classifier.
 
 \section{Comparison and Discussion}
 \label{sec:comparison}
@@ -255,7 +255,7 @@ Several modeling choices and known weaknesses limit how far the results of Secs.
 
 On the Bayesian side (Sec.~\ref{sec:bayesian}): the background is assumed to split equally between $B$ charges -- checked both indirectly (magnet-polarity cross-check) and directly (sideband counting asymmetry, $-0.047\pm0.029$, compatible with zero at only $1.6\sigma$) in Sec.~\ref{sec:bayes_syst}, but neither check has enough statistical power to fully rule out a real background asymmetry of similar size to the signal one; the exact value of the Savage-Dickey Bayes factor of Sec.~\ref{sec:bayes_factor} is bandwidth-fragile by many orders of magnitude, and only its qualitative conclusion (decisive evidence against $A=0$) should be trusted; the toy-MC coverage check of Sec.~\ref{sec:bayes_toymc} initially (60 replicas) showed a mild ($\sim$1.3$\sigma$) hint of undercoverage, which did not survive progressively larger replica counts (100: $\sim$1.1$\sigma$; 500: $\sim$0.8$\sigma$) -- resolved; even the best-fitting signal model (Crystal Ball with floated tail parameters) leaves $\chi^2/\mathrm{ndof}\approx2$, not $\approx1$ (Sec.~\ref{sec:bayes_gof}); and the fixed-binning Dalitz analysis of Sec.~\ref{sec:bayes_dalitz} uses a coarse $8\times8$ grid and a simple mass-window cut rather than a proper background subtraction.
 
-On the machine-learning side (Sec.~\ref{sec:ml}): the weak labels suffer from severe class imbalance ($1217$ background-like vs.\ $15{,}119$ signal-like events, Sec.~\ref{sec:ml_labels}); the two epistemic-uncertainty estimators (MC Dropout, RF ensemble-variance) disagree by a factor $\sim$18 in absolute scale and are only weakly correlated event-by-event ($\rho\approx0.24$, Sec.~\ref{sec:ml_uncertainty}); the hyperparameter search of Table~\ref{tab:ml_hyperparams} used a moderate, non-exhaustive grid; and the $\Araw$-vs-threshold stability check (Sec.~\ref{sec:ml_stability}) was originally simple post-cut counting only -- since addressed on the Bayesian side with a real mass refit on the ML-selected sample (Sec.~\ref{sec:ml_stability}), but the equivalent frequentist-side refit still depends on Sec.~\ref{sec:frequentist}.
+On the machine-learning side (Sec.~\ref{sec:ml}): the weak labels suffer from severe class imbalance ($1217$ background-like vs.\ $15{,}119$ signal-like events, Sec.~\ref{sec:ml_labels}); the two epistemic-uncertainty estimators (MC Dropout, RF ensemble-variance) disagree by a factor $\sim$16.5 in absolute scale and are only moderately correlated event-by-event ($\rho\approx0.37$, Sec.~\ref{sec:ml_uncertainty}); the RF/GBM hyperparameter search of Table~\ref{tab:ml_hyperparams} used a moderate, non-exhaustive grid; and the $\Araw$-vs-threshold stability check (Sec.~\ref{sec:ml_stability}) was originally simple post-cut counting only -- since addressed on the Bayesian side with a real mass refit on the ML-selected sample (Sec.~\ref{sec:ml_stability}), but the equivalent frequentist-side refit still depends on Sec.~\ref{sec:frequentist}.
 
 Cross-cutting the whole project: the mass window, background shape, and signal-region definition were fixed from the Bayesian fit alone and still need to be reconciled against Marco's frequentist choices before the comparison of Sec.~\ref{sec:comparison} can be considered final; and no detector-level systematic correction (selection efficiency, production asymmetry) is applied anywhere in this work, so $\Araw$ as reported throughout is explicitly \emph{not} a measurement of $\ACP$ (Sec.~\ref{sec:comparison}).
 
@@ -303,15 +303,15 @@ Narrow prior, $A\in[-0.3,0.3]$ & $17839$ & $-0.0495$ & $[-0.0577,-0.0414]$ \\
 \toprule
 Model & Test AUC & Brier score & Notes \\
 \midrule
-Logistic Regression      & $0.7048$ & $0.219$ & \\
-Logistic Regression (L1) & $0.7054$ & $0.220$ & \\
-Decision Tree            & $0.7614$ & $0.153$ & \\
-Random Forest            & $0.8103$ & $0.133$ & best AUC \\
-Gradient Boosting        & $0.8092$ & $0.126$ & \\
-FFNN                     & $0.7574$ & $0.072$ & best Brier \\
+Logistic Regression      & $0.7326$ & $0.208$ & \\
+Logistic Regression (L1) & $0.7333$ & $0.212$ & \\
+Decision Tree            & $0.7575$ & $0.153$ & \\
+Random Forest            & $0.8127$ & $0.132$ & AUC tied \\
+Gradient Boosting        & $0.8127$ & $0.125$ & AUC tied \\
+FFNN                     & $0.7681$ & $0.071$ & best Brier \\
 \bottomrule
 \end{tabular}
-\caption{Full model comparison, test-set AUC and (uncalibrated) Brier score, for all six classifiers of Sec.~\ref{sec:ml_models}. Isotonic recalibration of the Random Forest score reduces its Brier score to $0.053$ (Sec.~\ref{sec:ml_regcal}).}
+\caption{Full model comparison (20-feature classifier), test-set AUC and (uncalibrated) Brier score, all six classifiers of Sec.~\ref{sec:ml_models}. Isotonic recalibration of the Random Forest score reduces its Brier score to $0.053$ (Sec.~\ref{sec:ml_regcal}).}
 \label{tab:ml_full_comparison}
 \end{table}
 
@@ -321,14 +321,30 @@ FFNN                     & $0.7574$ & $0.072$ & best Brier \\
 \toprule
 Model & Best configuration (repeated-CV grid search) & CV AUC / Test AUC \\
 \midrule
-Random Forest     & \texttt{max\_depth}$=8$, \texttt{min\_samples\_leaf}$=20$, \texttt{n\_estimators}$=200$ & $0.8164$ / $0.8080$ \\
-Gradient Boosting & \texttt{learning\_rate}$=0.1$, \texttt{max\_depth}$=2$, \texttt{n\_estimators}$=100$ & $0.8146$ / $0.8063$ \\
+Random Forest     & \texttt{max\_depth}$=10$, \texttt{min\_samples\_leaf}$=10$, \texttt{n\_estimators}$=800$ & $0.8169$ / $0.8170$ \\
+Gradient Boosting & \texttt{learning\_rate}$=0.03$, \texttt{max\_depth}$=2$, \texttt{n\_estimators}$=300$ & $0.8145$ / $0.8104$ \\
 \bottomrule
 \end{tabular}
-\caption{Hyperparameter search results (\texttt{RepeatedStratifiedKFold} CV, moderate non-exhaustive grid; Sec.~\ref{sec:limitations}). Neither tuned configuration improves test AUC over the untuned defaults of Table~\ref{tab:ml_models} by more than $\sim$0.002 -- the untuned defaults were already close to the CV optimum on this grid.}
+\caption{Hyperparameter search results (\texttt{RepeatedStratifiedKFold} CV, moderate non-exhaustive grid; Sec.~\ref{sec:limitations}), 20-feature classifier. Unlike with 18 features, tuning now improves Random Forest test AUC over the untuned default of Table~\ref{tab:ml_models} by $+0.0043$; GBM's tuned configuration is instead marginally worse ($-0.0023$) than its untuned default.}
 \label{tab:ml_hyperparams}
 \end{table*}
-\todo{Giacomo -- append the FFNN architecture-search table (depth/width/dropout/learning-rate grid, \texttt{Ricerca architetturale sulla FFNN} cell) once the overnight run finishes and \texttt{ml\_summary.json} is updated with an \texttt{ffnn\_architecture\_search} entry.}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{llccc}
+\toprule
+Architecture & Layers & Dropout & Learning rate & CV AUC \\
+\midrule
+\texttt{deep\_4layer} (best) & $[128,64,32,16]$ & $0.1$ & $0.002$ & $0.7657\pm0.0207$ \\
+\texttt{wide\_2layer}        & $[64,32]$         & $0.1$ & $0.002$ & $0.7655\pm0.0210$ \\
+\texttt{deep\_4layer}        & $[128,64,32,16]$ & $0.2$ & $0.002$ & $0.7641\pm0.0196$ \\
+\texttt{deep\_5layer}        & $[128,64,32,16,8]$ & $0.4$ & $0.002$ & $0.7636\pm0.0189$ \\
+\texttt{deep\_4layer}        & $[128,64,32,16]$ & $0.1$ & $0.001$ & $0.7636\pm0.0169$ \\
+\bottomrule
+\end{tabular}
+\caption{Top-5 configurations from the FFNN architecture search ($7$ architectures $\times$ $4$ dropout rates $\times$ $4$ learning rates $=112$ configurations, each 10-fold repeated-CV). The best configuration (\texttt{deep\_4layer}) gives test AUC $0.7714$, a modest improvement over the original fixed architecture (32--16, dropout $0.2$) used throughout Secs.~\ref{sec:ml_models}--\ref{sec:ml_stability}, test AUC $0.7681$ (Table~\ref{tab:ml_models}).}
+\label{tab:ml_ffnn_search}
+\end{table*}
 
 \bibliography{biblio}
 
