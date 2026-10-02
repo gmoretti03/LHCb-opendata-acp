@@ -32,6 +32,7 @@ import operator
 import os
 import re
 import warnings
+import itertools
 from dataclasses import dataclass, field
 from functools import reduce
 from pathlib import Path
@@ -46,6 +47,7 @@ from iminuit import Minuit
 from iminuit.cost import ExtendedUnbinnedNLL, UnbinnedNLL
 from iminuit.util import describe
 from matplotlib.colors import LogNorm
+from matplotlib.gridspec import GridSpec
 from scipy.stats import chi2 as chi2_dist
 from scipy.stats import norm
 from tqdm.auto import tqdm
@@ -94,11 +96,15 @@ class Config:
     sim_tree:    str = "PhaseSpaceTree"
     # --- decay ------------------------------------------------------------
     n_products:  int = 3
-    m_product:   float = 493.677      # kaon mass [MeV]
-    m_B:         float = 5279.15      # PDG B mass [MeV]
+    m_K:         float = 493.677      # kaon mass [MeV]
+    m_Pi:        float = 139.57039    # pi mass   [MeV]
+    m_B:         float = 5279.41      # B mass    [MeV]
     # --- preselection (B -> KKK) -------------------------------------------
     prob_k_min:  float = 0.5
     prob_pi_max: float = 0.5
+    # --- preselection (B -> πππ) -------------------------------------------
+    prob_pi_min: float = 0.5
+    prob_k_max:  float = 0.5
     # --- mass fit ---------------------------------------------------------
     fit_window:  tuple = (5100.0, 6000.0)
     sig_region:  tuple = (5200.0, 5350.0)
@@ -175,17 +181,29 @@ def load_data(cfg: Config, columns=None) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
-def total_four_momentum(df: pd.DataFrame, cfg: Config, particles=None):
-    """Sum of the four-momenta of `particles` (default: all) with the mass hypothesis cfg.m_product."""
+def particle_mass(df: pd.DataFrame, cfg: Config, particles=None):
     particles = cfg.particles if particles is None else particles
-    mass = np.full(len(df), cfg.m_product)
+    for i in particles:
+        mass = np.ones(len(df[f'H{i}_ProbK']))
+        K_mask  = (df[f'H{i}_ProbK'] >= df[f'H{i}_ProbPi'])
+        Pi_mask = (df[f'H{i}_ProbK'] <  df[f'H{i}_ProbPi'])
+        mass[K_mask]  = cfg.m_K
+        mass[Pi_mask] = cfg.m_Pi
+        df[f'H{i}_Mass'] = mass
+    return df
+
+
+def total_four_momentum(df: pd.DataFrame, cfg: Config, particles=None):
+    """Sum of the four-momenta of `particles` (default: all) with the mass hypothesis cfg.m_K or cfg.m_Pi."""
+    particles = cfg.particles if particles is None else particles
+    df   = particle_mass(df, cfg, particles=particles)
     vecs = [vector.array({"px": df[f"H{i}_PX"].to_numpy(), "py": df[f"H{i}_PY"].to_numpy(),
-                          "pz": df[f"H{i}_PZ"].to_numpy(), "M": mass}) for i in particles]
+                          "pz": df[f"H{i}_PZ"].to_numpy(), "M": df[f"H{i}_Mass"].to_numpy()}) for i in particles]
     return reduce(operator.add, vecs)
 
 
 def invariant_mass(df: pd.DataFrame, cfg: Config, particles=None) -> np.ndarray:
-    """Invariant mass of `particles`, e.g. invariant_mass(df, cfg, (1, 3)) for a Dalitz pair."""
+    """Invariant mass of `particles`, e.g. invariant_mass(df, cfg, (1, 3)) for a Dalitz Plot."""
     return np.asarray(total_four_momentum(df, cfg, particles).mass)
 
 
@@ -211,12 +229,27 @@ def check_charges(df: pd.DataFrame, cfg: Config) -> None:
         assert set(values) <= {-1, 1}, f"unexpected charge values for H{i}"
 
 
-def kaon_preselection(df: pd.DataFrame, cfg: Config) -> np.ndarray:
-    """Boolean mask: all products are kaons (high ProbK, low ProbPi) and not muons."""
+def hadron_preselection(df: pd.DataFrame, cfg: Config) -> np.ndarray:
+    """Boolean mask: all products are hadrons and not muons."""
     mask = np.ones(len(df), dtype=bool)
     for i in cfg.particles:
-        mask &= ((df[f"H{i}_ProbPi"] < cfg.prob_pi_max) & (df[f"H{i}_ProbK"] > cfg.prob_k_min)
-                 & (df[f"H{i}_isMuon"] == 0)).to_numpy()
+        mask &= ((df[f"H{i}_isMuon"] == 0)).to_numpy()
+    return mask
+
+
+def kaon_preselection(df: pd.DataFrame, cfg: Config) -> np.ndarray:
+    """Boolean mask: all products are kaons (high ProbK, low ProbPi) and not muons."""
+    mask = hadron_preselection(df, cfg)
+    for i in cfg.particles:
+        mask &= ((df[f"H{i}_ProbPi"] < cfg.prob_pi_max) & (df[f"H{i}_ProbK"] > cfg.prob_k_min))
+    return mask
+
+
+def pion_preselection(df: pd.DataFrame, cfg: Config) -> np.ndarray:
+    """Boolean mask: all products are pions (high ProbPi, low ProbH) and not muons."""
+    mask = hadron_preselection(df, cfg)
+    for i in cfg.particles:
+        mask &= ((df[f"H{i}_ProbK"] < cfg.prob_k_max) & (df[f"H{i}_ProbPi"] > cfg.prob_pi_min))
     return mask
 
 
@@ -227,7 +260,7 @@ def select_window(df: pd.DataFrame, window, col: str = "B_Mass") -> pd.DataFrame
 
 def split_by_charge(df: pd.DataFrame, col: str = "B_Mass") -> Dict[str, np.ndarray]:
     """{'pos': masses of B+, 'neg': masses of B-}."""
-    return {side: df.loc[df["B_Charge"] == s.charge, col].to_numpy() for side, s in SIDES.items()}
+    return {side: df.loc[df["B_Charge"] == s.charge, col] for side, s in SIDES.items()}
 
 
 def in_region(m: np.ndarray, region) -> np.ndarray:
@@ -309,7 +342,7 @@ def plot_pid_2d(df_all: pd.DataFrame, df_sel: pd.DataFrame, cfg: Config):
 def plot_mass_by_charge(df, cfg: Config, bins=300, bin_range=None, logy=False, xlim=None, title=None, ax=None):
     """Overlay of the B mass distribution for B+ and B-."""
     if ax is None:
-        _, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(8, 6))
     for s in SIDES.values():
         ax.hist(df.loc[df["B_Charge"] == s.charge, "B_Mass"], bins=bins, range=bin_range,
                 histtype="step", linewidth=1.5, label=s.label)
@@ -320,7 +353,96 @@ def plot_mass_by_charge(df, cfg: Config, bins=300, bin_range=None, logy=False, x
         ax.set_xlim(xlim)
     ax.set(title=title or r"$B^\pm$ invariant mass", xlabel="Mass(KKK) [MeV]", ylabel="Counts / bin")
     ax.legend(fontsize=14)
-    return ax
+    return fig, ax
+
+
+def easy_dalitz_plot(cfg, mass=None, data=None, bins=100):
+    """Produce all the Dalitz Plot. If data are passed all the possible combinations are plotted"""
+    if mass is None:
+        if data is None:
+            raise ValueError("Provide either `mass` (dict of pair masses) or `data`.")
+        else:
+            mass = {f'{i}{j}': invariant_mass(data, cfg, particles=(i,j)) for i,j in list(itertools.combinations(cfg.particles, 2))}
+    
+    fig, axes = plt.subplots(1, len(mass.keys()), figsize=(7 * len(mass.keys()), 7))
+    for i, (couple1, couple2) in enumerate(list(itertools.combinations(mass.keys(), 2))):
+        ax = axes[i]
+        *_, im = ax.hist2d(mass[couple1]**2, mass[couple2]**2, bins=bins, norm=LogNorm())
+        # ax.scatter(mass[couple1]**2, mass[couple2]**2, alpha=0.1)
+        ax.set_xlabel(rf"M($K_{couple1[0]}K_{couple1[1]}$)$^2$ [MeV$^2$]", fontsize=12)
+        ax.set_ylabel(rf"M($K_{couple2[0]}K_{couple2[1]}$)$^2$ [MeV$^2$]", fontsize=12)
+        ax.set_title(rf"Dalitz Plot: $K_{couple1[0]}K_{couple1[1]}$ - $K_{couple2[0]}K_{couple2[1]}$", fontsize=16)
+        ax.set_xlim(np.min(mass[couple1]**2)-0.03*np.max(mass[couple1]**2), 1.03*np.max(mass[couple1]**2))
+        ax.set_ylim(np.min(mass[couple2]**2)-0.03*np.max(mass[couple2]**2), 1.03    *np.max(mass[couple2]**2))
+        fig.colorbar(im, ax=ax).set_label("Number of Events / bin", fontsize=12)
+    fig.tight_layout()
+    return fig
+
+def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title=''):
+    """Produce all the Dalitz Plot with marginal 1D distributions."""
+    if mass is None:
+        if data is None:
+            raise ValueError("Provide either `mass` (dict of pair masses) or `data`.")
+        else:
+            mass = {
+                f'{i}{j}': invariant_mass(data, cfg, particles=(i, j))
+                for i, j in itertools.combinations(cfg.particles, 2)
+            }
+    
+    combinations = list(itertools.combinations(mass.keys(), 2))
+    n_plots = len(combinations)
+    
+    fig = plt.figure(figsize=(8 * n_plots, 8))
+    outer_grid = GridSpec(1, n_plots, figure=fig, wspace=0.3)
+
+    for i, (couple1, couple2) in enumerate(combinations):
+        gs = outer_grid[i].subgridspec(
+            2, 2, 
+            width_ratios=[4, 1], 
+            height_ratios=[1, 4],
+            wspace=0.05, 
+            hspace=0.05
+        )
+        
+        ax_main = fig.add_subplot(gs[1, 0])
+        ax_left = fig.add_subplot(gs[1, 1], sharey=ax_main)
+        ax_top  = fig.add_subplot(gs[0, 0], sharex=ax_main)
+
+        x_vals = mass[couple1]**2
+        y_vals = mass[couple2]**2
+
+        # Dalitz Plot
+        h, x_edges, y_edges, im = ax_main.hist2d(x_vals, y_vals, range=range, bins=bins, norm=LogNorm())
+        # ax_main.scatter(x_vals, y_vals, alpha=0.2, s=1, marker='.', color='steelblue')
+        ax_main.set_xlabel(rf"$M^2(K_{{{couple1[0]}}}K_{{{couple1[1]}}})$ [MeV$^2$]", fontsize=13)
+        ax_main.set_ylabel(rf"$M^2(K_{{{couple2[0]}}}K_{{{couple2[1]}}})$ [MeV$^2$]", fontsize=13)
+        
+        # Histogram (X axes)
+        ax_top.hist(x_vals, bins=bins, color='steelblue', histtype='stepfilled', alpha=0.7)
+        ax_top.tick_params(axis="x", labelbottom=False)
+        ax_top.set_ylabel("Events", fontsize=10)
+        ax_top.set_title(rf"Dalitz Plot: $K_{{{couple1[0]}}}K_{{{couple1[1]}}}$ - $K_{{{couple2[0]}}}K_{{{couple2[1]}}}$" + add_title, fontsize=15, pad=12)
+        # ax_top.set_yscale('log')        
+
+        # Histogram (Y axes)
+        ax_left.hist(y_vals, bins=bins, color='steelblue', histtype='stepfilled', alpha=0.7, orientation='horizontal')
+        ax_left.tick_params(axis="y", labelleft=False)
+        ax_left.set_xlabel("Events", fontsize=10)
+        # ax_left.set_xscale('log')
+
+        x_min = range[0][0] if range is not None else np.min(x_vals) - 0.03 * np.max(x_vals)
+        x_max = range[0][1] if range is not None else 1.03 * np.max(x_vals)
+        y_min = range[1][0] if range is not None else np.min(y_vals) - 0.03 * np.max(y_vals)
+        y_max = range[1][1] if range is not None else 1.03 * np.max(y_vals)
+        ax_main.set_xlim(x_min, x_max)
+        ax_main.set_ylim(y_min, y_max)
+
+        # Colorbar
+        cbar = fig.colorbar(im, ax=ax_left, pad=0.1)
+        cbar.set_label(rf"Number of Events / ({x_edges[1]-x_edges[0]:.1e}x{y_edges[1]-y_edges[0]:.1e} MeV$^2$)", fontsize=12)
+        # fig.colorbar(im, ax=ax_left).set_label("Number of Events / bin", fontsize=12)
+    return fig, ax_main, ax_top, ax_left, h, x_edges, y_edges
+
 
 
 # =============================================================================
@@ -711,12 +833,14 @@ def run_coverage_study(data: pd.DataFrame, cfg: Config, best: Minuit, n_exp: int
     t_values, estimates, failed = [], {p: [] for p in pois}, 0
     for _ in tqdm(range(n_toys)):
         boot = data.iloc[rng.integers(0, len(data), len(data))]
-        samples = split_by_charge(boot)
+        samples = split_by_charge(boot, col='B_Mass')
         free = fit_joint(samples, cfg, n_exp, start=start, fixed=keep_fixed, hesse=False)
         if not free.valid:
             failed += 1
             continue
         null = fit_joint(samples, cfg, n_exp, start={**start, **truth}, fixed={**keep_fixed, **truth}, hesse=False)
+        if not null.valid:
+            continue
         t_values.append(max(null.fval - free.fval, 0.0))
         for p in pois:
             estimates[p].append(free.values[p])
