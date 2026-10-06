@@ -33,7 +33,7 @@ import os
 import re
 import warnings
 import itertools
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import reduce
 from pathlib import Path
 from typing import Callable, Dict, Mapping, Sequence
@@ -70,16 +70,16 @@ class Side:
 
 
 SIDES: Dict[str, Side] = {
-    "pos": Side(+1, r"$B^+$", "navy", -1),
+    "pos": Side(+1, r"$B^+$", "navy",    -1),
     "neg": Side(-1, r"$B^-$", "darkred", +1),
 }
 
 DEFAULT_LIMITS = {
-    "N_sig": (0, None),
-    "N_bkg": (0, None),
-    "A_CP": (-1.0, 1.0),
-    "sigma": (1.0, 100.0),
-    "lam": (1e-6, 1.0),   # lam1, lam2, ...
+    "N_sig":  (0, None),
+    "N_bkg":  (0, None),
+    "A_CP":   (-1.0, 1.0),
+    "sigma":  (1.0, 100.0),
+    "lam":    (1e-6, 1.0),   # lam1, lam2, ...
     "f_bkgs": (0.0, 1.0),
     # "mu" defaults to cfg.sig_region (see param_limit)
 }
@@ -96,9 +96,9 @@ class Config:
     sim_tree:    str = "PhaseSpaceTree"
     # --- decay ------------------------------------------------------------
     n_products:  int = 3
-    m_K:         float = 493.677      # kaon mass [MeV]
-    m_Pi:        float = 139.57039    # pi mass   [MeV]
-    m_B:         float = 5279.41      # B mass    [MeV]
+    m_K:         float = 493.677      # kaon mass  [MeV]
+    m_Pi:        float = 139.57039    # pi mass    [MeV]
+    m_B:         float = 5279.41      # B mass     [MeV]
     # --- preselection (B -> KKK) -------------------------------------------
     prob_k_min:  float = 0.5
     prob_pi_max: float = 0.5
@@ -106,7 +106,7 @@ class Config:
     prob_pi_min: float = 0.5
     prob_k_max:  float = 0.5
     # --- mass fit ---------------------------------------------------------
-    fit_window:  tuple = (5100.0, 6000.0)
+    fit_window:  tuple = (5100.0, 5600.0)
     sig_region:  tuple = (5200.0, 5350.0)
     n_exp:       int = 2              # number of exponentials in the background (1 or 2)
     limits:      dict = field(default_factory=lambda: dict(DEFAULT_LIMITS))
@@ -378,7 +378,45 @@ def easy_dalitz_plot(cfg, mass=None, data=None, bins=100):
     fig.tight_layout()
     return fig
 
-def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title=''):
+def get_charm_veto_mask(mass_dict, mode):
+    """
+    Crea una maschera booleana che vale True per gli eventi da MANTENERE 
+    e False per quelli da scartare (veto).
+    
+    Parametri:
+    - mass_dict: dizionario con le masse invarianti M (in MeV) delle coppie, es. {'12': m12, '13': m13}
+    - mode: 'a' o 'D' -> solo veto D0
+            'b' o 'all' -> veto D0 + J/psi + chi_c0
+            '[...]' -> veto on the selected particles
+    """
+    res_windows = {
+        'D':   (1864.84, 30.0),
+        'J':   (3096.90, 30.0),
+        'chi': (3414.70, 30.0)
+    }
+    
+    if mode in ['a', 'D']:
+        active_res = ['D']
+    elif mode in ['b', 'all']:
+        active_res = ['D', 'J', 'chi']
+    elif isinstance(mode, (list, tuple, set)):
+        active_res = mode
+    else:
+        raise ValueError(f"remove_resonances not valid.")
+
+    first_key = list(mass_dict.keys())[0]
+    reject_mask = np.zeros(len(mass_dict[first_key]), dtype=bool)
+
+    # Scarta l'evento se ALMENO UNA delle due coppie cade nella finestra |m - m0| < semi-larghezza
+    for pair_key, m_array in mass_dict.items():
+        for res in active_res:
+            m0, half_width = res_windows[res]
+            reject_mask |= (np.abs(m_array - m0) < half_width)
+
+    return ~reject_mask
+
+
+def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title='', remove_resonances=None):
     """Produce all the Dalitz Plot with marginal 1D distributions."""
     if mass is None:
         if data is None:
@@ -388,6 +426,11 @@ def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title=''):
                 f'{i}{j}': invariant_mass(data, cfg, particles=(i, j))
                 for i, j in itertools.combinations(cfg.particles, 2)
             }
+    
+    # resonances veto
+    if remove_resonances:
+        keep_mask = get_charm_veto_mask(mass, remove_resonances)
+        mass = {k: v[keep_mask] for k, v in mass.items()}
     
     combinations = list(itertools.combinations(mass.keys(), 2))
     n_plots = len(combinations)
@@ -422,13 +465,11 @@ def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title=''):
         ax_top.tick_params(axis="x", labelbottom=False)
         ax_top.set_ylabel("Events", fontsize=10)
         ax_top.set_title(rf"Dalitz Plot: $K_{{{couple1[0]}}}K_{{{couple1[1]}}}$ - $K_{{{couple2[0]}}}K_{{{couple2[1]}}}$" + add_title, fontsize=15, pad=12)
-        # ax_top.set_yscale('log')        
 
         # Histogram (Y axes)
         ax_left.hist(y_vals, bins=bins, color='steelblue', histtype='stepfilled', alpha=0.7, orientation='horizontal')
         ax_left.tick_params(axis="y", labelleft=False)
         ax_left.set_xlabel("Events", fontsize=10)
-        # ax_left.set_xscale('log')
 
         x_min = range[0][0] if range is not None else np.min(x_vals) - 0.03 * np.max(x_vals)
         x_max = range[0][1] if range is not None else 1.03 * np.max(x_vals)
@@ -440,9 +481,8 @@ def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title=''):
         # Colorbar
         cbar = fig.colorbar(im, ax=ax_left, pad=0.1)
         cbar.set_label(rf"Number of Events / ({x_edges[1]-x_edges[0]:.1e}x{y_edges[1]-y_edges[0]:.1e} MeV$^2$)", fontsize=12)
-        # fig.colorbar(im, ax=ax_left).set_label("Number of Events / bin", fontsize=12)
-    return fig, ax_main, ax_top, ax_left, h, x_edges, y_edges
 
+    return fig, ax_main, ax_top, ax_left, h, x_edges, y_edges
 
 
 # =============================================================================
@@ -748,6 +788,66 @@ def plot_sideband(sb_samples, sb_fits, cfg: Config, n_exp: int | None = None, bi
     ax.set(xlabel="Mass(KKK) [MeV]", ylabel="Density")
     ax.legend()
     return fig
+
+
+# ---- systematics scans ------------------------------------------------------------------
+# def sideband_subtracted_asymmetry(samples, cfg, n_exp=None):
+#     """A_CP from sideband-subtracted counting in the signal region (this one DOES depend on cfg.sig_region)."""
+#     n_exp = cfg.n_exp if n_exp is None else n_exp
+#     n_sig, n_obs = {}, {}
+#     for side, m in samples.items():
+#         sb = select_sideband(m, cfg)
+#         b = expected_background_in_signal(fit_sideband(sb, cfg, n_exp), len(sb), cfg, n_exp)
+#         n_obs[side] = int(in_region(m, cfg.sig_region).sum())
+#         n_sig[side] = n_obs[side] - b
+#     p, n = n_sig["pos"], n_sig["neg"]
+#     a = (n - p) / (n + p)
+#     err = 2 * np.sqrt(p**2 * n_obs["neg"] + n**2 * n_obs["pos"]) / (n + p) ** 2   # Poisson on N_obs only
+#     return a, err
+
+def scan_config(all_data, cfg, variations, n_exp=2, minos=False):
+    """
+    One joint fit per entry of `variations` = list of Config overrides, e.g.
+    [{'fit_window': (5100, 6000)}, {'sig_region': (5230, 5330)}, ...].
+    `data` must contain B_Mass and B_Charge over the FULL mass range (it is re-cut for every window).
+    """
+    rows = []
+    for var in tqdm(variations, desc="scan"):
+        cfg_v = replace(cfg, **var)
+        if ('prob_pi_max' or 'prob_k_min') in var.keys():
+            data = all_data[kaon_preselection(all_data, cfg_v)]
+        else:
+            data = all_data
+        (left, right), (slo, shi) = cfg_v.fit_window, cfg_v.sig_region
+        row = dict(left=left, right=right, sig_lo=slo, sig_hi=shi)
+        try:
+            if not (left <= slo < shi <= right):
+                raise ValueError("signal region not inside the fit window")
+            samples = split_by_charge(select_window(data, cfg_v.fit_window))
+            if sum(len(select_sideband(m, cfg_v)) for m in samples.values()) == 0:
+                raise ValueError("empty sideband")
+            m = fit_joint(samples, cfg_v, n_exp=n_exp, minos=minos)
+            # a_cnt, a_cnt_err = sideband_subtracted_asymmetry(samples, cfg_v, n_exp)
+            row.update(valid=m.valid, accurate=m.accurate, n_events=sum(map(len, samples.values())),
+                       A_CP=m.values["A_CP"], A_CP_err=m.errors["A_CP"], N_sig=m.values["N_sig"],
+                       mu=m.values["mu"], sigma=m.values["sigma"],
+                       gof=gof_joint(m, samples, cfg_v, n_exp),
+                       prob_k_min=cfg_v.prob_k_min, prob_pi_max=cfg_v.prob_pi_max,
+                       # A_count=a_cnt, A_count_err=a_cnt_err
+                       )
+        except Exception as e:
+            row.update(valid=False, error=f"{type(e).__name__}: {e}")
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+def scan_fit_window(data, cfg, lefts, rights, **kw):
+    return scan_config(data, cfg, [dict(fit_window=(l, r))   for l,  r  in itertools.product(lefts, rights)], **kw)
+
+def scan_signal_region(data, cfg, los, his, **kw):
+    return scan_config(data, cfg, [dict(sig_region=(lo, hi)) for lo, hi in itertools.product(los, his)], **kw)
+
+def scan_preselection_cuts(all_data, cfg, k_min, pi_max, **kw):
+    return scan_config(all_data, cfg, [dict(prob_k_min=k, prob_pi_max=pi) for k, pi in itertools.product(k_min, pi_max)], **kw)
 
 
 # =============================================================================
