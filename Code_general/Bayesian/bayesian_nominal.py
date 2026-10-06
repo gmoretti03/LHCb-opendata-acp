@@ -53,10 +53,15 @@ class Config:
     A_bound: float = 1.0          # prior A in (-A_bound, A_bound)
     veto: tuple = ()              # charm states vetoed, e.g. ("D0",); half-widths in CHARM_HALFWIDTH,
                                   # applied to both opposite-sign K+K- pairs
+    signal_per_charge: bool = False  # mu and sigma separate for B+ and B-
+    prob_k_min: float = 0.5       # preselection: ProbK > prob_k_min and ProbPi < prob_pi_max on all three tracks
+    prob_pi_max: float = 0.5
 
 
 NOMINAL = Config()
+# common list of variations, identical in the frequentist analysis (freq: Frequentist_Systematics.ipynb)
 VARIATIONS = [
+    replace(NOMINAL, name="window_lo5050", lo=5050.0),
     replace(NOMINAL, name="window_lo5150", lo=5150.0),
     replace(NOMINAL, name="window_hi5450", hi=5450.0),
     replace(NOMINAL, name="window_hi5700", hi=5700.0),
@@ -64,15 +69,22 @@ VARIATIONS = [
     replace(NOMINAL, name="bkg_shared_shape", shape="shared"),
     replace(NOMINAL, name="bkg_symmetric", asym="sym"),
     replace(NOMINAL, name="signal_crystal_ball", signal="cb"),
-    replace(NOMINAL, name="prior_A_narrow", A_bound=0.3),
+    replace(NOMINAL, name="signal_per_charge", signal_per_charge=True),
+    replace(NOMINAL, name="presel_probk_0.4", prob_k_min=0.4),
+    replace(NOMINAL, name="presel_probk_0.6", prob_k_min=0.6),
+    replace(NOMINAL, name="presel_probpi_0.4", prob_pi_max=0.4),
+    replace(NOMINAL, name="presel_probpi_0.6", prob_pi_max=0.6),
 ]
-# groups combined in the systematic uncertainty (largest shift per group, groups in quadrature)
 SYST_GROUPS = {
-    "window": ["window_lo5150", "window_hi5450", "window_hi5700"],
+    "window": ["window_lo5050", "window_lo5150", "window_hi5450", "window_hi5700"],
     "background": ["bkg_single_exp", "bkg_shared_shape", "bkg_symmetric"],
-    "signal": ["signal_crystal_ball"],
-    "prior": ["prior_A_narrow"],
+    "signal": ["signal_crystal_ball", "signal_per_charge"],
+    "preselection": ["presel_probk_0.4", "presel_probk_0.6", "presel_probpi_0.4", "presel_probpi_0.6"],
 }
+# variations that change the sample: Barlow criterion applies
+SAMPLE_CHANGING = SYST_GROUPS["window"] + SYST_GROUPS["preselection"]
+# prior sensitivity: Bayesian-only check, not part of the systematic uncertainty
+PRIOR_CHECKS = [replace(NOMINAL, name="prior_A_narrow", A_bound=0.3)]
 # charm vetoes: informative robustness checks only (not in the systematic uncertainty), same
 # definition as in the frequentist analysis; "all" is the reference one
 CHARM_VETOES = [replace(NOMINAL, name="veto_D0", veto=("D0",)),
@@ -81,8 +93,10 @@ CHARM_VETOES = [replace(NOMINAL, name="veto_D0", veto=("D0",)),
 
 # ---------------------------------------------------------------- data
 def load_candidates(data_dir: str) -> pd.DataFrame:
-    """Read both polarities, apply the shared preselection, add B mass/charge and the two
-    opposite-sign K+K- masses (m12, m13; H1 is the kaon with charge opposite to the B)."""
+    """Read both polarities, apply a preselection looser than every variation (ProbK > 0.4,
+    ProbPi < 0.6, muon veto; `select` then applies the cuts of each Config), add B mass/charge,
+    the two opposite-sign K+K- masses (m12, m13; H1 is the kaon with charge opposite to the B) and
+    the per-candidate min ProbK / max ProbPi over the three tracks."""
     br = [f"H{i}_{v}" for i in (1, 2, 3) for v in ("PX", "PY", "PZ", "ProbK", "ProbPi", "isMuon", "Charge")]
     frames = []
     for pol in ("Down", "Up"):
@@ -93,20 +107,22 @@ def load_candidates(data_dir: str) -> pd.DataFrame:
     df = pd.concat(frames, ignore_index=True)
     sel = np.ones(len(df), bool)
     for i in (1, 2, 3):
-        sel &= (df[f"H{i}_ProbPi"] < 0.5) & (df[f"H{i}_ProbK"] > 0.5) & (~df[f"H{i}_isMuon"].astype(bool))
+        sel &= (df[f"H{i}_ProbPi"] < 0.6) & (df[f"H{i}_ProbK"] > 0.4) & (~df[f"H{i}_isMuon"].astype(bool))
     df = df[sel].reset_index(drop=True)
     p = {i: df[[f"H{i}_PX", f"H{i}_PY", f"H{i}_PZ"]].to_numpy() for i in (1, 2, 3)}
     e = {i: np.sqrt((p[i] ** 2).sum(1) + M_K ** 2) for i in (1, 2, 3)}
     def mass(*idx):
         return np.sqrt(np.clip(sum(e[i] for i in idx) ** 2 - (sum(p[i] for i in idx) ** 2).sum(1), 0, None))
     out = pd.DataFrame({"m": mass(1, 2, 3), "q": (df.H1_Charge + df.H2_Charge + df.H3_Charge).to_numpy(),
-                        "m12": mass(1, 2), "m13": mass(1, 3), "magnet": df["magnet"].to_numpy()})
+                        "m12": mass(1, 2), "m13": mass(1, 3), "magnet": df["magnet"].to_numpy(),
+                        "min_probk": df[["H1_ProbK", "H2_ProbK", "H3_ProbK"]].min(axis=1).to_numpy(),
+                        "max_probpi": df[["H1_ProbPi", "H2_ProbPi", "H3_ProbPi"]].max(axis=1).to_numpy()})
     assert np.all(df.H1_Charge.to_numpy() == -out.q.to_numpy()), "H1 is expected to be the opposite-sign kaon"
     return out[np.isin(out.q, [1, -1])].reset_index(drop=True)
 
 
 def select(cands: pd.DataFrame, cfg: Config) -> pd.DataFrame:
-    keep = (cands.m > cfg.lo) & (cands.m < cfg.hi)
+    keep = (cands.m > cfg.lo) & (cands.m < cfg.hi) & (cands.min_probk > cfg.prob_k_min) & (cands.max_probpi < cfg.prob_pi_max)
     for st in cfg.veto:
         m0 = CHARM_STATES[st]
         hw = CHARM_HALFWIDTH[st]
@@ -116,7 +132,8 @@ def select(cands: pd.DataFrame, cfg: Config) -> pd.DataFrame:
 
 # ---------------------------------------------------------------- model
 def param_names(cfg: Config) -> list:
-    names = ["N_s", "N_b", "A"] + (["A_b"] if cfg.asym == "free" else []) + ["mu", "sigma"]
+    names = ["N_s", "N_b", "A"] + (["A_b"] if cfg.asym == "free" else []) \
+        + (["mu_pos", "mu_neg", "sigma_pos", "sigma_neg"] if cfg.signal_per_charge else ["mu", "sigma"])
     if cfg.signal == "cb":
         names += ["beta", "m_cb"]
     sides = ["pos", "neg"] if cfg.shape == "charge" else ["all"]
@@ -125,8 +142,9 @@ def param_names(cfg: Config) -> list:
     return names
 
 
-def _signal_pdf(m, d, cfg):
-    mu, s = d["mu"], d["sigma"]
+def _signal_pdf(m, d, cfg, side=None):
+    mu = d[f"mu_{side}"] if cfg.signal_per_charge else d["mu"]
+    s = d[f"sigma_{side}"] if cfg.signal_per_charge else d["sigma"]
     if cfg.signal == "gauss":
         return norm.pdf(m, mu, s) / (norm.cdf(cfg.hi, mu, s) - norm.cdf(cfg.lo, mu, s))
     b, mm = d["beta"], d["m_cb"]
@@ -148,8 +166,12 @@ def _bkg_pdf(m, d, side, cfg):
 
 def _in_prior(d, cfg, n):
     if not (0 < d["N_s"] < 5 * n and 0 < d["N_b"] < 5 * n and -cfg.A_bound < d["A"] < cfg.A_bound
-            and -1 < d.get("A_b", 0.0) < 1 and 5260 < d["mu"] < 5310 and 3 < d["sigma"] < 40):
+            and -1 < d.get("A_b", 0.0) < 1):
         return False
+    for k in (("mu_pos", "mu_neg", "sigma_pos", "sigma_neg") if cfg.signal_per_charge else ("mu", "sigma")):
+        lo_, hi_ = (5260, 5310) if k.startswith("mu") else (3, 40)
+        if not lo_ < d[k] < hi_:
+            return False
     if cfg.signal == "cb" and not (0.3 < d["beta"] < 5 and 1.01 < d["m_cb"] < 50):
         return False
     for k in (["pos", "neg"] if cfg.shape == "charge" else ["all"]):
@@ -181,9 +203,9 @@ class Posterior:
         if not _in_prior(d, self.cfg, self.n):
             return -np.inf
         m, p, cfg = self.m, self.plus, self.cfg
-        s = _signal_pdf(m, d, cfg)
-        dp = d["N_s"] * (1 - d["A"]) / 2 * s[p] + d["N_b"] * (1 - d["A_b"]) / 2 * _bkg_pdf(m[p], d, "pos", cfg)
-        dn = d["N_s"] * (1 + d["A"]) / 2 * s[~p] + d["N_b"] * (1 + d["A_b"]) / 2 * _bkg_pdf(m[~p], d, "neg", cfg)
+        sp, sn = _signal_pdf(m[p], d, cfg, "pos"), _signal_pdf(m[~p], d, cfg, "neg")
+        dp = d["N_s"] * (1 - d["A"]) / 2 * sp + d["N_b"] * (1 - d["A_b"]) / 2 * _bkg_pdf(m[p], d, "pos", cfg)
+        dn = d["N_s"] * (1 + d["A"]) / 2 * sn + d["N_b"] * (1 + d["A_b"]) / 2 * _bkg_pdf(m[~p], d, "neg", cfg)
         if np.any(dp <= 0) or np.any(dn <= 0) or not (np.all(np.isfinite(dp)) and np.all(np.isfinite(dn))):
             return -np.inf
         return float(np.sum(np.log(dp)) + np.sum(np.log(dn)) - (d["N_s"] + d["N_b"]))
@@ -191,7 +213,7 @@ class Posterior:
 
 def _start(cfg: Config, n: int) -> dict:
     st = {"N_s": 0.78 * n, "N_b": 0.22 * n, "A": -0.04, "A_b": 0.0, "mu": 5284.4, "sigma": 18.0,
-          "beta": 1.8, "m_cb": 10.0}
+          "beta": 1.8, "m_cb": 10.0, "mu_pos": 5284.4, "mu_neg": 5284.4, "sigma_pos": 18.0, "sigma_neg": 18.0}
     for k in ("pos", "neg", "all"):
         st[f"lam1_{k}"] = 0.03 if cfg.nexp == 2 else 0.004
         st[f"lam2_{k}"], st[f"f_{k}"] = 0.002, 0.15
@@ -269,7 +291,8 @@ def _prior_box(cfg, n, names):
            "mu": (5260, 5310), "sigma": (3, 40), "beta": (0.3, 5), "m_cb": (1.01, 50)}
     lo_, hi_ = [], []
     for k in names:
-        a, b = box.get(k, (1e-5, 0.1)) if not k.startswith("f_") else (0, 1)
+        base = k.rsplit("_", 1)[0] if k.endswith(("_pos", "_neg")) and k.startswith(("mu", "sigma")) else k
+        a, b = box.get(base, (1e-5, 0.1)) if not k.startswith("f_") else (0, 1)
         lo_.append(a); hi_.append(b)
     return np.array(lo_), np.array(hi_)
 
@@ -282,7 +305,7 @@ def binned_gof(post: Posterior, theta, width=10.0) -> dict:
     chi2, per = 0.0, {}
     for side, sg, msk in (("pos", -1, post.plus), ("neg", +1, ~post.plus)):
         obs, _ = np.histogram(post.m[msk], edges)
-        exp = (d["N_s"] * (1 + sg * d["A"]) / 2 * _signal_pdf(cen, d, cfg)
+        exp = (d["N_s"] * (1 + sg * d["A"]) / 2 * _signal_pdf(cen, d, cfg, side)
                + d["N_b"] * (1 + sg * d["A_b"]) / 2 * _bkg_pdf(cen, d, side, cfg)) * width
         per[side] = float(np.sum((obs - exp) ** 2 / exp))
         chi2 += per[side]
@@ -383,15 +406,25 @@ def coverage_summary(toys: list, a_true: float, sd_data: float) -> dict:
             "chain_over_tau_min_worst": float(min(t["chain_over_tau_min"] for t in toys))}
 
 
-def systematics(nominal: dict, variations: list) -> dict:
-    a0 = nominal["A"]["median"]
+def systematics(nominal: dict, variations: list, dchi2_max: float = 25.0) -> dict:
+    """Common rule (same as freq `lhcb_freq.combine_systematics`): for sample-changing variations the shift counts
+    only if |shift| > sigma_B = sqrt(|sd_var^2 - sd_nom^2|) (Barlow); variations on the same sample whose binned
+    chi2 is worse than the nominal by more than `dchi2_max` are rejected by the data; then the largest |shift| per
+    group, groups added in quadrature."""
+    a0, s0 = nominal["A"]["median"], nominal["A"]["sd"]
     by = {v["config"]["name"]: v for v in variations}
-    shifts = {k: by[k]["A"]["median"] - a0 for k in by}
-    groups = {g: max(abs(shifts[k]) for k in ks if k in shifts) for g, ks in SYST_GROUPS.items()
-              if any(k in shifts for k in ks)}
-    return {"A_nominal": a0, "shifts": shifts, "groups_max_abs_shift": groups,
-            "total_quadrature": float(np.sqrt(sum(v ** 2 for v in groups.values()))),
-            "rule": "largest |shift| per group, groups added in quadrature"}
+    per = {}
+    for k, v in by.items():
+        d = v["A"]["median"] - a0
+        sb = float(np.sqrt(abs(v["A"]["sd"] ** 2 - s0 ** 2))) if k in SAMPLE_CHANGING else None
+        rejected = (k not in SAMPLE_CHANGING) and (v["gof"]["chi2"] - nominal["gof"]["chi2"] > dchi2_max)
+        per[k] = {"shift": float(d), "sigma_barlow": sb, "rejected_by_data": bool(rejected),
+                  "counts": bool((not rejected) and (sb is None or abs(d) > sb))}
+    groups = {g: float(max([abs(per[k]["shift"]) for k in ks if k in per and per[k]["counts"]] or [0.0]))
+              for g, ks in SYST_GROUPS.items()}
+    return {"A_nominal": a0, "sigma_stat": s0, "variations": per, "groups": groups,
+            "total": float(np.sqrt(sum(v ** 2 for v in groups.values()))),
+            "rule": f"Barlow for sample-changing variants; exclude dchi2>{dchi2_max:g}; max per group; groups in quadrature"}
 
 
 def bayes_factor_gaussian(res: dict, par: str, prior_density: float) -> float:
