@@ -87,16 +87,16 @@ In this dataset only the charge combinations $(+1,-1,-1)$ and $(-1,+1,+1)$ occur
 
 \subsection{Invariant Mass Reconstruction}
 \label{sec:data_mass}
-The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K=493.677\,\MeV$) regardless of their PID likelihoods, and their four-momenta are summed to reconstruct the $B$ candidate, $m(KKK)=\sqrt{(\sum_i E_i)^2-|\sum_i \vec{p}_i|^2}$. Below $\sim$5150\,\MeV\ the background rises, consistent with a partially reconstructed contribution that a single exponential cannot describe; the fit window used throughout -- in the frequentist and Bayesian fits and to build the ML weak labels (Sec.~\ref{sec:ml_labels}) -- is therefore $[5150,5450]\,\MeV$. This leaves $17{,}839$ preselected candidates in the fit window: $9358$ with $B$-charge $+1$ and $8481$ with $B$-charge $-1$, split $10{,}500$ (magnet down) / $7339$ (magnet up).
+The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K=493.677\,\MeV$) regardless of their PID likelihoods, and their four-momenta are summed to reconstruct the $B$ candidate, $m(KKK)=\sqrt{(\sum_i E_i)^2-|\sum_i \vec{p}_i|^2}$. The nominal fit window, common to the frequentist and Bayesian analyses, is $[5100,5600]\,\MeV$. Below $\sim$5150\,\MeV\ the background rises, consistent with a partially reconstructed contribution that a single exponential cannot describe; the window includes the start of this rise, which is described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}). This leaves $19{,}731$ preselected candidates in the fit window: $10{,}292$ with $B$-charge $+1$ and $9439$ with $B$-charge $-1$, split $11{,}636$ (magnet down) / $8095$ (magnet up). \todo{ML window: the ML weak labels were built in the window of the simplified model, $[5150,5450]\,\MeV$ -- decision pending (B2).}
 
 \subsection{Data Exploration}
 \label{sec:data_exploration}
-Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit window, split by $B$ charge (left) and by magnet polarity (right). The spectrum peaks at $m\approx5284\,\MeV$ over a falling combinatorial background, with a similar shape for the two charges and the two magnet polarities. The charge-counting asymmetry of all candidates in the fit window, signal and background together, is $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.049$.
+Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit window, split by $B$ charge (left) and by magnet polarity (right). The spectrum peaks at $m\approx5284\,\MeV$ over a falling combinatorial background, with a similar shape for the two charges and the two magnet polarities. The charge-counting asymmetry of all candidates in the fit window, signal and background together, is $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.043$.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/mass_spectrum.pdf}
-\caption{Reconstructed $B\to KKK$ invariant mass in the fit window $[5150,5450]\,\MeV$, split by $B$ charge (left) and by magnet polarity (right). Both splits show a consistent peak at $m\approx5284\,\MeV$ over a falling combinatorial background.}
+\caption{Reconstructed $B\to KKK$ invariant mass in the nominal fit window $[5100,5600]\,\MeV$, split by $B$ charge (left) and by magnet polarity (right). Both splits show a consistent peak at $m\approx5284\,\MeV$ over a falling combinatorial background, which rises below $\sim$5150\,\MeV.}
 \label{fig:mass_spectrum}
 \end{figure*}
 
@@ -126,6 +126,7 @@ is used to derive a confidence interval on $A$ via Wilks' theorem, and to test t
 
 \section{Bayesian Analysis}
 \label{sec:bayesian}
+\todo{This section still describes the simplified model ($[5150,5450]\,\MeV$, single exponential, symmetric background): to be rewritten for the nominal model after the full run (Bayesian\_Nominal.ipynb).}
 
 \subsection{Model and Priors}
 \label{sec:bayes_model}
