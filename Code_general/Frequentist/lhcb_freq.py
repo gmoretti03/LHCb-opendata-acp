@@ -99,6 +99,11 @@ class Config:
     m_K:         float = 493.677      # kaon mass  [MeV]
     m_Pi:        float = 139.57039    # pi mass    [MeV]
     m_B:         float = 5279.41      # B mass     [MeV]
+    res_windows = {
+        'D':   (1864.84, 30.0),
+        'J':   (3096.90, 30.0),
+        'chi': (3414.70, 30.0)
+    }
     # --- preselection (B -> KKK) -------------------------------------------
     prob_k_min:  float = 0.5
     prob_pi_max: float = 0.5
@@ -378,39 +383,43 @@ def easy_dalitz_plot(cfg, mass=None, data=None, bins=100):
     fig.tight_layout()
     return fig
 
-def get_charm_veto_mask(mass_dict, mode):
+
+def remove_charm_resonances(cfg, data, remove, couple_inv_mass=None):
+    if couple_inv_mass is None:
+            if data is None:
+                raise ValueError("Provide either `mass` (dict of pair masses) or `data`.")
+            else:
+                couple_inv_mass = {f'{i}{j}': invariant_mass(data, cfg, particles=(i,j)) for i,j in list(itertools.combinations(cfg.particles, 2))}
+    return data[get_charm_veto_mask(cfg, couple_inv_mass, remove)]
+
+def get_charm_veto_mask(cfg, couple_inv_mass, remove):
     """
     Crea una maschera booleana che vale True per gli eventi da MANTENERE 
     e False per quelli da scartare (veto).
     
     Parametri:
     - mass_dict: dizionario con le masse invarianti M (in MeV) delle coppie, es. {'12': m12, '13': m13}
-    - mode: 'a' o 'D' -> solo veto D0
+    - remove: 'a' o 'D' -> solo veto D0
             'b' o 'all' -> veto D0 + J/psi + chi_c0
             '[...]' -> veto on the selected particles
     """
-    res_windows = {
-        'D':   (1864.84, 30.0),
-        'J':   (3096.90, 30.0),
-        'chi': (3414.70, 30.0)
-    }
     
-    if mode in ['a', 'D']:
+    if remove in ['a', 'D']:
         active_res = ['D']
-    elif mode in ['b', 'all']:
+    elif remove in ['b', 'all']:
         active_res = ['D', 'J', 'chi']
-    elif isinstance(mode, (list, tuple, set)):
-        active_res = mode
+    elif isinstance(remove, (list, tuple, set)):
+        active_res = remove
     else:
         raise ValueError(f"remove_resonances not valid.")
 
-    first_key = list(mass_dict.keys())[0]
-    reject_mask = np.zeros(len(mass_dict[first_key]), dtype=bool)
+    first_key = list(couple_inv_mass.keys())[0]
+    reject_mask = np.zeros(len(couple_inv_mass[first_key]), dtype=bool)
 
     # Scarta l'evento se ALMENO UNA delle due coppie cade nella finestra |m - m0| < semi-larghezza
-    for pair_key, m_array in mass_dict.items():
+    for pair_key, m_array in couple_inv_mass.items():
         for res in active_res:
-            m0, half_width = res_windows[res]
+            m0, half_width = cfg.res_windows[res]
             reject_mask |= (np.abs(m_array - m0) < half_width)
 
     return ~reject_mask
@@ -429,7 +438,7 @@ def dalitz_plot(cfg, mass=None, data=None, range=None, bins=100, add_title='', r
     
     # resonances veto
     if remove_resonances:
-        keep_mask = get_charm_veto_mask(mass, remove_resonances)
+        keep_mask = get_charm_veto_mask(cfg, mass, remove_resonances)
         mass = {k: v[keep_mask] for k, v in mass.items()}
     
     combinations = list(itertools.combinations(mass.keys(), 2))
