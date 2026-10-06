@@ -50,6 +50,7 @@ from matplotlib.colors import LogNorm
 from matplotlib.gridspec import GridSpec
 from scipy.stats import chi2 as chi2_dist
 from scipy.stats import norm
+from scipy.stats import crystalball   # [Giacomo, 2026-10-06] per la variante di segnale Crystal Ball
 from tqdm.auto import tqdm
 
 # =============================================================================
@@ -81,6 +82,9 @@ DEFAULT_LIMITS = {
     "sigma":  (1.0, 100.0),
     "lam":    (1e-6, 1.0),   # lam1, lam2, ...
     "f_bkgs": (0.0, 1.0),
+    # [Giacomo, 2026-10-06] parametri delle code della Crystal Ball (variante di segnale)
+    "beta":   (0.3, 5.0),
+    "m_cb":   (1.01, 50.0),
     # "mu" defaults to cfg.sig_region (see param_limit)
 }
 
@@ -118,6 +122,20 @@ class Config:
     fit_window:  tuple = (5100.0, 5600.0)
     sig_region:  tuple = (5200.0, 5350.0)
     n_exp:       int = 2              # number of exponentials in the background (1 or 2)
+    # [Giacomo, 2026-10-06] opzioni per le varianti dello studio sistematico (i default = modello nominale):
+    #   bkg_shape:  "charge" = forma del fondo (lam1, lam2, f_bkgs) separata per B+ e B-;  "shared" = condivisa
+    #   bkg_yield:  "free" = N_bkg_pos, N_bkg_neg indipendenti;  "symmetric" = stessa resa di fondo per le due cariche
+    #   signal:     "gauss" = gaussiana troncata;  "cb" = Crystal Ball troncata con code (beta, m_cb) libere e condivise
+    #   signal_per_charge: True = mu e sigma separati per B+ e B- (mu_pos, mu_neg, sigma_pos, sigma_neg)
+    # [Giacomo, 2026-10-06] ipotesi di massa delle tracce per B_Mass: "kaon" = kaone per tutte e tre (analisi B->KKK,
+    # come dichiarato nel report); "pid" = kaone o pione traccia per traccia secondo ProbK >= ProbPi (comportamento
+    # precedente). Con i tagli nominali (ProbK > 0.5, ProbPi < 0.5) le due coincidono; con tagli piu' larghi (varianti
+    # di preselezione) "pid" ricostruirebbe alcune tracce come pioni e cambierebbe la massa del B.
+    mass_hypothesis: str = "kaon"
+    bkg_shape:   str = "charge"
+    bkg_yield:   str = "free"
+    signal:      str = "gauss"
+    signal_per_charge: bool = False
     limits:      dict = field(default_factory=lambda: dict(DEFAULT_LIMITS))
 
     def __post_init__(self):
@@ -196,6 +214,8 @@ def particle_mass(df: pd.DataFrame, cfg: Config, particles=None):
         mass = np.ones(len(df[f'H{i}_ProbK']))
         K_mask  = (df[f'H{i}_ProbK'] >= df[f'H{i}_ProbPi'])
         Pi_mask = (df[f'H{i}_ProbK'] <  df[f'H{i}_ProbPi'])
+        if getattr(cfg, "mass_hypothesis", "pid") == "kaon":   # [Giacomo, 2026-10-06] vedi Config.mass_hypothesis
+            K_mask, Pi_mask = np.ones(len(mass), bool), np.zeros(len(mass), bool)
         mass[K_mask]  = cfg.m_K
         mass[Pi_mask] = cfg.m_Pi
         df[f'H{i}_Mass'] = mass
@@ -523,6 +543,13 @@ def gauss_pdf(m, mu, sigma, window):
     return norm.pdf(m, mu, sigma) / (norm.cdf(hi, mu, sigma) - norm.cdf(lo, mu, sigma))
 
 
+def cb_pdf(m, mu, sigma, beta, m_cb, window):
+    """[Giacomo, 2026-10-06] Crystal Ball (coda a bassa massa) troncata e normalizzata su `window`."""
+    lo, hi = window
+    z = crystalball.cdf((hi - mu) / sigma, beta, m_cb) - crystalball.cdf((lo - mu) / sigma, beta, m_cb)
+    return crystalball.pdf((np.asarray(m) - mu) / sigma, beta, m_cb) / sigma / z
+
+
 def _bkg_weights(n_exp: int, f_bkgs):
     return [1.0] if n_exp == 1 else [f_bkgs, 1.0 - f_bkgs]
 
@@ -562,9 +589,21 @@ def make_model(cfg: Config, side: str | None = None, n_exp: int | None = None) -
     """
     n_exp = cfg.n_exp if n_exp is None else n_exp
     window, intervals = cfg.fit_window, cfg.window_intervals
-    keys = ["N_sig"] + (["A_CP"] if side else []) + ["mu", "sigma"] + _bkg_keys(n_exp)
+    cb = cfg.signal == "cb"
+    keys = ["N_sig"] + (["A_CP"] if side else []) + ["mu", "sigma"] + (["beta", "m_cb"] if cb else []) + _bkg_keys(n_exp)
     suffix = f"_{side}" if side else ""
-    names = [k + suffix if k in _bkg_keys(n_exp) else k for k in keys]
+    # [Giacomo, 2026-10-06] quali parametri hanno il suffisso _pos/_neg (separati per carica) dipende dalle opzioni
+    # di Config: nel modello nominale solo il fondo (resa e forma). I parametri con lo stesso nome nei due modelli
+    # vengono condivisi da iminuit nel fit congiunto.
+    def _per_side(k):
+        if k == "N_bkg":
+            return cfg.bkg_yield != "symmetric"
+        if k in _bkg_keys(n_exp):
+            return cfg.bkg_shape != "shared"
+        if k in ("mu", "sigma"):
+            return cfg.signal_per_charge
+        return False
+    names = [k + suffix if (side and _per_side(k)) else k for k in keys]
     sign = SIDES[side].asym_sign if side else 0
 
     def model(m, *args):
@@ -572,7 +611,9 @@ def make_model(cfg: Config, side: str | None = None, n_exp: int | None = None) -
         n_sig = p["N_sig"] * (1 + sign * p["A_CP"]) / 2 if side else p["N_sig"]
         lams = [p[f"lam{k}"] for k in range(1, n_exp + 1)]
         bkg = background_pdf(m, lams, p.get("f_bkgs"), intervals)
-        dens = n_sig * gauss_pdf(m, p["mu"], p["sigma"], window) + p["N_bkg"] * bkg
+        sig = (cb_pdf(m, p["mu"], p["sigma"], p["beta"], p["m_cb"], window) if cb
+               else gauss_pdf(m, p["mu"], p["sigma"], window))
+        dens = n_sig * sig + p["N_bkg"] * bkg
         return n_sig + p["N_bkg"], dens
 
     return _with_signature(model, names)
@@ -700,11 +741,20 @@ def initial_values(samples: Mapping[str, np.ndarray], cfg: Config, n_exp: int | 
     """Starting values for the joint fit, built from the sideband fits of each sample."""
     n_exp = cfg.n_exp if n_exp is None else n_exp
     start, n_sig = {"A_CP": 0.0, "mu": cfg.m_B, "sigma": 20.0}, 0.0
+    per_side = []
     for side, m in samples.items():
         bs = background_start(m, cfg, n_exp)
         n_sig += len(m) - bs["N_bkg"]
         start.update({f"{k}_{side}": v for k, v in bs.items()})
+        per_side.append(bs)
     start["N_sig"] = n_sig
+    # [Giacomo, 2026-10-06] valori iniziali anche per i parametri condivisi delle varianti (media delle due cariche),
+    # per mu/sigma separati per carica e per le code della Crystal Ball; i nomi non usati dal modello sono ignorati
+    for k in per_side[0]:
+        start.setdefault(k, float(np.mean([bs[k] for bs in per_side])))
+    for side in samples:
+        start.setdefault(f"mu_{side}", cfg.m_B); start.setdefault(f"sigma_{side}", 20.0)
+    start.setdefault("beta", 1.8); start.setdefault("m_cb", 10.0)
     return start
 
 
@@ -830,30 +880,36 @@ def scan_config(all_data, cfg, variations, n_exp=2, minos=False):
     """
     rows = []
     for var in tqdm(variations, desc="scan"):
+        # [Giacomo, 2026-10-06] una variante puo' avere un'etichetta ("label") e cambiare anche n_exp
+        var = dict(var); label = var.pop("label", None)
+        n_exp_v = var.get("n_exp", n_exp)
         cfg_v = replace(cfg, **var)
         # [Giacomo, 2026-10-06] prima era `('prob_pi_max' or 'prob_k_min') in var.keys()`, che controlla solo
         # 'prob_pi_max' (l'`or` tra due stringhe restituisce la prima): una variante con solo 'prob_k_min'
         # non avrebbe riapplicato la preselezione. Inoltre `all_data` deve essere un campione NON preselezionato
         # (o preselezionato con tagli piu' larghi di tutta la griglia), altrimenti i tagli piu' larghi del
         # nominale non possono recuperare eventi: vedi la cella `data_loose` nel notebook.
-        if any(k in var for k in ("prob_pi_max", "prob_k_min")):
-            data = all_data[kaon_preselection(all_data, cfg_v)]
-        else:
-            data = all_data
+        # [Giacomo, 2026-10-06] la preselezione della variante si riapplica sempre: con un campione gia'
+        # preselezionato ai tagli nominali non cambia nulla; con `data_loose` (tagli piu' larghi) da' il campione
+        # giusto per ogni variante, cosi' tutte le varianti possono usare lo stesso input.
+        data = all_data[kaon_preselection(all_data, cfg_v)]
         (left, right), (slo, shi) = cfg_v.fit_window, cfg_v.sig_region
-        row = dict(left=left, right=right, sig_lo=slo, sig_hi=shi)
+        row = dict(label=label, left=left, right=right, sig_lo=slo, sig_hi=shi)
         try:
             if not (left <= slo < shi <= right):
                 raise ValueError("signal region not inside the fit window")
             samples = split_by_charge(select_window(data, cfg_v.fit_window))
             if sum(len(select_sideband(m, cfg_v)) for m in samples.values()) == 0:
                 raise ValueError("empty sideband")
-            m = fit_joint(samples, cfg_v, n_exp=n_exp, minos=minos)
+            m = fit_joint(samples, cfg_v, n_exp=n_exp_v, minos=minos)
             # a_cnt, a_cnt_err = sideband_subtracted_asymmetry(samples, cfg_v, n_exp)
             row.update(valid=m.valid, accurate=m.accurate, n_events=sum(map(len, samples.values())),
                        A_CP=m.values["A_CP"], A_CP_err=m.errors["A_CP"], N_sig=m.values["N_sig"],
-                       mu=m.values["mu"], sigma=m.values["sigma"],
-                       gof=gof_joint(m, samples, cfg_v, n_exp),
+                       # [Giacomo, 2026-10-06] con signal_per_charge ci sono mu_pos/mu_neg: si registra la media
+                       mu=(m.values["mu"] if "mu" in m.parameters else 0.5 * (m.values["mu_pos"] + m.values["mu_neg"])),
+                       sigma=(m.values["sigma"] if "sigma" in m.parameters else 0.5 * (m.values["sigma_pos"] + m.values["sigma_neg"])),
+                       gof=gof_joint(m, samples, cfg_v, n_exp_v), chi2=gof_joint(m, samples, cfg_v, n_exp_v).chi2,
+                       fval=m.fval,
                        prob_k_min=cfg_v.prob_k_min, prob_pi_max=cfg_v.prob_pi_max,
                        # A_count=a_cnt, A_count_err=a_cnt_err
                        )
@@ -989,3 +1045,38 @@ def plot_coverage(res: CoverageResult, bins: int = 30):
         ax.set(xlabel=name, ylabel="toys")
     fig.tight_layout()
     return fig
+
+
+# ---- [Giacomo, 2026-10-06] combinazione delle varianti nello studio sistematico ---------------------------------
+# Regola comune con l'analisi bayesiana:
+#  1) varianti che cambiano il campione (finestra, preselezione): lo spostamento conta solo se supera la fluttuazione
+#     statistica attesa tra i due campioni (criterio di Barlow), sigma_B = sqrt(|sigma_var^2 - sigma_nom^2|);
+#  2) varianti sullo stesso campione respinte dai dati (chi2 binnato peggiore del nominale di piu' di 25) escluse;
+#  3) per ogni gruppo lo spostamento massimo in valore assoluto; gruppi sommati in quadratura.
+def combine_systematics(nominal: Mapping, rows: Sequence[Mapping], groups: Mapping[str, Sequence[str]],
+                        sample_changing: Sequence[str], dchi2_max: float = 25.0) -> dict:
+    """`nominal` e ogni elemento di `rows` hanno A_CP, A_CP_err, chi2, label; `groups` = {gruppo: [label, ...]}."""
+    a0, s0, n0 = nominal["A_CP"], nominal["A_CP_err"], nominal.get("n_events")
+    per_var = {}
+    for r in rows:
+        lab = r["label"]
+        if not r.get("valid", True) or not np.isfinite(r.get("A_CP", np.nan)):
+            per_var[lab] = dict(shift=None, sigma_barlow=None, rejected_by_data=False, counts=False, fit_failed=True)
+            continue
+        d = r["A_CP"] - a0
+        # se l'errore del fit non e' affidabile (accurate=False, es. parametro al limite) la sigma statistica della
+        # variante si stima dal numero di eventi, sigma_var ~ sigma_nom * sqrt(N_nom / N_var)
+        err_from_n = (r.get("accurate") is False) and n0 and r.get("n_events")
+        s_var = s0 * np.sqrt(n0 / r["n_events"]) if err_from_n else r["A_CP_err"]
+        sb = float(np.sqrt(abs(s_var ** 2 - s0 ** 2))) if lab in sample_changing else None
+        rejected = (lab not in sample_changing) and (r["chi2"] - nominal["chi2"] > dchi2_max)
+        counts = (not rejected) and (sb is None or abs(d) > sb)
+        per_var[lab] = dict(shift=float(d), sigma_barlow=sb, rejected_by_data=bool(rejected), counts=bool(counts),
+                            sigma_from_n_events=bool(err_from_n))
+    by_group = {}
+    for g, labs in groups.items():
+        vals = [abs(per_var[l]["shift"]) for l in labs if l in per_var and per_var[l]["counts"]]
+        by_group[g] = float(max(vals)) if vals else 0.0
+    return dict(A_nominal=float(a0), sigma_stat=float(s0), variations=per_var, groups=by_group,
+                total=float(np.sqrt(sum(v ** 2 for v in by_group.values()))),
+                rule="Barlow for sample-changing variants; exclude dchi2>%g; max per group; groups in quadrature" % dchi2_max)
