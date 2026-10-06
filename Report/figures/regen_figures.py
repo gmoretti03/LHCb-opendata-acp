@@ -8,8 +8,9 @@ results JSON. The notebooks are taken from the `bayes` / `mach_lear` branches wi
 
 usage (from anywhere, cern env):  python regen_figures.py bayes|ml [OUTDIR]
 OUTDIR defaults to this directory (Report/figures); figures are written as PDF. Runtime: ~10 min (bayes), ~3 min (ml).
-The Bayesian chains reproduce the notebook bit-for-bit; the FFNN (TensorFlow) is not
-deterministic, so MC-dropout numbers can differ in the third significant digit.
+The Bayesian chains reproduce the notebook bit-for-bit. The notebook's FFNN training is not
+reproducible; here it is made deterministic, so the FFNN-based figures are reproducible but come
+from a different training than the notebook's (test AUC spread between trainings ~0.004).
 """
 import json, os, subprocess, sys, tempfile, time
 import matplotlib
@@ -46,6 +47,13 @@ nb = json.load(open(NB_NAME))
 plt.show = lambda *a, **k: plt.close("all")
 
 ns = {"__name__": "__main__"}
+if MODE == "ml":
+    # the notebook only calls tf.random.set_seed, which does not make Keras training reproducible;
+    # fixing all seeds and enabling op determinism makes these figures reproducible run to run
+    # (they still differ from the notebook's own, non-reproducible, FFNN training)
+    import tensorflow as tf
+    tf.keras.utils.set_random_seed(42)
+    tf.config.experimental.enable_op_determinism()
 for i in CELLS:
     src = "".join(nb["cells"][i]["source"])
     src = src.replace('"../../opendata-project/Data"', repr(DATA_DIR))
@@ -176,7 +184,7 @@ else:
     fig, ax = plt.subplots(figsize=(7, 6))
     for name, sc_ in g["scores_test"].items():
         fpr, tpr, _ = roc_curve(g["y_test"], sc_)
-        ax.plot(fpr, tpr, label=f"{name} (AUC = {roc_auc_score(g['y_test'], sc_):.3f})")
+        ax.plot(fpr, tpr, label=name)
     ax.plot([0, 1], [0, 1], "k:", alpha=0.5)
     ax.set_xlabel("False positive rate (background efficiency)")
     ax.set_ylabel("True positive rate (signal efficiency)")
