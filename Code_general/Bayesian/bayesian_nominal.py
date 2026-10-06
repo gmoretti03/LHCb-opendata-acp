@@ -34,7 +34,10 @@ from scipy.stats import crystalball, norm
 logging.getLogger("emcee").setLevel(logging.ERROR)   # tau warnings are reported in the results instead
 
 M_K = 493.677
-CHARM_STATES = {"D0": 1864.84, "Jpsi": 3096.9, "chic0": 3414.7}   # MeV, decaying to K+K-
+CHARM_STATES = {"D0": 1864.84, "Jpsi": 3096.9, "chic0": 3414.7}   # MeV (PDG), decaying to K+K-
+# veto half-widths, from the peak widths measured in m(K+K-) of the nominal window (2026-10-06):
+# D0 sigma 6.5 MeV, J/psi ~8 MeV, chi_c0 ~18 MeV with its peak ~11 MeV below the PDG mass (natural width)
+CHARM_HALFWIDTH = {"D0": 30.0, "Jpsi": 30.0, "chic0": 60.0}
 
 
 # ---------------------------------------------------------------- configuration
@@ -48,8 +51,8 @@ class Config:
     asym: str = "free"            # "free": A_b free; "sym": A_b = 0
     signal: str = "gauss"         # "gauss" or "cb" (Crystal Ball, free beta and m)
     A_bound: float = 1.0          # prior A in (-A_bound, A_bound)
-    veto: tuple = ()              # charm states vetoed, e.g. ("D0",)
-    veto_halfwidth: float = 30.0  # MeV, on both opposite-sign K+K- pairs
+    veto: tuple = ()              # charm states vetoed, e.g. ("D0",); half-widths in CHARM_HALFWIDTH,
+                                  # applied to both opposite-sign K+K- pairs
 
 
 NOMINAL = Config()
@@ -70,8 +73,10 @@ SYST_GROUPS = {
     "signal": ["signal_crystal_ball"],
     "prior": ["prior_A_narrow"],
 }
-# final step (charmless result), as in the frequentist notebook; states/width to be fixed with it
-CHARM_VETO_FINAL = replace(NOMINAL, name="charm_veto_final", veto=("D0",))
+# charm vetoes: informative robustness checks only (not in the systematic uncertainty), same
+# definition as in the frequentist analysis; "all" is the reference one
+CHARM_VETOES = [replace(NOMINAL, name="veto_D0", veto=("D0",)),
+                replace(NOMINAL, name="veto_D0_Jpsi_chic0", veto=("D0", "Jpsi", "chic0"))]
 
 
 # ---------------------------------------------------------------- data
@@ -104,7 +109,8 @@ def select(cands: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     keep = (cands.m > cfg.lo) & (cands.m < cfg.hi)
     for st in cfg.veto:
         m0 = CHARM_STATES[st]
-        keep &= ~((np.abs(cands.m12 - m0) < cfg.veto_halfwidth) | (np.abs(cands.m13 - m0) < cfg.veto_halfwidth))
+        hw = CHARM_HALFWIDTH[st]
+        keep &= ~((np.abs(cands.m12 - m0) < hw) | (np.abs(cands.m13 - m0) < hw))
     return cands[keep].reset_index(drop=True)
 
 
