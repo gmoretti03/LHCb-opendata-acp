@@ -54,7 +54,19 @@
 
 \section{Introduction}
 \label{sec:intro}
-Charge-parity (CP) violation -- the small observed asymmetry between the behavior of matter and antimatter -- is one of the necessary ingredients for the matter-dominated universe we observe, yet the CP violation built into the Standard Model is far too small to account for it. Studying CP violation in the decays of $B$ mesons, where it is comparatively large and experimentally accessible, is one of the main ways to test the Standard Model's CKM description of the effect and search for physics beyond it. Charmless three-body decays such as $B^{\pm}\to h^{\pm}h^{+}h^{-}$ ($h=K,\pi$) are especially interesting in this respect: unlike a two-body decay, the three-body phase space (the Dalitz plot) allows the raw asymmetry $\Araw$ to be studied not only as a single global number, but also \emph{locally}, since interference between intermediate resonances can concentrate CP-violating effects in specific kinematic regions rather than spreading them uniformly~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}.
+Charge-parity (CP) violation -- the small observed asymmetry between the behavior of matter and antimatter -- is one of the necessary ingredients for the matter-dominated universe we observe, yet the CP violation built into the Standard Model is far too small to account for it. Studying CP violation in the decays of $B$ mesons, where it is comparatively large and experimentally accessible, is one of the main ways to test the Standard Model's CKM description of the effect and search for physics beyond it. Charmless three-body decays such as $B^{\pm}\to h^{\pm}h^{+}h^{-}$ ($h=K,\pi$) are especially interesting in this respect: unlike a two-body decay, the three-body phase space (the Dalitz plot) allows the asymmetry to be studied not only as a single global number, but also \emph{locally}, since interference between intermediate resonances can concentrate CP-violating effects in specific kinematic regions rather than spreading them uniformly~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}.
+
+The quantity measured in this work is the raw asymmetry between the signal yields of the two charges,
+\begin{equation}
+\Araw=\frac{N(B^-)-N(B^+)}{N(B^-)+N(B^+)} .
+\label{eq:araw}
+\end{equation}
+It differs from the physical asymmetry $\ACP$ by the production asymmetry $A_P$ of $B^\pm$ mesons in $pp$ collisions and by the detection asymmetry $A_D$ of the final state; to first order in these small quantities,
+\begin{equation}
+\ACP\approx\Araw-A_P-A_D ,
+\label{eq:acp}
+\end{equation}
+where $A_D$ arises mainly from the different interaction cross sections of $K^+$ and $K^-$ with the detector material and depends on the kaon momenta~\cite{lhcb_cpv_prd2023}. Neither correction is applied here, so $\Araw$ is not a measurement of $\ACP$.
 
 In this work we use the LHCb Open Data record for $B^{\pm}\to K^{\pm}K^{+}K^{-}$~\cite{opendata_record,opendata_notebook} to address the question: \emph{to what extent do frequentist likelihood fits, Bayesian inference, and machine-learning-assisted event selection produce consistent, well-controlled estimates of the raw asymmetry $\Araw$ in this decay?} The aim is not a competitive measurement of $\ACP$, but a methodological comparison of the three inference frameworks on the same data and the same physical question. Section~\ref{sec:data} describes the dataset and the preselection common to the three analyses; Secs.~\ref{sec:frequentist}--\ref{sec:ml} present the frequentist, Bayesian, and machine-learning analyses respectively; Sec.~\ref{sec:comparison} brings the three together.
 
@@ -65,13 +77,13 @@ In this work we use the LHCb Open Data record for $B^{\pm}\to K^{\pm}K^{+}K^{-}$
 \label{sec:data_presel}
 The dataset is the CERN Open Data record 4900, ``Matter Antimatter Differences -- B meson decays to three hadrons''~\cite{opendata_record}: candidates for $B^{\pm}\to h^{\pm}h^{+}h^{-}$ decays collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, reconstructed with the LHCb software and already passed through trigger and offline selection. The data are distributed as ROOT \texttt{TTree}s (\texttt{DecayTree}) containing only the most relevant reconstructed branches, split across two files by magnet polarity (magnet up/down), for a combined $8{,}556{,}118$ candidates. The same record also includes a simplified, detector-response-free phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$; it is not used in this work.
 
-For each of the three final-state tracks ($H1$, $H2$, $H3$) the analysis reads momentum components (\texttt{PX}, \texttt{PY}, \texttt{PZ}), PID likelihoods (\texttt{ProbK}, \texttt{ProbPi}), a muon flag (\texttt{isMuon}), and the track charge -- 18 kinematic/PID branches plus 3 charges. The same preselection is applied in all three analyses (frequentist, Bayesian, machine learning), so that their results are directly comparable: a kaon-PID cut and a muon veto applied to all three tracks,
+For each of the three final-state tracks ($H1$, $H2$, $H3$) the analysis reads momentum components (\texttt{PX}, \texttt{PY}, \texttt{PZ}), PID likelihoods (\texttt{ProbK}, \texttt{ProbPi}), a muon flag (\texttt{isMuon}), and the track charge. The same preselection is used in all three analyses: a kaon-PID requirement and a muon veto on every track,
 \[
 \texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
 \]
-which retains $23{,}895$ of the $8{,}556{,}118$ read candidates ($0.28\%$) -- the PID requirement, applied on all three tracks simultaneously, is by far the dominant reduction, consistent with selecting a comparatively pure $KKK$ final state out of a much larger, PID-unconstrained sample.
+which retains $23{,}895$ of the $8{,}556{,}118$ candidates ($0.28\%$), the PID requirement being by far the dominant reduction.
 
-In this dataset $H1$ is, by construction, always the track of opposite charge to the other two: only the charge combinations $(+1,-1,-1)$ and $(-1,+1,+1)$ occur for $(H1,H2,H3)$. Equivalently, $H2$ and $H3$ are always the same-sign, interchangeable pair (the two kaons sharing the sign of the $B$), while $H1$ is the unique kaon of opposite sign -- a labeling convention that matters when constructing the Dalitz-plot variables, which are the invariant masses of the two opposite-sign pairs, $m^2(H1,H2)$ and $m^2(H1,H3)$.
+In this dataset only the charge combinations $(+1,-1,-1)$ and $(-1,+1,+1)$ occur for $(H1,H2,H3)$: $H1$ is always the kaon of charge opposite to the $B$, and $H2$, $H3$ are the interchangeable same-sign pair. The Dalitz-plot variables are therefore the invariant masses of the two opposite-sign pairs, $m^2(H1,H2)$ and $m^2(H1,H3)$.
 
 \subsection{Invariant Mass Reconstruction}
 \label{sec:data_mass}
@@ -79,7 +91,7 @@ The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K
 
 \subsection{Data Exploration}
 \label{sec:data_exploration}
-Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit window, split by $B$ charge (left) and by magnet polarity (right). The spectrum peaks at $m\approx5284\,\MeV$ with a visible signal excess over a falling combinatorial background, and its shape is qualitatively similar for the two charges and the two magnet polarities -- as expected, since a large raw asymmetry would already be visible by eye at this level. The simple charge-counting asymmetry on the full fit-window sample, $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.049$, is numerically close to all the fit-based estimates below (Secs.~\ref{sec:bayes_posterior}, \ref{sec:ml_stability}). Since $A_{\mathrm{count}}$ mixes signal and background, this closeness is itself informative: with a charge-symmetric background one would expect $A_{\mathrm{count}}\approx\Araw\,N_s/(N_s+N_b)\approx-0.043$, so the data suggest a background asymmetry of similar sign and size to the signal one (see the sideband check of Sec.~\ref{sec:bayes_syst}).
+Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit window, split by $B$ charge (left) and by magnet polarity (right). The spectrum peaks at $m\approx5284\,\MeV$ over a falling combinatorial background, with a similar shape for the two charges and the two magnet polarities. The charge-counting asymmetry of all candidates in the fit window, signal and background together, is $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.049$.
 
 \begin{figure*}[t]
 \centering
@@ -117,11 +129,11 @@ is used to derive a confidence interval on $A$ via Wilks' theorem, and to test t
 
 \subsection{Model and Priors}
 \label{sec:bayes_model}
-The Bayesian analysis reuses the same physical mass model as the frequentist fit (Sec.~\ref{sec:frequentist}): a signal-plus-background mixture
+The Bayesian analysis describes the mass spectrum with a signal-plus-background mixture
 \[
 f(m) = N_s\, S(m;\mu,\sigma) + N_b\, B(m;\lambda),
 \]
-with $S$ a truncated Gaussian and $B$ a truncated exponential, both normalized on the fit window $[5150,5450]\,\MeV$ (Sec.~\ref{sec:data_mass}). The signal yield is split between the two $B$-meson charges through a simultaneous parametrization, $N_s^+ = N_s(1-A)/2$ and $N_s^- = N_s(1+A)/2$, so that $A$ is a fit parameter rather than being derived from two independent yields; the background is assumed to be shared equally between charges, $N_b^{\pm}=N_b/2$. The likelihood is the extended unbinned likelihood of both charge samples, Eq.~\eqref{eq:likelihood}.
+with $S$ a truncated Gaussian and $B$ a truncated exponential, both normalized on the fit window $[5150,5450]\,\MeV$ (Sec.~\ref{sec:data_mass}). The signal yield is split between the two $B$-meson charges through a simultaneous parametrization, $N_s^+ = N_s(1-A)/2$ and $N_s^- = N_s(1+A)/2$, so that $A=(N_s^--N_s^+)/(N_s^-+N_s^+)$ is a fit parameter rather than being derived from two independent yields; the background is assumed to be shared equally between charges, $N_b^{\pm}=N_b/2$. The likelihood is the extended unbinned likelihood of both charge samples, Eq.~\eqref{eq:likelihood}.
 
 The full parameter vector is $\theta=(N_s,N_b,A,\mu,\sigma,\lambda)$, with independent bounded-uniform priors: $N_s,N_b\in(0,5N)$ with $N=17839$ the number of selected events, $A\in(-1,1)$, $\mu\in(5260,5310)\,\MeV$, $\sigma\in(3,40)\,\MeV$, $\lambda\in(10^{-5},0.05)\,\MeV^{-1}$. Bounds and the walker starting point were chosen from the preselected mass spectrum (peak at $\mu\approx5283\,\MeV$).
 
@@ -146,7 +158,7 @@ so inside the bounds the posterior is proportional to the likelihood. The eviden
 
 \subsection{MCMC Sampling and Convergence Diagnostics}
 \label{sec:bayes_mcmc}
-The posterior was sampled with \texttt{emcee} using an ensemble of 32 walkers initialized in a narrow ball around the starting point, run for 9000 steps with the first 1500 ($\sim$1/6) discarded as burn-in, leaving $2.4\times10^5$ samples. The mean acceptance fraction is $0.52$. Convergence was checked through the integrated autocorrelation time $\tau$ of each parameter, $\tau\in[58,79]$ steps: the post-burn-in chain is $N/\tau\geq95$ autocorrelation times long for every parameter, above the usual threshold of $50$ for a reliable $\tau$ estimate, and corresponds to $\gtrsim3000$ effectively independent samples per parameter.
+The posterior was sampled with the affine-invariant ensemble sampler of Goodman and Weare~\cite{goodman_weare} as implemented in \texttt{emcee}~\cite{emcee}, with 32 walkers initialized in a narrow ball around the starting point and run for 9000 steps with the first 1500 ($\sim$1/6) discarded as burn-in, leaving $2.4\times10^5$ samples. The mean acceptance fraction is $0.52$. Convergence was checked through the integrated autocorrelation time of each parameter, $\tau=1+2\sum_{t\geq1}\rho(t)$, with $\rho(t)$ the autocorrelation of the chain at lag $t$. We find $\tau\in[58,79]$ steps: the post-burn-in chain is $N/\tau\geq95$ autocorrelation times long for every parameter, above the threshold of $50$ recommended for a reliable estimate of $\tau$~\cite{emcee}, and corresponds to $\gtrsim3000$ effectively independent samples per parameter.
 
 \subsection{Posterior Results and Credible Intervals}
 \label{sec:bayes_posterior}
@@ -155,12 +167,12 @@ The marginal posterior on the raw asymmetry gives (median and central intervals)
 \Araw = -0.0497, \\
 68\%~\text{CI}~[-0.058,-0.041], \qquad 95\%~\text{CI}~[-0.066,-0.033].
 \end{gather*}
-The posterior is very close to Gaussian, with standard deviation $0.0083$. The result has the same sign and order of magnitude as the published $\ACP(KKK)=-0.037\pm0.002\,(\text{stat})\pm0.002\,(\text{syst})\pm0.003\,(J/\psi K)$~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}; this is a sanity check only, since $\Araw$ is not corrected for detection or production asymmetries and is therefore not directly comparable to $\ACP$ (Sec.~\ref{sec:comparison}). The fitted yields are $N_s=15281\pm130$ and $N_b=2555\pm65$, with $\mu=5284.41\pm0.16\,\MeV$ and $\sigma=17.95\pm0.13\,\MeV$ (Fig.~\ref{fig:bayes_corner}).
+The posterior is very close to Gaussian, with standard deviation $0.0083$. The result has the same sign and order of magnitude as the published $\ACP(KKK)=-0.037\pm0.002\,(\text{stat})\pm0.002\,(\text{syst})\pm0.003\,(J/\psi K)$~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}, which is the most that can be expected without the corrections of Eq.~\eqref{eq:acp}. The fitted yields are $N_s=15281\pm130$ and $N_b=2555\pm65$, with $\mu=5284.41\pm0.16\,\MeV$ and $\sigma=17.95\pm0.13\,\MeV$ (Fig.~\ref{fig:bayes_corner}).
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/bayes_corner.pdf}
-\caption{Corner plot of the 6-parameter posterior, nominal fit. Diagonal: marginal posteriors, with dashed lines at the 16th, 50th and 84th percentiles (also given in the titles). Off-diagonal: 2D marginals, with \texttt{corner}'s default contours at the $0.5,1,1.5,2\sigma$ levels of a 2D Gaussian. $A$ is essentially uncorrelated with the other parameters; the only visible correlations are mild ones between $N_b$ and $N_s$ and between $N_b$ and $\sigma$.}
+\caption{Posterior of the six parameters, nominal fit. Diagonal: marginal posteriors with the 16th, 50th and 84th percentiles (dashed lines and titles). Off-diagonal: 2D marginals, contours at the $0.5,1,1.5,2\sigma$ levels of a 2D Gaussian. $A$ is essentially uncorrelated with the other parameters.}
 \label{fig:bayes_corner}
 \end{figure*}
 
@@ -170,11 +182,20 @@ Computing the evidence of each hypothesis by direct numerical integration is imp
 \[
 BF_{01} = \frac{p(A=0\mid\text{data})}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
 \]
-$A=0$ lies $6.0$ posterior standard deviations from the median, deep in a tail where the chain contains essentially no samples. Estimating $p(A=0\mid\text{data})$ with a Gaussian KDE on the $A$ chain is therefore unreliable: at the Silverman bandwidth it gives $BF_{01}\approx3\times10^{-59}$, and rescaling the bandwidth by $0.5$--$3$ moves the result between $10^{-228}$ and $10^{-9}$, since the KDE value at $A=0$ only reflects the kernel tails of the few most extreme samples. Because the marginal posterior of $A$ is very close to Gaussian, a more meaningful estimate uses its Gaussian approximation, giving $BF_{01}\approx1.3\times10^{-6}$ ($\ln BF_{10}\approx13.5$): decisive evidence against $A=0$ on the Jeffreys scale, as is every KDE value above. As for any Bayes factor of a point null against a free parameter, the value scales with the prior width (Lindley's paradox): with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_syst}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged.
+$A=0$ lies $6.0$ posterior standard deviations from the median, deep in a tail where the chain contains essentially no samples. Estimating $p(A=0\mid\text{data})$ with a Gaussian KDE on the $A$ chain is therefore unreliable: at the Silverman bandwidth it gives $BF_{01}\approx3\times10^{-59}$, and rescaling the bandwidth by $0.5$--$3$ moves the result between $10^{-228}$ and $10^{-9}$, since the KDE value at $A=0$ only reflects the kernel tails of the few most extreme samples. A more meaningful estimate uses the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), giving $BF_{01}\approx1.3\times10^{-6}$ ($\ln BF_{10}\approx13.5$): very strong evidence against $A=0$ on the scale of Ref.~\cite{kass_raftery} ($2\ln BF_{10}>10$), as is every KDE value above. As for any Bayes factor of a point null against a free parameter, the value scales with the prior width (the mechanism behind Lindley's paradox): with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_syst}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged.
 
 \subsection{Goodness-of-Fit and Signal Model Comparison}
 \label{sec:bayes_gof}
-A binned comparison of data and posterior-median model ($\chi^2=\sum(\text{obs}-\text{exp})^2/\text{exp}$ over 30 mass bins per charge) shows that the minimal Gaussian signal model does not fully describe the data: $\chi^2/\text{ndof}=127.4/54=2.36$, with $\chi^2=80.4$ for $B^+$ and $47.1$ for $B^-$. The largest pulls sit on the two flanks of the peak, about $\pm3\sigma$ from $\mu$ (Fig.~\ref{fig:bayes_pulls}): the observed signal shape has heavier tails than a Gaussian. Table~\ref{tab:gof} compares three signal shapes. A Crystal Ball with tail parameters fixed to typical values ($\beta=1.5$, $m=3$) makes the fit worse, not better. Letting $\beta$ and $m$ float (an 8-parameter fit) improves $\chi^2/\text{ndof}$ to $2.00$, with $\beta=1.83$ and $m=12.4$, i.e.\ a tail specific to this dataset. Across the three models $\Araw$ changes by at most $0.0015$, a fifth of its statistical uncertainty, so the asymmetry does not depend on the signal shape even though none of the models reaches $\chi^2/\text{ndof}\approx1$.
+A binned comparison of data and posterior-median model ($\chi^2=\sum(\text{obs}-\text{exp})^2/\text{exp}$ over 30 mass bins per charge) shows that the minimal Gaussian signal model does not fully describe the data: $\chi^2/\text{ndof}=127.4/54=2.36$, with $\chi^2=80.4$ for $B^+$ and $47.1$ for $B^-$. The largest positive pulls, in the $B^+$ sample, sit on the two flanks of the peak, about $\pm3\sigma$ from $\mu$ (Fig.~\ref{fig:bayes_fit}): the observed signal shape has heavier tails than a Gaussian. We therefore also fit a Crystal Ball shape~\cite{skwarnicki}, a Gaussian core with a power-law low-mass tail,
+\begin{equation}
+S_{\mathrm{CB}}(x)\propto
+\begin{cases}
+e^{-x^2/2}, & x>-\beta,\\[2pt]
+\left(\frac{m}{\beta}\right)^{m} e^{-\beta^2/2}\left(\frac{m}{\beta}-\beta-x\right)^{-m}, & x\leq-\beta,
+\end{cases}
+\label{eq:cb}
+\end{equation}
+with $x=(m_{KKK}-\mu)/\sigma$, $\beta$ the point where the tail starts (in units of $\sigma$) and $m$ its power. Table~\ref{tab:gof} compares three signal shapes. With the tail parameters fixed to typical values ($\beta=1.5$, $m=3$) the fit gets worse, not better. Letting $\beta$ and $m$ float (an 8-parameter fit) improves $\chi^2/\text{ndof}$ to $2.00$, with $\beta=1.83$ and $m=12.4$, i.e.\ a tail specific to this dataset. Across the three models $\Araw$ changes by at most $0.0015$, a fifth of its statistical uncertainty, so the asymmetry does not depend on the signal shape even though none of the models reaches $\chi^2/\text{ndof}\approx1$.
 
 \begin{table}[h]
 \centering
@@ -187,48 +208,53 @@ Crystal Ball (fixed $\beta,m$) & $-0.0512$ & $[-0.059,-0.043]$ & $4.50$ \\
 Crystal Ball (free $\beta,m$) & $-0.0504$ & $[-0.059,-0.042]$ & $2.00$ \\
 \bottomrule
 \end{tabular}
-\caption{Signal-model comparison. $\Araw$ is stable; goodness-of-fit is not, and improves only once the Crystal Ball tail parameters are fitted rather than fixed.}
+\caption{$\Araw$ and goodness-of-fit for three signal models.}
 \label{tab:gof}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/bayes_pulls.pdf}
-\caption{Binned pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$, of the nominal Gaussian-signal model, separately for $B^+$ and $B^-$. The largest positive pulls lie on the flanks of the peak ($\sim$5230 and $\sim$5340\,\MeV, about $\pm3\sigma$ from $\mu$), the signature of non-Gaussian tails; they drive $\chi^2/\text{ndof}=2.36$ and motivate the Crystal Ball comparison of Table~\ref{tab:gof}.}
-\label{fig:bayes_pulls}
-\end{figure}
+\includegraphics[width=0.85\textwidth]{figures/bayes_mass_fit.pdf}
+\caption{Mass distributions of $B^+$ (left) and $B^-$ (right) candidates with the nominal model (posterior medians): total, signal and background components. Bottom: pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$.}
+\label{fig:bayes_fit}
+\end{figure*}
 
-\subsection{Robustness Checks: Mass Window, Background Model, Prior, Magnet Polarity}
+\subsection{Robustness Checks}
 \label{sec:bayes_syst}
-The nominal fit was repeated under three alternative modeling choices -- a narrower window ($[5200,5450]\,\MeV$), a window without the sparse high-mass tail ($[5150,5400]\,\MeV$), and a linear instead of exponential background -- and with a narrower prior on the asymmetry, $A\in(-0.3,0.3)$, as a prior-sensitivity check. All four use the nominal chain length (9000 steps, 32 walkers). They give $\Araw\in[-0.0498,-0.0495]$ (Fig.~\ref{fig:bayes_syst_forest}, Table~\ref{tab:bayes_systematics}): the spread, $3\times10^{-4}$, is about 4\% of the statistical uncertainty and only about twice the Monte Carlo error on the posterior median ($\sim$$1.4\times10^{-4}$), so no sensitivity to these choices is detected.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/bayes_systematics_forest.pdf}
-\caption{Posterior median (point) and 68\% CI (bar) of $\Araw$ for the nominal fit and the four variations of Table~\ref{tab:bayes_systematics}. The five results are indistinguishable on the scale of the statistical uncertainty.}
-\label{fig:bayes_syst_forest}
-\end{figure}
+The nominal fit was repeated under three alternative modeling choices -- a narrower window ($[5200,5450]\,\MeV$), a window without the sparse high-mass tail ($[5150,5400]\,\MeV$), and a linear instead of exponential background -- and with a narrower prior on the asymmetry, $A\in(-0.3,0.3)$, as a prior-sensitivity check. All four use the nominal chain length (9000 steps, 32 walkers). They give $\Araw\in[-0.0498,-0.0495]$ (Table~\ref{tab:bayes_systematics}): the spread, $3\times10^{-4}$, is about 4\% of the statistical uncertainty and only about twice the Monte Carlo error on the posterior median ($\sim$$1.4\times10^{-4}$), so no sensitivity to these choices is detected.
 
 As an experimental cross-check, the fit was repeated separately on the two magnet polarities, whose left-right detection asymmetries are opposite and partially cancel in the combined sample: $\Araw(\text{down})=-0.055$ ($[-0.065,-0.044]$, $n=10500$) and $\Araw(\text{up})=-0.043$ ($[-0.056,-0.030]$, $n=7339$). They differ by $0.7\sigma$, so there is no indication that the asymmetry is an artifact of one polarity (Fig.~\ref{fig:bayes_magnet}).
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/bayes_magnet_posterior.pdf}
-\caption{Posterior on $\Araw$ for the magnet-down-only, magnet-up-only, and combined fits. The two single-polarity posteriors differ by $0.7\sigma$.}
+\caption{Posterior of $\Araw$ for the magnet-down, magnet-up and combined samples.}
 \label{fig:bayes_magnet}
 \end{figure}
 
-The assumption of a charge-symmetric background, $N_b^{\pm}=N_b/2$, was tested on the sidebands ($|m-\mu|>4\sigma$, where the expected signal contamination is negligible): their counting asymmetry is $A_{\text{sideband}}=-0.047\pm0.029$ ($n=1217$), $1.6\sigma$ from zero and equally compatible with the signal asymmetry. The same picture emerges from the full fit-window count (Sec.~\ref{sec:data_exploration}), which is closer to $\Araw$ than a symmetric background would allow. The check is therefore inconclusive rather than reassuring. The definitive test is a fit with independent background yields $N_b^+$, $N_b^-$, as in the frequentist joint fit (Sec.~\ref{sec:frequentist}). A simple estimate suggests the impact on $\Araw$ is small: if the background carried $A_b=A_{\text{sideband}}$, attributing the excess $A_b N_b$ to the background rather than to the signal would give $(N^--N^+-A_bN_b)/N_s\approx-0.0495$.
+The assumption of a charge-symmetric background, $N_b^{\pm}=N_b/2$, is the strongest one in the model, and the data do not support it well. The sidebands ($|m-\mu|>4\sigma$, where the signal contribution is small) have a counting asymmetry $A_{\text{sideband}}=-0.047\pm0.029$ ($n=1217$); and the counting asymmetry of the whole fit window, $A_{\mathrm{count}}=-0.049$ (Sec.~\ref{sec:data_exploration}), is as large as $\Araw$ itself, whereas a symmetric background would dilute it to $\Araw\,N_s/(N_s+N_b)\approx-0.043$. We therefore repeated the nominal fit with independent background yields, $N_b^{\pm}=N_b(1\mp A_b)/2$, adding the background asymmetry $A_b$ as a seventh parameter with a uniform prior on $(-1,1)$ (same sampler settings; $\tau\leq79$, acceptance $0.49$). The result is
+\begin{gather*}
+\Araw=-0.0457,\quad 68\%~\text{CI}~[-0.054,-0.037],\\
+A_b=-0.071\pm0.024 ,
+\end{gather*}
+with a correlation of $-0.16$ between $A$ and $A_b$. The background asymmetry differs from zero by $2.9\sigma$, and allowing for it moves $\Araw$ by $+0.004$, half of its statistical uncertainty -- a larger effect than any other variation in this section. In Bayesian terms the evidence for $A_b\neq0$ is nonetheless weak: the Savage-Dickey ratio gives $BF_{10}\approx2.2$, ``not worth more than a bare mention'' on the scale of Ref.~\cite{kass_raftery}, because the wide prior on $A_b$ penalizes the extra parameter (Sec.~\ref{sec:bayes_factor}). The frequentist fit of Sec.~\ref{sec:frequentist} uses independent background yields for the two charges as well.
 
 \subsection{Toy-MC Coverage Validation}
 \label{sec:bayes_toymc}
-To check whether the credible intervals have the claimed frequentist coverage, 500 pseudo-datasets of the same size as the data were generated from the fitted model (parametric bootstrap, with the posterior-median $\theta$ as ground truth) and each was refit with a 3500-step chain. The fraction of replicas whose interval contains the injected $A$ is $0.664$ for the 68\% CI ($0.8\sigma$ below nominal, binomial uncertainty $0.021$) and $0.962$ for the 95\% CI ($1.2\sigma$ above nominal): the intervals have correct coverage. This is a closure test of the inference procedure: since the toys are generated from the same model that is fitted, it does not probe the model mismatch of Sec.~\ref{sec:bayes_gof}, which is instead addressed by the signal-model and robustness checks.
+A credible interval states where the parameter lies given the data and the prior; nothing guarantees that it also has frequentist coverage, i.e.\ that over repeated experiments it contains the true value with the stated probability. To check this, 500 pseudo-datasets of the same size as the data were generated from the fitted model (parametric bootstrap, with the posterior-median $\theta$ as ground truth) and each was refit with a 3500-step chain. The fraction of replicas whose interval contains the injected $A$ is $0.664$ for the 68\% CI ($0.8\sigma$ below nominal, binomial uncertainty $0.021$) and $0.962$ for the 95\% CI ($1.2\sigma$ above nominal): the coverage is consistent with nominal. The estimates themselves are unbiased and their spread matches the reported uncertainty (Fig.~\ref{fig:bayes_toys}): their mean differs from the injected value by $-0.0005\pm0.0004$, and their standard deviation, $0.0080$, agrees with the posterior standard deviation of the data fit, $0.0083$. This is a closure test of the inference procedure: since the toys are generated from the same model that is fitted, it does not probe the model mismatch of Sec.~\ref{sec:bayes_gof}, which is instead addressed by the signal-model and robustness checks.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{figures/bayes_toy_estimates.pdf}
+\caption{Posterior medians of $A$ in the 500 pseudo-datasets, compared with a Gaussian centred on the injected value with width equal to the posterior standard deviation of the data fit.}
+\label{fig:bayes_toys}
+\end{figure}
 
 \subsection{Local Dalitz-Plot Asymmetry (Fixed Binning)}
 \label{sec:bayes_dalitz}
-To test whether the asymmetry is uniform over phase space or concentrated in specific regions, each candidate was placed in the Dalitz plane using the two opposite-sign $K^+K^-$ invariant masses $m^2(H1,H2)$ and $m^2(H1,H3)$ (Sec.~\ref{sec:data_presel}), sorted into $m^2_{\mathrm{lo}}$ and $m^2_{\mathrm{hi}}$ to remove the $H2/H3$ labeling ambiguity. The plane was divided into an $8\times8$ grid. In each bin with at least 20 candidates (29 of 64), the local asymmetry $A_i=(N_i^--N_i^+)/N_i$, with binomial uncertainty $\sigma(A_i)=\sqrt{(1-A_i^2)/N_i}$, was compared with the global counting asymmetry $A_{\mathrm{glob}}=-0.049$ through $S_i=(A_i-A_{\mathrm{glob}})/\sigma(A_i)$.
+To test whether the asymmetry is uniform over phase space or concentrated in specific regions, each candidate was placed in the Dalitz plane using the two opposite-sign $K^+K^-$ invariant masses $m^2(H1,H2)$ and $m^2(H1,H3)$ (Sec.~\ref{sec:data_presel}), sorted into $m^2_{\mathrm{lo}}$ and $m^2_{\mathrm{hi}}$ to remove the $H2/H3$ labeling ambiguity. The plane was divided into an $8\times8$ grid. In each bin with at least 20 candidates (29 of 64), the local asymmetry $A_i=(N_i^--N_i^+)/N_i$, with binomial uncertainty $\sigma(A_i)=\sqrt{(1-A_i^2)/N_i}$, was compared with the global counting asymmetry $A_{\mathrm{glob}}=-0.049$ through $S_i=(A_i-A_{\mathrm{glob}})/\sigma(A_i)$; a comparison with zero would instead mostly reflect the global asymmetry itself.
 
-Three of the 29 bins have $|S_i|>3$, all with $A_i$ more negative than the global value; about $0.08$ would be expected if the asymmetry were uniform, with a probability of $7\times10^{-5}$ for three or more. A global test of homogeneity, $\chi^2=\sum_i S_i^2=85.6$ for 28 degrees of freedom ($p\approx10^{-7}$), confirms that the local asymmetry is not uniform. The most negative bins lie at low $m^2_{\mathrm{lo}}$ (Fig.~\ref{fig:bayes_dalitz}). Testing against zero instead of $A_{\mathrm{glob}}$ would partly reflect the global asymmetry itself. Restricting the sample to the signal window ($|m-\mu|<2\sigma$, $n=15{,}119$, $\approx$96\% signal purity from the fitted model) gives the same picture -- 29 populated bins, three with $|S_i|>3$, $\chi^2=95.5/28$ -- so the structure is not produced by the combinatorial background. Two caveats apply: the binning is coarse and was not optimized, and $\sigma(A_i)$ ignores the background fluctuations, which a proper sWeight-based background subtraction would include (Sec.~\ref{sec:limitations}). Section~\ref{sec:ml_kmeans} revisits the same question with an adaptive, data-driven binning ($K$-means).
+Three of the 29 bins have $|S_i|>3$, all with $A_i$ more negative than the global value; about $0.08$ would be expected if the asymmetry were uniform, with a probability of $7\times10^{-5}$ for three or more. A global test of homogeneity, $\chi^2=\sum_i S_i^2=85.6$ for 28 degrees of freedom ($p\approx10^{-7}$), confirms that the local asymmetry is not uniform. The most negative bins lie at low $m^2_{\mathrm{lo}}$ (Fig.~\ref{fig:bayes_dalitz}). Restricting the sample to the signal window ($|m-\mu|<2\sigma$, $n=15{,}119$, $\approx$96\% signal purity from the fitted model) gives the same picture -- 29 populated bins, three with $|S_i|>3$, $\chi^2=95.5/28$ -- so the structure is not produced by the combinatorial background. Three caveats apply: the binning is coarse and was not optimized; the asymmetries are computed on all candidates, without the sWeight-based background subtraction that a full analysis would use (Sec.~\ref{sec:limitations}); and, since $\Araw$ is not corrected for detection asymmetries, local variations can also be instrumental -- the $K^+$/$K^-$ detection asymmetry depends on the kaon momenta, which are correlated with the position in the Dalitz plane. Section~\ref{sec:ml_kmeans} revisits the same question with an adaptive, data-driven binning ($K$-means).
 
 \begin{figure*}[t]
 \centering
@@ -349,13 +375,13 @@ As with the Bayesian fit (Sec.~\ref{sec:bayes_syst}), the ML-selected sample was
 \label{sec:limitations}
 Several modeling choices and known weaknesses limit how far the results of Secs.~\ref{sec:bayesian}--\ref{sec:ml} can be pushed, and are collected here rather than scattered through the results sections.
 
-On the Bayesian side (Sec.~\ref{sec:bayesian}): the background is assumed to split equally between $B$ charges, while the sideband asymmetry ($-0.047\pm0.029$) and the full-window count both point to a background asymmetry of similar size to the signal one (Sec.~\ref{sec:bayes_syst}) -- the estimated impact on $\Araw$ is small, but a fit with independent $N_b^\pm$ is needed to settle it; the Savage-Dickey Bayes factor of Sec.~\ref{sec:bayes_factor} is known only approximately ($BF_{01}\sim10^{-6}$ from the Gaussian approximation, KDE estimates unusable this far in the tail) and depends on the prior width, though the conclusion (decisive evidence against $A=0$) is robust; the toy-MC coverage check of Sec.~\ref{sec:bayes_toymc} is a closure test and cannot detect model misspecification; even the best-fitting signal model (Crystal Ball with floated tail parameters) leaves $\chi^2/\mathrm{ndof}\approx2$, not $\approx1$ (Sec.~\ref{sec:bayes_gof}); and the fixed-binning Dalitz analysis of Sec.~\ref{sec:bayes_dalitz} uses a coarse $8\times8$ grid and a simple mass-window cut rather than a proper background subtraction.
+On the Bayesian side (Sec.~\ref{sec:bayesian}): the nominal model assumes a charge-symmetric background, while a fit with independent background yields finds $A_b=-0.071\pm0.024$ and shifts $\Araw$ by $+0.004$ (Sec.~\ref{sec:bayes_syst}), the largest model dependence observed; the Savage-Dickey Bayes factor of Sec.~\ref{sec:bayes_factor} is known only approximately ($BF_{01}\sim10^{-6}$ from the Gaussian approximation, KDE estimates unusable this far in the tail) and depends on the prior width, though the conclusion (decisive evidence against $A=0$) is robust; the toy-MC coverage check of Sec.~\ref{sec:bayes_toymc} is a closure test and cannot detect model misspecification; even the best-fitting signal model (Crystal Ball with floated tail parameters) leaves $\chi^2/\mathrm{ndof}\approx2$, not $\approx1$ (Sec.~\ref{sec:bayes_gof}); and the fixed-binning Dalitz analysis of Sec.~\ref{sec:bayes_dalitz} uses a coarse $8\times8$ grid, a simple mass-window cut rather than a proper background subtraction, and no correction for momentum-dependent detection asymmetries.
 
 On the machine-learning side (Sec.~\ref{sec:ml}): the weak labels suffer from severe class imbalance ($1217$ background-like vs.\ $15{,}119$ signal-like events, Sec.~\ref{sec:ml_labels}); the two epistemic-uncertainty estimators (MC Dropout, RF ensemble-variance) disagree by a factor $\sim$15 in absolute scale and are only moderately correlated event-by-event ($\rho\approx0.36$, Sec.~\ref{sec:ml_uncertainty}), and the MC-dropout estimate itself varies by $\sim$20\% between trainings; the test set is small ($0.017$ uncertainty on each test AUC), so the hyperparameter searches (Tables~\ref{tab:ml_hyperparams}--\ref{tab:ml_ffnn_search}) cannot resolve test-AUC differences of the size observed; and the stability of $\Araw$ under the ML selection was checked with a Bayesian refit only (Sec.~\ref{sec:ml_stability}).
 
 More generally, no detector-level systematic correction (selection efficiency, production asymmetry) is applied anywhere in this work, so $\Araw$ as reported throughout is explicitly \emph{not} a measurement of $\ACP$ (Sec.~\ref{sec:comparison}).
 
-The most natural next steps, in rough priority order, are: replacing the fixed-cut local Dalitz asymmetries (both binned, Sec.~\ref{sec:bayes_dalitz}, and $K$-means, Sec.~\ref{sec:ml_kmeans}) with a proper sWeight-based background subtraction; fitting the background yields of the two charges independently; and applying the frequentist fit to the ML-selected sample.
+The most natural next steps, in rough priority order, are: replacing the fixed-cut local Dalitz asymmetries (both binned, Sec.~\ref{sec:bayes_dalitz}, and $K$-means, Sec.~\ref{sec:ml_kmeans}) with a proper sWeight-based background subtraction; a background model with independent charge yields and, possibly, a charge-dependent shape; and applying the frequentist fit to the ML-selected sample.
 
 \section{Conclusions}
 \label{sec:conclusions}
@@ -387,9 +413,10 @@ Narrower window ($[5200,5450]$) & $17267$ & $-0.0497$ & $[-0.0580,-0.0413]$ \\
 Shorter high-mass tail ($[5150,5400]$) & $17590$ & $-0.0498$ & $[-0.0581,-0.0415]$ \\
 Linear background & $17839$ & $-0.0498$ & $[-0.0581,-0.0415]$ \\
 Narrow prior, $A\in[-0.3,0.3]$ & $17839$ & $-0.0495$ & $[-0.0577,-0.0414]$ \\
+Independent background yields ($A_b$ free) & $17839$ & $-0.0457$ & $[-0.0540,-0.0371]$ \\
 \bottomrule
 \end{tabular}
-\caption{Bayesian systematic-variation study (Sec.~\ref{sec:bayes_syst}): $\Araw$ under three alternative modeling choices and a narrower prior on $A$, each refit with the same chain length as the nominal fit (9000 steps, 32 walkers). The five medians span $3\times10^{-4}$, about 4\% of the statistical uncertainty.}
+\caption{Bayesian systematic-variation study (Sec.~\ref{sec:bayes_syst}): $\Araw$ under alternative modeling choices and a narrower prior on $A$, each refit with the same chain length as the nominal fit (9000 steps, 32 walkers). The first five medians span $3\times10^{-4}$, about 4\% of the statistical uncertainty; freeing the background asymmetry shifts $\Araw$ by $+0.004$.}
 \label{tab:bayes_systematics}
 \end{table*}
 

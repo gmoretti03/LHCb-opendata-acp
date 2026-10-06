@@ -27,11 +27,17 @@ DATA_DIR = os.path.join(REPO, "LHCb", "opendata-project", "Data")
 
 BRANCH, NB_DIR, NB_NAME, EXTRA = {
     "bayes": ("bayes", "LHCb/Code_general/Bayesian", "Bayesian_Analysis.ipynb",
-              ["bayesian_model.py", "results/posterior_summary.json"]),
+              ["bayesian_model.py", "results/posterior_summary.json",
+               "results/toy_mc_coverage_final.json"]),
     "ml": ("mach_lear", "LHCb/Code_general/Machine_Learning", "ML_Analysis.ipynb", []),
 }[MODE]
 CELLS = {
-    "bayes": [1, 3, 4, 6, 7, 10, 12, 14, 15, 18, 20, 26, 37, 46],
+    # bayes cells are located by content, so the script keeps working when cells are added
+    "bayes": ["import bayesian_model as bm", "FILES = [", "presel = (", "M_K = 493.677",
+              "bm.MASS_HI, 61)", "theta0 = np.array([bm.INITIAL_GUESS", "nwalkers = 32",
+              "tau = sampler.get_autocorr_time()", "discard = nsteps // 6", "A_median = np.median(A_samples)",
+              "theta_med = np.median(flat_samples", "def fit_subset", "def binned_gof(",
+              "is_bachelor = charges_arr"],
     "ml": [1, 3, 4, 6, 8, 10, 13, 15, 17, 19, 20, 23, 25, 29, 31, 33, 35, 42, 44, 48, 49],
 }[MODE]
 
@@ -54,6 +60,12 @@ if MODE == "ml":
     import tensorflow as tf
     tf.keras.utils.set_random_seed(42)
     tf.config.experimental.enable_op_determinism()
+def _find(key):
+    hits = [k for k, c in enumerate(nb["cells"]) if c["cell_type"] == "code" and key in "".join(c["source"])]
+    assert len(hits) == 1, f"cell marker {key!r} matches {len(hits)} cells"
+    return hits[0]
+
+CELLS = [_find(c) if isinstance(c, str) else c for c in CELLS]
 for i in CELLS:
     src = "".join(nb["cells"][i]["source"])
     src = src.replace('"../../opendata-project/Data"', repr(DATA_DIR))
@@ -93,26 +105,41 @@ if MODE == "bayes":
                              f"^{{+{q84-q50:{f}}}}_{{-{q50-q16:{f}}}}$", fontsize=11)
     save(fig, "bayes_corner.pdf")
 
-    # pulls
+    # mass fit with signal/background components, and pulls underneath
     gof_bins, pull_p, pull_m = g["gof_bins"], g["pull_p"], g["pull_m"]
+    N_s, N_b, A, mu, sigma, lam = g["theta_med"]
+    m_obs, q_obs = g["m_obs"], g["q_obs"]
     centers = 0.5 * (gof_bins[:-1] + gof_bins[1:])
-    w = (gof_bins[1] - gof_bins[0]) * 0.9
-    fig, axs = plt.subplots(1, 2, figsize=(12, 4), sharey=True)
-    for ax, pull, col, lab, c2 in ((axs[0], pull_p, "steelblue", r"$B^+$", g["chi2_p"]),
-                                   (axs[1], pull_m, "indianred", r"$B^-$", g["chi2_m"])):
-        ax.bar(centers, pull, width=w, color=col)
-        ax.axhline(0, color="k", lw=0.8)
+    bw = gof_bins[1] - gof_bins[0]
+    grid = np.linspace(bm.MASS_LO, bm.MASS_HI, 600)
+    fig, axs = plt.subplots(2, 2, figsize=(12, 6), sharex=True, gridspec_kw={"height_ratios": [3, 1], "hspace": 0.05})
+    for col, (qs, pull, lab, c2) in enumerate(((1, pull_p, r"$B^+$", g["chi2_p"]), (-1, pull_m, r"$B^-$", g["chi2_m"]))):
+        Nsq = N_s * (1 - qs * A) / 2
+        obs, _ = np.histogram(m_obs[q_obs == qs], bins=gof_bins)
+        ax = axs[0, col]
+        ax.errorbar(centers, obs, yerr=np.sqrt(obs), fmt="o", ms=3, color="k", label="Data")
+        sig_c = Nsq * bm.signal_pdf(grid, mu, sigma) * bw
+        bkg_c = N_b / 2 * bm.background_pdf(grid, lam) * bw
+        ax.plot(grid, sig_c + bkg_c, color="crimson", lw=1.5, label="Total model")
+        ax.plot(grid, sig_c, color="steelblue", ls="--", lw=1.2, label="Signal")
+        ax.fill_between(grid, 0, bkg_c, color="gray", alpha=0.35, label="Background")
+        ax.set_yscale("log")
+        ax.set_ylim(5, obs.max() * 3)
+        ax.set_title(f"{lab}  ($\\chi^2 = {c2:.1f}$ / 30 bins)")
+        axp = axs[1, col]
+        axp.bar(centers, pull, width=bw * 0.9, color="steelblue" if qs > 0 else "indianred")
+        axp.axhline(0, color="k", lw=0.8)
         for y in (2, -2):
-            ax.axhline(y, color="gray", ls=":")
-        ax.set_title(f"Pulls, {lab}  ($\\chi^2 = {c2:.1f}$ / 30 bins)")
-        ax.set_xlabel(r"$m(KKK)$ [MeV]")
-    axs[0].set_ylabel(r"(obs $-$ exp) / $\sqrt{\mathrm{exp}}$")
-    plt.tight_layout()
-    save(fig, "bayes_pulls.pdf")
+            axp.axhline(y, color="gray", ls=":")
+        axp.set_xlabel(r"$m(KKK)$ [MeV]")
+    axs[0, 0].set_ylabel("Candidates / 10 MeV")
+    axs[1, 0].set_ylabel("Pull")
+    axs[0, 1].legend(loc="upper right")
+    save(fig, "bayes_mass_fit.pdf")
 
     # magnet polarity posteriors
     rd, ru = g["result_down"], g["result_up"]
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(6, 4))
     ax.hist(rd["A_samples"], bins=60, density=True, histtype="step", lw=1.5,
             label=f"Magnet down ($n={rd['n']}$)")
     ax.hist(ru["A_samples"], bins=60, density=True, histtype="step", lw=1.5,
@@ -126,24 +153,26 @@ if MODE == "bayes":
     plt.tight_layout()
     save(fig, "bayes_magnet_posterior.pdf")
 
-    # systematic-variation forest plot (numbers from the full-length-chain study, JSON on `bayes`)
-    syst = json.load(open("posterior_summary.json"))["systematic_variations"]
-    names_en = [r"Nominal ([5150, 5450] MeV, exp. bkg)", r"Narrower window ([5200, 5450] MeV)",
-                r"Reduced high-mass tail ([5150, 5400] MeV)", r"Linear background",
-                r"Narrow prior, $A \in [-0.3, 0.3]$"]
-    fig, ax = plt.subplots(figsize=(9, 4.5))
-    ys = list(range(len(syst)))[::-1]
-    for y, r in zip(ys, syst):
-        med, (lo, hi) = r["A_median"], r["A_ci68"]
-        ax.errorbar(med, y, xerr=[[med - lo], [hi - med]], fmt="o", capsize=4,
-                    color="crimson" if y == ys[0] else "steelblue")
-    ax.axvline(syst[0]["A_median"], color="crimson", ls=":", alpha=0.6, label="Nominal median")
-    ax.set_yticks(ys)
-    ax.set_yticklabels(names_en)
-    ax.set_xlabel(r"$A_{\mathrm{raw}}$ (median and 68% CI)")
-    ax.legend(loc="upper right")
+    # toy-MC: distribution of the posterior-median estimates of A over the 500 pseudo-datasets
+    from scipy.stats import norm
+    toys = np.array(json.load(open("toy_mc_coverage_final.json"))["toy_A_medians"])
+    A_true = float(np.median(g["A_samples"]))
+    sd_post = float(np.std(g["A_samples"]))
+    fig, ax = plt.subplots(figsize=(6, 4.2))
+    ax.hist(toys, bins=30, density=True, histtype="stepfilled", color="steelblue", alpha=0.5,
+            label=f"Toy estimates ($n={len(toys)}$): mean $= {toys.mean():.5f}$, sd $= {toys.std(ddof=1):.5f}$")
+    xs = np.linspace(toys.min(), toys.max(), 300)
+    ax.plot(xs, norm.pdf(xs, A_true, sd_post), color="crimson",
+            label=f"Gaussian: injected $A$, posterior sd $= {sd_post:.5f}$")
+    ax.axvline(A_true, color="k", ls=":", label=f"Injected $A = {A_true:.4f}$")
+    ax.set_xlabel(r"Posterior median of $A$ in each pseudo-dataset")
+    ax.set_ylabel("Density")
+    ax.legend(loc="upper left", fontsize=8.5)
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.45)
     plt.tight_layout()
-    save(fig, "bayes_systematics_forest.pdf")
+    save(fig, "bayes_toy_estimates.pdf")
+    print(f"toys: bias = {toys.mean()-A_true:.5f} +- {toys.std(ddof=1)/np.sqrt(len(toys)):.5f}, "
+          f"sd = {toys.std(ddof=1):.5f}, posterior sd = {sd_post:.5f}")
 
     # fixed-binning Dalitz maps; significance w.r.t. the GLOBAL asymmetry
     m2_lo, m2_hi, q = g["m2_lo_dz"], g["m2_hi_dz"], g["q_dz"]
