@@ -389,10 +389,14 @@ def get_charm_veto_mask(mass_dict, mode):
             'b' o 'all' -> veto D0 + J/psi + chi_c0
             '[...]' -> veto on the selected particles
     """
+    # [Giacomo, 2026-10-06] chi_c0: semi-larghezza 60 MeV (non 30), come concordato e come nel bayesiano.
+    # Nei dati il picco della chi_c0 in m(K+K-) e' a ~3404 MeV (11 MeV sotto il valore PDG) con sigma ~18 MeV
+    # (larghezza naturale + risoluzione): +-30 MeV attorno al PDG ne lascerebbe fuori una buona parte.
+    # D0 (sigma 6.5 MeV) e J/psi (sigma ~8 MeV) restano a +-30 MeV.
     res_windows = {
         'D':   (1864.84, 30.0),
         'J':   (3096.90, 30.0),
-        'chi': (3414.70, 30.0)
+        'chi': (3414.70, 60.0)
     }
     
     if mode in ['a', 'D']:
@@ -814,7 +818,12 @@ def scan_config(all_data, cfg, variations, n_exp=2, minos=False):
     rows = []
     for var in tqdm(variations, desc="scan"):
         cfg_v = replace(cfg, **var)
-        if ('prob_pi_max' or 'prob_k_min') in var.keys():
+        # [Giacomo, 2026-10-06] prima era `('prob_pi_max' or 'prob_k_min') in var.keys()`, che controlla solo
+        # 'prob_pi_max' (l'`or` tra due stringhe restituisce la prima): una variante con solo 'prob_k_min'
+        # non avrebbe riapplicato la preselezione. Inoltre `all_data` deve essere un campione NON preselezionato
+        # (o preselezionato con tagli piu' larghi di tutta la griglia), altrimenti i tagli piu' larghi del
+        # nominale non possono recuperare eventi: vedi la cella `data_loose` nel notebook.
+        if any(k in var for k in ("prob_pi_max", "prob_k_min")):
             data = all_data[kaon_preselection(all_data, cfg_v)]
         else:
             data = all_data
