@@ -237,3 +237,22 @@ a.set_xlabel(r"$m(KKK)$ [MeV]"); a.set_ylabel("Candidates / 10 MeV"); a.legend(l
 ps.panel_label(a, "LHCb 2013 region", loc="upper left")
 plt.tight_layout()
 save(fig, "ml_nominal_dalitz_region.pdf")
+
+# ---------------- high-background sample (ProbK > 0.3): tighter PID cut vs cut on the GBM score
+hb = js("high_background.json")
+ns0 = hb["pid"][0]["N_sig"]
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.2))
+for kind, lab, col, mk in (("pid", r"Tighter PID cut (ProbK $>$ 0.3 ... 0.8)", C["signal"], "o"), ("ml", "Cut on the GBM score (0 ... 0.9)", C["model"], "s")):
+    rows = [r for r in hb[kind] if r["N_sig"] / ns0 > 0.15]
+    eff = np.array([r["N_sig"] / ns0 for r in rows])
+    axs[0].plot(eff, [r["A_err"] for r in rows], mk + "-", color=col, label=lab)
+    axs[1].errorbar(eff, [r["A"] for r in rows], yerr=[r["A_err"] for r in rows], fmt=mk + "-", color=col, capsize=3, label=lab)
+nom = hb["pid"][2]
+for a in axs:
+    a.axvline(nom["N_sig"] / ns0, color=C["background"], ls=":", lw=1)
+    a.set_xlabel("Signal efficiency (fitted $N_s$ relative to ProbK $>$ 0.3)")
+axs[0].set_ylabel(r"$\sigma(A_{\mathrm{raw}})$"); axs[0].legend(loc="upper right", fontsize=10)
+axs[1].set_ylabel(r"$A_{\mathrm{raw}}$ (frequentist fit)")
+ps.panel_label(axs[0], "dotted: nominal selection", loc="lower left")
+plt.tight_layout()
+save(fig, "ml_nominal_high_background.pdf")
