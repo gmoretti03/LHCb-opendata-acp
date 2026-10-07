@@ -69,6 +69,11 @@ ax = np.array(fig.axes).reshape(len(main), len(main))
 for k in range(len(main)):
     q16, q50, q84 = np.percentile(th[:, k], [16, 50, 84]); f = fmts[k]
     ax[k, k].set_title(f"{labels[k].split(' [')[0]} $= {q50:{f}}^{{+{q84-q50:{f}}}}_{{-{q50-q16:{f}}}}$", fontsize=11)
+for a_ in fig.axes:   # plain tick labels (no "+5.284e3" offset on the mu axis)
+    for axis in (a_.xaxis, a_.yaxis):
+        fmt = axis.get_major_formatter()
+        if hasattr(fmt, "set_useOffset"):
+            fmt.set_useOffset(False)
 save(fig, "bayes_nominal_corner.pdf")
 
 # ---------------- mass fit, log scale, components and pulls
