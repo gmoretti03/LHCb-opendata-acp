@@ -4541,7 +4541,7 @@
  },
  "dalitz": [
   {
-   "label": "finestra nominale",
+   "label": "nominal window",
    "n": 19731,
    "A_glob": -0.04323146317976788,
    "bins_populated": 32,
@@ -4552,7 +4552,7 @@
    "p_at_least_nsig_if_uniform": 0.003426203978956318
   },
   {
-   "label": "finestra di segnale",
+   "label": "signal window",
    "n": 15130,
    "A_glob": -0.04613350958360873,
    "bins_populated": 29,

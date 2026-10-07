@@ -5,3 +5,8 @@ start 2026-10-06 18:25:18
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
 [NbConvertApp] Writing 1012038 bytes to Bayesian_Nominal.ipynb
 end 2026-10-06 22:12:24 exit=0
+start 2026-10-07 20:06:56
+[NbConvertApp] Converting notebook Bayesian_Nominal.ipynb to notebook
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+[NbConvertApp] Writing 1006185 bytes to Bayesian_Nominal.ipynb
+end 2026-10-07 20:07:08 exit=0
