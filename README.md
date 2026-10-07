@@ -37,7 +37,7 @@ from them when the notebook is run again; the notebooks are delivered already ex
 | `Code_general/Bayesian/Bayesian_Nominal.ipynb` | nominal Bayesian model: posterior, Bayes factors, dispersed chains, magnet polarities, systematic variants, 200 toys, Dalitz, charm vetoes | ~2.5 h (10 cores) | `nominal/` |
 | `Code_general/Bayesian/Bayesian_Nominal_Checks.ipynb` | posterior predictive check, trace plot, Dalitz structure by magnet polarity | ~30 min | `nominal/ppc.json`, `nominal/trace_dispersed.npz`, `nominal/dalitz_magnet.json` |
 | `Code_general/Bayesian/Bayes_vs_Freq_LowStat.ipynb` | Bayesian vs frequentist intervals on the same likelihood at low statistics (toys, N = 50–2000) | ~1 h (10 cores) | `lowstat/` |
-| `Code_general/Bayesian/Bayesian_Analysis.ipynb` | minimal six-parameter model used as a cross-check, 500 toys | ~15 h (1 core) | `*.json` |
+| `Code_general/Bayesian/Bayesian_Analysis.ipynb` | minimal six-parameter model used as a cross-check, 500 toys | ~16 h (1 core) | `*.json` |
 | `Code_general/Machine_Learning/ML_Nominal.ipynb` | weak labels, classifiers, regularization, bias–variance, calibration, uncertainty (RF, MC dropout, deep ensemble), K-means on the Dalitz plane, ML selection and refits with the three methods, hyperparameter search | ~4.5 h | `nominal/` |
 
 Python modules: `lhcb_freq.py` (frequentist fits), `bayesian_nominal.py` (nominal Bayesian model, toys, systematics),

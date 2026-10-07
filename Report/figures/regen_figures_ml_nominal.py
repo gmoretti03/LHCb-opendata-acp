@@ -213,3 +213,27 @@ axs[0].set_yscale("log"); axs[0].set_ylabel("Candidates / 25 MeV"); axs[0].legen
 axs[1].set_ylabel("Fraction passing the cut"); axs[1].set_ylim(0, 1); axs[1].legend(loc="upper right")
 plt.tight_layout()
 save(fig, "ml_nominal_mass_after_cut.pdf")
+
+# ---------------- ordered Dalitz plot with the resonances, and B+ vs B- mass in the region of LHCb-PAPER-2013-027
+reg_mq = npy("paper_region_mass_charge.npy")
+from matplotlib.patches import Rectangle
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 5.0), gridspec_kw={"width_ratios": [1.1, 1]})
+a = axs[0]
+a.scatter(lo2, hi2, s=0.6, color="k", alpha=0.35, rasterized=True)
+res_m = {r"$\phi(1020)$": 1.019461, r"$D^0$": 1.86484, r"$J/\psi$": 3.0969, r"$\chi_{c0}$": 3.4147}   # GeV
+for lab_, mval in res_m.items():
+    a.axvline(mval ** 2, color=C["model"], ls="--", lw=0.8, alpha=0.7)
+    a.text(mval ** 2 + 0.15, 25.5, lab_, color=C["model"], fontsize=10, rotation=90, va="top")
+a.add_patch(Rectangle((1.2, 0), 0.8, 15, fill=False, ec=C["signal"], lw=2))
+a.text(2.15, 1.0, "LHCb 2013\nregion", color=C["signal"], fontsize=10)
+a.set_xlim(0, 16); a.set_ylim(0, 26)
+a.set_xlabel(r"$m^2_{\mathrm{lo}}(K^+K^-)$ [GeV$^2$]"); a.set_ylabel(r"$m^2_{\mathrm{hi}}(K^+K^-)$ [GeV$^2$]")
+a = axs[1]
+eb = np.arange(5100, 5600.1, 10)
+for sgn, lab_, col in ((+1, r"$B^+$", C["pos"]), (-1, r"$B^-$", C["neg"])):
+    mm = reg_mq[reg_mq[:, 1] == sgn, 0]
+    a.hist(mm, bins=eb, histtype="step", lw=1.8, color=col, label=f"{lab_} ({len(mm)} candidates)")
+a.set_xlabel(r"$m(KKK)$ [MeV]"); a.set_ylabel("Candidates / 10 MeV"); a.legend(loc="center right")
+ps.panel_label(a, "LHCb 2013 region", loc="upper left")
+plt.tight_layout()
+save(fig, "ml_nominal_dalitz_region.pdf")

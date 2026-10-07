@@ -27,7 +27,7 @@ def fetch(rel_in_bayes_dir, binary=False):
     """file from the bayes branch (or from REGEN_NOMINAL_DIR for results/nominal/*), copied to `work`."""
     dst = os.path.join(work, os.path.basename(rel_in_bayes_dir))
     if LOCAL:   # local test: results from LOCAL, module from the Bayesian directory two levels up
-        src = os.path.join(LOCAL, os.path.basename(rel_in_bayes_dir)) if rel_in_bayes_dir.startswith("results/") \
+        src = os.path.join(LOCAL, "..", rel_in_bayes_dir[len("results/"):]) if rel_in_bayes_dir.startswith("results/") \
             else os.path.join(LOCAL, "..", "..", rel_in_bayes_dir)
         with open(src, "rb") as f, open(dst, "wb") as g:
             g.write(f.read())
@@ -225,3 +225,19 @@ for row, (k, lab) in enumerate(show):
 axs[-1, 0].set_xlabel("Step"); axs[-1, 1].set_xlabel("Step")
 plt.tight_layout()
 save(fig, "bayes_nominal_trace.pdf")
+
+# ---------------- Bayesian vs frequentist intervals at low statistics (Bayes_vs_Freq_LowStat.ipynb)
+ls_ = json.load(open(fetch("results/lowstat/summary.json")))
+Ns = ls_["N_grid"]; summ = {int(k): v for k, v in ls_["summary"].items()}
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.0))
+for a, lvl, nomv in ((axs[0], "68", 0.6827), (axs[1], "95", 0.9545)):
+    for k, (key, lab, col, mk) in enumerate((("bayes", "Bayesian credible", C["signal"], "o"), ("minos", "Profile likelihood (Minos)", C["model"], "s"),
+                                            ("hesse", "Hesse", "k", "^"))):
+        x = np.array(Ns) * (1 + 0.06 * (k - 1))
+        y = [summ[n][key + lvl][0] for n in Ns]; e = [summ[n][key + lvl][1] for n in Ns]
+        a.errorbar(x, y, yerr=e, fmt=mk, color=col, capsize=3, label=lab)
+    a.axhline(nomv, color=C["background"], ls="--", lw=1.2, label="Nominal")
+    a.set_xscale("log"); a.set_xlabel("Candidates per pseudo-dataset"); a.set_ylabel(f"Coverage of the {lvl}% interval")
+axs[0].legend(loc="lower right", fontsize=10)
+plt.tight_layout()
+save(fig, "bayes_nominal_lowstat.pdf")
