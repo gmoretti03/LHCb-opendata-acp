@@ -50,7 +50,7 @@ from matplotlib.colors import LogNorm
 from matplotlib.gridspec import GridSpec
 from scipy.stats import chi2 as chi2_dist
 from scipy.stats import norm
-from scipy.stats import crystalball   # [Giacomo, 2026-10-06] per la variante di segnale Crystal Ball
+from scipy.stats import crystalball   # [Giacomo, 2026-10-06] for the Crystal Ball signal variant
 from tqdm.auto import tqdm
 
 # =============================================================================
@@ -82,7 +82,7 @@ DEFAULT_LIMITS = {
     "sigma":  (1.0, 100.0),
     "lam":    (1e-6, 1.0),   # lam1, lam2, ...
     "f_bkgs": (0.0, 1.0),
-    # [Giacomo, 2026-10-06] parametri delle code della Crystal Ball (variante di segnale)
+    # [Giacomo, 2026-10-06] tail parameters of the Crystal Ball (signal variant)
     "beta":   (0.3, 5.0),
     "m_cb":   (1.01, 50.0),
     # "mu" defaults to cfg.sig_region (see param_limit)
@@ -103,10 +103,10 @@ class Config:
     m_K:         float = 493.677      # kaon mass  [MeV]
     m_Pi:        float = 139.57039    # pi mass    [MeV]
     m_B:         float = 5279.41      # B mass     [MeV]
-    # [Giacomo, 2026-10-06] chi_c0: semi-larghezza 60 MeV (non 30), come concordato e come nel bayesiano.
-    # Nei dati il picco della chi_c0 in m(K+K-) e' a ~3404 MeV (11 MeV sotto il valore PDG) con sigma ~18 MeV
-    # (larghezza naturale + risoluzione): +-30 MeV attorno al PDG ne lascerebbe fuori una buona parte.
-    # D0 (sigma 6.5 MeV) e J/psi (sigma ~8 MeV) restano a +-30 MeV.
+    # [Giacomo, 2026-10-06] chi_c0: half-width 60 MeV (not 30), as agreed and as in the Bayesian analysis.
+    # In the data the chi_c0 peak in m(K+K-) is at ~3404 MeV (11 MeV below the PDG value) with sigma ~18 MeV
+    # (natural width + resolution): +-30 MeV around the PDG value would leave a large part of it out.
+    # D0 (sigma 6.5 MeV) and J/psi (sigma ~8 MeV) stay at +-30 MeV.
     res_windows = {
         'D':   (1864.84, 30.0),
         'J':   (3096.90, 30.0),
@@ -122,15 +122,15 @@ class Config:
     fit_window:  tuple = (5100.0, 5600.0)
     sig_region:  tuple = (5200.0, 5350.0)
     n_exp:       int = 2              # number of exponentials in the background (1 or 2)
-    # [Giacomo, 2026-10-06] opzioni per le varianti dello studio sistematico (i default = modello nominale):
-    #   bkg_shape:  "charge" = forma del fondo (lam1, lam2, f_bkgs) separata per B+ e B-;  "shared" = condivisa
-    #   bkg_yield:  "free" = N_bkg_pos, N_bkg_neg indipendenti;  "symmetric" = stessa resa di fondo per le due cariche
-    #   signal:     "gauss" = gaussiana troncata;  "cb" = Crystal Ball troncata con code (beta, m_cb) libere e condivise
-    #   signal_per_charge: True = mu e sigma separati per B+ e B- (mu_pos, mu_neg, sigma_pos, sigma_neg)
-    # [Giacomo, 2026-10-06] ipotesi di massa delle tracce per B_Mass: "kaon" = kaone per tutte e tre (analisi B->KKK,
-    # come dichiarato nel report); "pid" = kaone o pione traccia per traccia secondo ProbK >= ProbPi (comportamento
-    # precedente). Con i tagli nominali (ProbK > 0.5, ProbPi < 0.5) le due coincidono; con tagli piu' larghi (varianti
-    # di preselezione) "pid" ricostruirebbe alcune tracce come pioni e cambierebbe la massa del B.
+    # [Giacomo, 2026-10-06] options for the variants of the systematic study (defaults = nominal model):
+    #   bkg_shape:  "charge" = background shape (lam1, lam2, f_bkgs) separate for B+ and B-;  "shared" = shared
+    #   bkg_yield:  "free" = independent N_bkg_pos, N_bkg_neg;  "symmetric" = same background yield for the two charges
+    #   signal:     "gauss" = truncated Gaussian;  "cb" = truncated Crystal Ball with free, shared tails (beta, m_cb)
+    #   signal_per_charge: True = separate mu and sigma for B+ and B- (mu_pos, mu_neg, sigma_pos, sigma_neg)
+    # [Giacomo, 2026-10-06] mass hypothesis of the tracks for B_Mass: "kaon" = kaon for all three (B->KKK analysis,
+    # as stated in the report); "pid" = kaon or pion track by track from ProbK >= ProbPi (previous
+    # behaviour). With the nominal cuts (ProbK > 0.5, ProbPi < 0.5) the two coincide; with looser cuts (preselection
+    # variants) "pid" would reconstruct some tracks as pions and change the B mass.
     mass_hypothesis: str = "kaon"
     bkg_shape:   str = "charge"
     bkg_yield:   str = "free"
@@ -214,7 +214,7 @@ def particle_mass(df: pd.DataFrame, cfg: Config, particles=None):
         mass = np.ones(len(df[f'H{i}_ProbK']))
         K_mask  = (df[f'H{i}_ProbK'] >= df[f'H{i}_ProbPi'])
         Pi_mask = (df[f'H{i}_ProbK'] <  df[f'H{i}_ProbPi'])
-        if getattr(cfg, "mass_hypothesis", "pid") == "kaon":   # [Giacomo, 2026-10-06] vedi Config.mass_hypothesis
+        if getattr(cfg, "mass_hypothesis", "pid") == "kaon":   # [Giacomo, 2026-10-06] see Config.mass_hypothesis
             K_mask, Pi_mask = np.ones(len(mass), bool), np.zeros(len(mass), bool)
         mass[K_mask]  = cfg.m_K
         mass[Pi_mask] = cfg.m_Pi
@@ -413,22 +413,21 @@ def remove_charm_resonances(cfg, data, remove, couple_inv_mass=None):
             if data is None:
                 raise ValueError("Provide either `mass` (dict of pair masses) or `data`.")
             else:
-                # [Giacomo, 2026-10-06] solo le due coppie di carica opposta (H1H2, H1H3: H1 e' sempre il kaone di carica
-                # opposta al B). Prima si usavano tutte e tre le coppie, inclusa H2H3 che ha carica uguale e non puo'
-                # venire da D0, J/psi o chi_c0: il veto su di essa scartava eventi a caso (~1600 nella versione completa).
-                # Controllo nella finestra [5100, 5600]: restano 18744 (solo D0) e 16367 (D0 + J/psi + chi_c0).
+                # [Giacomo, 2026-10-06] only the two opposite-sign pairs (H1H2, H1H3: H1 is always the kaon with charge
+                # opposite to the B). Previously all three pairs were used, including H2H3, which has equal charges and cannot
+                # come from D0, J/psi or chi_c0: vetoing it rejected random events (~1600 in the full version).
+                # Check in the window [5100, 5600]: 18744 (D0 only) and 16367 (D0 + J/psi + chi_c0) candidates remain.
                 couple_inv_mass = {f'1{j}': invariant_mass(data, cfg, particles=(1, j)) for j in (2, 3)}
     return data[get_charm_veto_mask(cfg, couple_inv_mass, remove)]
 
 def get_charm_veto_mask(cfg, couple_inv_mass, remove):
     """
-    Crea una maschera booleana che vale True per gli eventi da MANTENERE 
-    e False per quelli da scartare (veto).
-    
-    Parametri:
-    - mass_dict: dizionario con le masse invarianti M (in MeV) delle coppie, es. {'12': m12, '13': m13}
-    - remove: 'a' o 'D' -> solo veto D0
-            'b' o 'all' -> veto D0 + J/psi + chi_c0
+    Boolean mask, True for the events to KEEP and False for the vetoed ones.
+
+    Parameters:
+    - couple_inv_mass: dictionary with the invariant masses (MeV) of the pairs, e.g. {'12': m12, '13': m13}
+    - remove: 'a' or 'D' -> D0 veto only
+            'b' or 'all' -> D0 + J/psi + chi_c0 veto
             '[...]' -> veto on the selected particles
     """
     
@@ -444,7 +443,7 @@ def get_charm_veto_mask(cfg, couple_inv_mass, remove):
     first_key = list(couple_inv_mass.keys())[0]
     reject_mask = np.zeros(len(couple_inv_mass[first_key]), dtype=bool)
 
-    # Scarta l'evento se ALMENO UNA delle due coppie cade nella finestra |m - m0| < semi-larghezza
+    # Reject the event if AT LEAST ONE of the two pairs falls in the window |m - m0| < half-width
     for pair_key, m_array in couple_inv_mass.items():
         for res in active_res:
             m0, half_width = cfg.res_windows[res]
@@ -544,7 +543,7 @@ def gauss_pdf(m, mu, sigma, window):
 
 
 def cb_pdf(m, mu, sigma, beta, m_cb, window):
-    """[Giacomo, 2026-10-06] Crystal Ball (coda a bassa massa) troncata e normalizzata su `window`."""
+    """[Giacomo, 2026-10-06] Crystal Ball (low-mass tail) truncated and normalised on `window`."""
     lo, hi = window
     z = crystalball.cdf((hi - mu) / sigma, beta, m_cb) - crystalball.cdf((lo - mu) / sigma, beta, m_cb)
     return crystalball.pdf((np.asarray(m) - mu) / sigma, beta, m_cb) / sigma / z
@@ -592,9 +591,9 @@ def make_model(cfg: Config, side: str | None = None, n_exp: int | None = None) -
     cb = cfg.signal == "cb"
     keys = ["N_sig"] + (["A_CP"] if side else []) + ["mu", "sigma"] + (["beta", "m_cb"] if cb else []) + _bkg_keys(n_exp)
     suffix = f"_{side}" if side else ""
-    # [Giacomo, 2026-10-06] quali parametri hanno il suffisso _pos/_neg (separati per carica) dipende dalle opzioni
-    # di Config: nel modello nominale solo il fondo (resa e forma). I parametri con lo stesso nome nei due modelli
-    # vengono condivisi da iminuit nel fit congiunto.
+    # [Giacomo, 2026-10-06] which parameters carry the _pos/_neg suffix (separate for each charge) depends on the
+    # Config options: in the nominal model only the background (yield and shape). Parameters with the same name in
+    # the two models are shared by iminuit in the joint fit.
     def _per_side(k):
         if k == "N_bkg":
             return cfg.bkg_yield != "symmetric"
@@ -748,8 +747,8 @@ def initial_values(samples: Mapping[str, np.ndarray], cfg: Config, n_exp: int | 
         start.update({f"{k}_{side}": v for k, v in bs.items()})
         per_side.append(bs)
     start["N_sig"] = n_sig
-    # [Giacomo, 2026-10-06] valori iniziali anche per i parametri condivisi delle varianti (media delle due cariche),
-    # per mu/sigma separati per carica e per le code della Crystal Ball; i nomi non usati dal modello sono ignorati
+    # [Giacomo, 2026-10-06] starting values also for the shared parameters of the variants (mean of the two charges),
+    # for mu/sigma separate per charge and for the Crystal Ball tails; names not used by the model are ignored
     for k in per_side[0]:
         start.setdefault(k, float(np.mean([bs[k] for bs in per_side])))
     for side in samples:
@@ -880,18 +879,18 @@ def scan_config(all_data, cfg, variations, n_exp=2, minos=False):
     """
     rows = []
     for var in tqdm(variations, desc="scan"):
-        # [Giacomo, 2026-10-06] una variante puo' avere un'etichetta ("label") e cambiare anche n_exp
+        # [Giacomo, 2026-10-06] a variant can have a label ("label") and change n_exp too
         var = dict(var); label = var.pop("label", None)
         n_exp_v = var.get("n_exp", n_exp)
         cfg_v = replace(cfg, **var)
-        # [Giacomo, 2026-10-06] prima era `('prob_pi_max' or 'prob_k_min') in var.keys()`, che controlla solo
-        # 'prob_pi_max' (l'`or` tra due stringhe restituisce la prima): una variante con solo 'prob_k_min'
-        # non avrebbe riapplicato la preselezione. Inoltre `all_data` deve essere un campione NON preselezionato
-        # (o preselezionato con tagli piu' larghi di tutta la griglia), altrimenti i tagli piu' larghi del
-        # nominale non possono recuperare eventi: vedi la cella `data_loose` nel notebook.
-        # [Giacomo, 2026-10-06] la preselezione della variante si riapplica sempre: con un campione gia'
-        # preselezionato ai tagli nominali non cambia nulla; con `data_loose` (tagli piu' larghi) da' il campione
-        # giusto per ogni variante, cosi' tutte le varianti possono usare lo stesso input.
+        # [Giacomo, 2026-10-06] this used to be `('prob_pi_max' or 'prob_k_min') in var.keys()`, which only checks
+        # 'prob_pi_max' (`or` between two strings returns the first): a variant with only 'prob_k_min'
+        # would not have re-applied the preselection. Moreover `all_data` must be a sample NOT preselected
+        # (or preselected with cuts looser than the whole grid), otherwise cuts looser than the
+        # nominal ones cannot recover events: see the `data_loose` cell in the notebook.
+        # [Giacomo, 2026-10-06] the preselection of the variant is always re-applied: with a sample already
+        # preselected with the nominal cuts nothing changes; with `data_loose` (looser cuts) it gives the right
+        # sample for every variant, so all variants can use the same input.
         data = all_data[kaon_preselection(all_data, cfg_v)]
         (left, right), (slo, shi) = cfg_v.fit_window, cfg_v.sig_region
         row = dict(label=label, left=left, right=right, sig_lo=slo, sig_hi=shi)
@@ -905,7 +904,7 @@ def scan_config(all_data, cfg, variations, n_exp=2, minos=False):
             # a_cnt, a_cnt_err = sideband_subtracted_asymmetry(samples, cfg_v, n_exp)
             row.update(valid=m.valid, accurate=m.accurate, n_events=sum(map(len, samples.values())),
                        A_CP=m.values["A_CP"], A_CP_err=m.errors["A_CP"], N_sig=m.values["N_sig"],
-                       # [Giacomo, 2026-10-06] con signal_per_charge ci sono mu_pos/mu_neg: si registra la media
+                       # [Giacomo, 2026-10-06] with signal_per_charge there are mu_pos/mu_neg: their mean is recorded
                        mu=(m.values["mu"] if "mu" in m.parameters else 0.5 * (m.values["mu_pos"] + m.values["mu_neg"])),
                        sigma=(m.values["sigma"] if "sigma" in m.parameters else 0.5 * (m.values["sigma_pos"] + m.values["sigma_neg"])),
                        gof=gof_joint(m, samples, cfg_v, n_exp_v), chi2=gof_joint(m, samples, cfg_v, n_exp_v).chi2,
@@ -1047,15 +1046,15 @@ def plot_coverage(res: CoverageResult, bins: int = 30):
     return fig
 
 
-# ---- [Giacomo, 2026-10-06] combinazione delle varianti nello studio sistematico ---------------------------------
-# Regola comune con l'analisi bayesiana:
-#  1) varianti che cambiano il campione (finestra, preselezione): lo spostamento conta solo se supera la fluttuazione
-#     statistica attesa tra i due campioni (criterio di Barlow), sigma_B = sqrt(|sigma_var^2 - sigma_nom^2|);
-#  2) varianti sullo stesso campione respinte dai dati (chi2 binnato peggiore del nominale di piu' di 25) escluse;
-#  3) per ogni gruppo lo spostamento massimo in valore assoluto; gruppi sommati in quadratura.
+# ---- [Giacomo, 2026-10-06] combination of the variants of the systematic study ---------------------------------
+# Rule common to the Bayesian analysis:
+#  1) variants that change the sample (window, preselection): the shift counts only if it exceeds the expected
+#     statistical fluctuation between the two samples (Barlow criterion), sigma_B = sqrt(|sigma_var^2 - sigma_nom^2|);
+#  2) variants on the same sample rejected by the data (binned chi2 worse than the nominal by more than 25) are excluded;
+#  3) for each group the largest absolute shift; groups added in quadrature.
 def combine_systematics(nominal: Mapping, rows: Sequence[Mapping], groups: Mapping[str, Sequence[str]],
                         sample_changing: Sequence[str], dchi2_max: float = 25.0) -> dict:
-    """`nominal` e ogni elemento di `rows` hanno A_CP, A_CP_err, chi2, label; `groups` = {gruppo: [label, ...]}."""
+    """`nominal` and every element of `rows` have A_CP, A_CP_err, chi2, label; `groups` = {group: [label, ...]}."""
     a0, s0, n0 = nominal["A_CP"], nominal["A_CP_err"], nominal.get("n_events")
     per_var = {}
     for r in rows:
@@ -1064,8 +1063,8 @@ def combine_systematics(nominal: Mapping, rows: Sequence[Mapping], groups: Mappi
             per_var[lab] = dict(shift=None, sigma_barlow=None, rejected_by_data=False, counts=False, fit_failed=True)
             continue
         d = r["A_CP"] - a0
-        # se l'errore del fit non e' affidabile (accurate=False, es. parametro al limite) la sigma statistica della
-        # variante si stima dal numero di eventi, sigma_var ~ sigma_nom * sqrt(N_nom / N_var)
+        # if the fit error is not reliable (accurate=False, e.g. a parameter at its limit) the statistical sigma of the
+        # variant is estimated from the number of events, sigma_var ~ sigma_nom * sqrt(N_nom / N_var)
         err_from_n = (r.get("accurate") is False) and n0 and r.get("n_events")
         s_var = s0 * np.sqrt(n0 / r["n_events"]) if err_from_n else r["A_CP_err"]
         sb = float(np.sqrt(abs(s_var ** 2 - s0 ** 2))) if lab in sample_changing else None
