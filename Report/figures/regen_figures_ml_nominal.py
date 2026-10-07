@@ -51,32 +51,42 @@ ps.use(); C = ps.COLORS
 def save(fig, name):
     fig.savefig(os.path.join(OUT, name)); plt.close(fig); print("saved", name)
 
-# ---------------- ROC curves (AUC values are in the table)
-from sklearn.metrics import roc_curve
+# ---------------- ROC curves, AUC in the legend, working point of the selection used later
+from sklearn.metrics import roc_curve, roc_auc_score
 y = scores[:, 0]
+ref = models["reference_model"]
+styles = {"Logistic Regression": ("tab:gray", "-"), "Logistic Regression (L1)": ("tab:gray", "--"),
+          "Decision Tree": ("tab:olive", "-"), "Random Forest": ("tab:green", "-"),
+          "Gradient Boosting": ("tab:purple", "-"), "FFNN": ("tab:brown", "-")}
 fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.4))
 for k, name in enumerate(models["order"], 1):
-    fpr, tpr, _ = roc_curve(y, scores[:, k])
-    ax.plot(fpr, tpr, label=name, lw=1.5 if name == models["reference_model"] else 1.0)
+    fpr, tpr, _ = roc_curve(y, scores[:, k]); col, ls_ = styles[name]
+    ax.plot(fpr, tpr, color=col, ls=ls_, lw=2.2 if name == ref else 1.1,
+            label=f"{name} ({roc_auc_score(y, scores[:, k]):.3f})")
+k_ref = models["order"].index(ref) + 1
+sel_ = scores[:, k_ref] > 0.5
+wp_fpr, wp_tpr = np.mean(sel_[y == 0]), np.mean(sel_[y == 1])
+ax.plot([wp_fpr], [wp_tpr], "o", ms=8, mfc="white", mec="k", mew=1.5, label=f"{ref}, score $>0.5$")
 ax.plot([0, 1], [0, 1], "k:", alpha=0.5)
-ax.set_xlabel("False positive rate (background efficiency)"); ax.set_ylabel("True positive rate (signal efficiency)")
-ax.legend(loc="lower right")
+ax.set_xlabel("Background-like efficiency (false positive rate)"); ax.set_ylabel("Signal-like efficiency (true positive rate)")
+ax.legend(loc="lower right", fontsize=10, title="Test AUC", title_fontsize=10)
 save(fig, "ml_nominal_roc.pdf")
 
-# ---------------- feature importance (RF, Gini) next to |Lasso coefficient|
+# ---------------- feature importance (RF, Gini) and |Lasso coefficient|: two panels, same feature order
 names = list(feats["importance"].keys())
 imp = np.array([feats["importance"][n] for n in names]); coef = np.array([feats["abs_lasso_coef"][n] for n in names])
-order = np.argsort(imp)[::-1]
-fig, ax1 = plt.subplots(figsize=(ps.DOUBLE, 4.8))
-x = np.arange(len(names)); w = 0.4
-ax1.bar(x - w / 2, imp[order], w, color="steelblue", label="RF importance (Gini)")
-ax1.set_ylabel("RF importance (Gini)")
-ax2 = ax1.twinx()
-ax2.bar(x + w / 2, coef[order], w, color="darkorange", alpha=0.8, label=r"|Lasso coefficient|")
-ax2.set_ylabel("|Lasso coefficient| (standardized features)")
-ax1.set_xticks(x); ax1.set_xticklabels([names[i] for i in order], rotation=90)
-h1, l1 = ax1.get_legend_handles_labels(); h2, l2 = ax2.get_legend_handles_labels()
-ax1.legend(h1 + h2, l1 + l2, loc="upper right")
+order = np.argsort(imp)                                  # ascending: most important at the top of a barh
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 6.2), sharey=True)
+yy = np.arange(len(names))
+is_b = np.array([names[i].startswith("B_") for i in order])
+for a, val, lab in ((axs[0], imp, "Random Forest importance (Gini)"), (axs[1], coef, "|Lasso coefficient| (standardized features)")):
+    a.barh(yy, val[order], color=np.where(is_b, C["model"], C["signal"]), height=0.7)
+    a.set_xlabel(lab); a.grid(axis="x", alpha=0.3)
+axs[0].set_yticks(yy); axs[0].set_yticklabels([names[i].replace("_", r"\_") if False else names[i] for i in order], fontsize=11)
+for t_, b_ in zip(axs[0].get_yticklabels(), is_b):
+    if b_: t_.set_color(C["model"])
+ps.panel_label(axs[1], f"Spearman $\\rho = {feats['spearman_importance_vs_lasso']:.2f}$", loc="lower right")
+plt.tight_layout()
 save(fig, "ml_nominal_features.pdf")
 
 # ---------------- bias-variance (GBM staged): accuracy and AUC
@@ -92,29 +102,45 @@ for a in axs:
 plt.tight_layout()
 save(fig, "ml_nominal_bias_variance.pdf")
 
-# ---------------- calibration (reference RF raw vs isotonic)
+# ---------------- calibration (reference RF raw vs isotonic), with the score distribution below
 cal = bvc["calibration"]
-fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.6))
-ax.plot(cal["raw"]["pred"], cal["raw"]["obs"], "o-", label=f"Raw RF score (Brier = {cal['brier_raw_rf']:.3f})")
-ax.plot(cal["isotonic"]["pred"], cal["isotonic"]["obs"], "s-", label=f"Isotonic-recalibrated (Brier = {cal['brier_isotonic_rf']:.3f})")
+rf_s = scores[:, models["order"].index("Random Forest") + 1]
+edges10 = np.linspace(0, 1, 11)
+cnt, _ = np.histogram(rf_s, edges10); cnt = cnt[cnt > 0]                 # calibration_curve drops empty bins
+obs_r = np.array(cal["raw"]["obs"]); err_r = np.sqrt(obs_r * (1 - obs_r) / cnt)
+fig, (ax, axh) = plt.subplots(2, 1, figsize=(ps.SINGLE, 6.4), sharex=True, gridspec_kw={"height_ratios": [3, 1.1], "hspace": 0.06})
+ax.errorbar(cal["raw"]["pred"], obs_r, yerr=err_r, fmt="o-", capsize=3, color=C["signal"],
+            label=f"Raw RF score (Brier = {cal['brier_raw_rf']:.3f})")
+ax.plot(cal["isotonic"]["pred"], cal["isotonic"]["obs"], "s-", color=C["up"], label=f"Isotonic-recalibrated (Brier = {cal['brier_isotonic_rf']:.3f})")
 ax.plot([0, 1], [0, 1], "k:", label="Perfect calibration")
-ax.set_xlabel("Predicted probability"); ax.set_ylabel("Observed fraction of signal-like events"); ax.legend(loc="lower right")
+ax.set_ylabel("Observed signal-like fraction"); ax.legend(loc="lower right", fontsize=10)
+for lab_, msk, col in (("signal-like", y == 1, C["signal"]), ("background-like", y == 0, C["model"])):
+    axh.hist(rf_s[msk], bins=edges10, histtype="step", lw=1.5, color=col, label=lab_)
+axh.set_yscale("log"); axh.set_xlabel("Predicted probability (raw RF score)"); axh.set_ylabel("Test\ncandidates")
+axh.legend(loc="upper left", fontsize=9, ncol=2)
 save(fig, "ml_nominal_calibration.pdf")
 
 # ---------------- uncertainty: per-event RF spread vs score; distributions of the three estimators; training size
 yt, rf_mean, rf_std, mc_std, de_std = unc_arr.T
 fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.3))
-sc = axs[0].scatter(rf_mean, rf_std, c=yt, cmap="coolwarm", s=6, alpha=0.4, rasterized=True)
-axs[0].set_xlabel("Mean RF score (over trees)"); axs[0].set_ylabel("Std. dev. across trees")
-cb = plt.colorbar(sc, ax=axs[0], ticks=[0, 1]); cb.ax.set_yticklabels(["background-\nlike", "signal-\nlike"])
+eb = np.linspace(0, 1, 21); cb_ = 0.5 * (eb[1:] + eb[:-1])
+for lab_, msk, col in (("signal-like", yt == 1, C["signal"]), ("background-like", yt == 0, C["model"])):
+    med, lo_, hi_ = [], [], []
+    for x0, x1 in zip(eb[:-1], eb[1:]):
+        v = rf_std[msk & (rf_mean >= x0) & (rf_mean < x1)]
+        med.append(np.median(v) if len(v) >= 10 else np.nan)
+        lo_.append(np.percentile(v, 16) if len(v) >= 10 else np.nan); hi_.append(np.percentile(v, 84) if len(v) >= 10 else np.nan)
+    axs[0].plot(cb_, med, color=col, lw=1.8, label=lab_)
+    axs[0].fill_between(cb_, lo_, hi_, color=col, alpha=0.2)
+axs[0].set_xlabel("Mean RF score (over trees)"); axs[0].set_ylabel("Spread across trees"); axs[0].legend(loc="lower center", fontsize=10)
 bins = np.linspace(0, max(rf_std.max(), mc_std.max(), de_std.max()), 50)
-for arr, lab in ((rf_std, "RF trees"), (mc_std, "MC dropout (FFNN)"), (de_std, "Deep ensemble (FFNN, seeds)")):
-    axs[1].hist(arr, bins=bins, histtype="step", density=True, lw=1.5, label=lab)
+for arr, lab, col in ((rf_std, "RF trees", "tab:green"), (mc_std, "MC dropout (FFNN)", "tab:brown"), (de_std, "Deep ensemble (FFNN)", "tab:purple")):
+    axs[1].hist(arr, bins=bins, histtype="step", density=True, lw=1.5, label=lab, color=col)
 axs[1].set_xlabel("Estimated per-event uncertainty"); axs[1].set_ylabel("Density"); axs[1].set_ylim(0, axs[1].get_ylim()[1] * 1.35); axs[1].legend(loc="upper right")
 ts = unc["training_size"]
-axs[2].plot([t["n_train"] for t in ts], [t["rf_std_mean"] for t in ts], "o-", label="all")
-axs[2].plot([t["n_train"] for t in ts], [t["rf_std_bkg"] for t in ts], "s--", label="background-like")
-axs[2].plot([t["n_train"] for t in ts], [t["rf_std_sig"] for t in ts], "^--", label="signal-like")
+axs[2].plot([t["n_train"] for t in ts], [t["rf_std_mean"] for t in ts], "o-", color="k", label="all")
+axs[2].plot([t["n_train"] for t in ts], [t["rf_std_bkg"] for t in ts], "s--", color=C["model"], label="background-like")
+axs[2].plot([t["n_train"] for t in ts], [t["rf_std_sig"] for t in ts], "^--", color=C["signal"], label="signal-like")
 axs[2].set_xlabel("Training-set size"); axs[2].set_ylabel("Mean RF spread across trees"); axs[2].legend()
 plt.tight_layout()
 save(fig, "ml_nominal_uncertainty.pdf")
@@ -129,16 +155,16 @@ assert len(data) == len(km8), "K-means labels do not match the data sample"
 lo2 = (np.minimum(data.m12, data.m13) / 1e3) ** 2; hi2 = (np.maximum(data.m12, data.m13) / 1e3) ** 2
 fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.4))
 K = int(km8.max()) + 1
-cmap = plt.get_cmap("tab10", K)
-s = ax.scatter(lo2, hi2, c=km8, cmap=cmap, vmin=-0.5, vmax=K - 0.5, s=3, alpha=0.5, rasterized=True)
 groups = {g["group"]: g for g in km["8"]["all"]["groups"]}
+S_ev = np.array([groups[k]["S_vs_global"] for k in km8])
+sct = ax.scatter(lo2, hi2, c=S_ev, cmap="coolwarm", vmin=-4, vmax=4, s=3, alpha=0.6, rasterized=True)
 for k in range(K):
-    if k in groups:
-        sel = km8 == k
-        ax.text(np.median(lo2[sel]), np.median(hi2[sel]), f"{groups[k]['S_vs_global']:+.1f}", ha="center", va="center",
-                fontsize=9, weight="bold", bbox=dict(boxstyle="round,pad=0.15", fc="white", alpha=0.7))
+    sel = km8 == k
+    ax.text(np.median(lo2[sel]), np.median(hi2[sel]), f"{groups[k]['S_vs_global']:+.1f}", ha="center", va="center",
+            fontsize=10, weight="bold", bbox=dict(boxstyle="round,pad=0.15", fc="white", alpha=0.75))
 ax.set_xlabel(r"$m^2_{\mathrm{lo}}(K^+K^-)$ [GeV$^2$]"); ax.set_ylabel(r"$m^2_{\mathrm{hi}}(K^+K^-)$ [GeV$^2$]")
-plt.colorbar(s, ax=ax, label="Cluster", ticks=range(K))
+ax.set_xlim(0, 16); ax.set_ylim(0, 30)
+plt.colorbar(sct, ax=ax, label=r"$S_k$")
 save(fig, "ml_nominal_kmeans.pdf")
 
 # ---------------- A_raw vs RF/GBM-score threshold, with the nested-subsample band

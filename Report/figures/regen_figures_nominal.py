@@ -119,17 +119,28 @@ a.axvline(0, color="gray", ls=":")
 a.set_xlabel(r"$A_{\mathrm{raw}}$"); a.set_ylabel("Posterior density"); a.legend(loc="upper left")
 save(fig, "bayes_nominal_magnet.pdf")
 
-# ---------------- toys
+# ---------------- toys: pulls and coverage
 from scipy.stats import norm
-est = np.array([t["A_median"] for t in toys]); a_true = nom["A"]["median"]; sd = nom["A"]["sd"]
-fig, a = plt.subplots(figsize=(ps.SINGLE, 4.6))
-a.hist(est, bins=25, density=True, histtype="stepfilled", color=C["replica"], alpha=0.5,
-       label=f"Toy estimates ($n={len(est)}$): mean $= {est.mean():.5f}$, sd $= {est.std(ddof=1):.5f}$")
-xs = np.linspace(est.min(), est.max(), 300)
-a.plot(xs, norm.pdf(xs, a_true, sd), color=C["model"], label=f"Gaussian: injected $A$, posterior sd $= {sd:.5f}$")
-a.axvline(a_true, color="k", ls=":", label=f"Injected $A = {a_true:.4f}$")
-a.set_xlabel(r"Posterior median of $A$ in each pseudo-dataset"); a.set_ylabel("Density")
-a.legend(loc="upper left", fontsize=10); a.set_ylim(0, a.get_ylim()[1] * 1.55)
+a_true = nom["A"]["median"]
+pull = np.array([(t["A_median"] - a_true) / t["A_sd"] for t in toys])
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.3), gridspec_kw={"width_ratios": [1.6, 1]})
+a = axs[0]
+a.hist(pull, bins=np.linspace(-3.5, 3.5, 29), density=True, histtype="stepfilled", color=C["replica"], alpha=0.5,
+       label=f"{len(pull)} pseudo-datasets")
+xs = np.linspace(-3.5, 3.5, 300)
+a.plot(xs, norm.pdf(xs), color=C["model"], lw=1.5, label="Standard normal")
+a.set_xlabel(r"Pull $(\hat A - A_{\mathrm{true}})/\sigma(\hat A)$"); a.set_ylabel("Density")
+ps.panel_label(a, f"mean $= {pull.mean():+.2f}\\pm{pull.std(ddof=1)/np.sqrt(len(pull)):.2f}$\nsd $= {pull.std(ddof=1):.2f}$")
+a.legend(loc="upper right")
+a = axs[1]
+cov = summary["toys"]
+for x, nomcov, key in ((0, 0.6827, "coverage_68"), (1, 0.9545, "coverage_95")):
+    a.errorbar([x], [cov[key]], yerr=[cov[key + "_err"]], fmt="o", color=C["data"], capsize=4,
+               label="Observed" if x == 0 else None)
+    a.hlines(nomcov, x - 0.3, x + 0.3, color=C["model"], lw=2, label="Nominal" if x == 0 else None)
+a.set_xticks([0, 1]); a.set_xticklabels(["68% interval", "95% interval"]); a.set_xlim(-0.6, 1.6)
+a.set_ylabel("Coverage"); a.set_ylim(0.55, 1.0); a.legend(loc="lower right")
+plt.tight_layout()
 save(fig, "bayes_nominal_toys.pdf")
 
 # ---------------- Dalitz maps, nominal window, significance w.r.t. the global asymmetry
@@ -144,14 +155,45 @@ ext = [0, 16, 0, 30]
 fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.3))
 im0 = axs[0].imshow(np.where(n > 0, n, np.nan).T, origin="lower", aspect="auto", extent=ext, cmap="Greys")
 plt.colorbar(im0, ax=axs[0], label="Candidates per bin")
-im1 = axs[1].imshow(ai.T, origin="lower", aspect="auto", extent=ext, cmap="RdBu_r", vmin=-0.5, vmax=0.5)
+im1 = axs[1].imshow(ai.T, origin="lower", aspect="auto", extent=ext, cmap="coolwarm", vmin=-0.5, vmax=0.5)
 plt.colorbar(im1, ax=axs[1], label=r"$A_i$")
-im2 = axs[2].imshow(sg.T, origin="lower", aspect="auto", extent=ext, cmap="RdBu_r", vmin=-4, vmax=4)
+im2 = axs[2].imshow(sg.T, origin="lower", aspect="auto", extent=ext, cmap="coolwarm", vmin=-4, vmax=4)
 plt.colorbar(im2, ax=axs[2], label=r"$S_i$")
+from matplotlib.patches import Rectangle
+for i_ in range(len(el) - 1):
+    for j_ in range(len(eh) - 1):
+        if ok[i_, j_] and abs(sg[i_, j_]) > 3:
+            axs[2].add_patch(Rectangle((el[i_], eh[j_]), el[i_ + 1] - el[i_], eh[j_ + 1] - eh[j_], fill=False, ec="k", lw=1.8))
+charm = {r"$D^0$": 1.86484, r"$J/\psi$": 3.0969, r"$\chi_{c0}$": 3.4147}      # GeV, world averages
+for a in axs[1:]:
+    for lab_, mval in charm.items():
+        a.axvline(mval ** 2, color="k", ls="--", lw=0.7, alpha=0.45); a.axhline(mval ** 2, color="k", ls="--", lw=0.7, alpha=0.45)
+for lab_, mval in charm.items():
+    axs[1].text(mval ** 2 + 0.2, 28.8, lab_, fontsize=10, va="top", rotation=90)
 for a in axs:
     a.set_xlabel(r"$m^2_{\mathrm{lo}}(K^+K^-)$ [GeV$^2$]"); a.set_ylabel(r"$m^2_{\mathrm{hi}}(K^+K^-)$ [GeV$^2$]")
 plt.tight_layout()
 save(fig, "bayes_nominal_dalitz_maps.pdf")
+
+# ---------------- Savage-Dickey: marginal posterior vs prior density at the null value, for A and A_b
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.0))
+for a, par, lab in ((axs[0], "A", r"$A$"), (axs[1], "A_b", r"$A_b$")):
+    x = thinned[:, names.index(par)]; m_, s_ = nom[par]["mean"], nom[par]["sd"]
+    lo_ = min(-0.01, m_ - 5 * s_); hi_ = max(0.01, m_ + 5 * s_)
+    a.hist(x, bins=60, range=(lo_, hi_), density=True, histtype="stepfilled", color=C["replica"], alpha=0.45, label="Posterior (MCMC)")
+    xs = np.linspace(lo_, hi_, 600)
+    a.plot(xs, norm.pdf(xs, m_, s_), color=C["model"], lw=1.5, label="Gaussian approximation")
+    a.axhline(0.5, color=C["background"], ls="--", lw=1.5, label=r"Prior, uniform on $(-1,1)$")
+    p0 = norm.pdf(0.0, m_, s_)
+    a.plot([0], [p0], "o", color=C["model"], ms=7); a.plot([0], [0.5], "o", color=C["background"], ms=7)
+    a.axvline(0, color="k", ls=":", lw=0.8)
+    a.set_yscale("log"); a.set_ylim(1e-5 if par == "A" else 0.05, 300)
+    a.set_xlabel(lab); a.set_ylabel("Density")
+    bf = p0 / 0.5
+    ps.panel_label(a, f"$BF_{{01}}={bf:.1e}$" if bf < 0.01 else f"$BF_{{01}}={bf:.1f}$", loc="upper right" if par == "A" else "upper left")
+axs[0].legend(loc="lower left", fontsize=10)
+plt.tight_layout()
+save(fig, "bayes_nominal_savage_dickey.pdf")
 
 # ---------------- posterior predictive check and trace plot (Bayesian_Nominal_Checks.ipynb)
 ppc = json.load(open(fetch("results/nominal/ppc.json")))

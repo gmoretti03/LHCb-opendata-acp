@@ -189,9 +189,16 @@ Computing the evidence of each hypothesis by direct numerical integration is imp
 \[
 BF_{01} = \frac{p(A=0\mid D)}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
 \]
-With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the posterior odds of $H_0$ against $H_1$. $A=0$ lies $5.2$ posterior standard deviations from the median, in a tail where the chain contains essentially no samples, so a kernel density estimate of $p(A=0\mid D)$ would only reflect the kernel tails of the few most extreme samples. We therefore use the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), with the mean and standard deviation of the chain, which gives $BF_{01}\approx1.1\times10^{-4}$ ($\ln BF_{10}\approx9.1$): decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys} ($BF_{10}>100$). As for any Bayes factor of a point null against a free parameter, the value scales with the prior width -- the Ockham factor built into the Bayes factor, which penalizes a free parameter in proportion to the prior volume it is allowed to explore, and the mechanism behind Lindley's paradox: with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_checks}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged.
+With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the posterior odds of $H_0$ against $H_1$. $A=0$ lies $5.2$ posterior standard deviations from the median, in a tail where the chain contains essentially no samples, so a kernel density estimate of $p(A=0\mid D)$ would only reflect the kernel tails of the few most extreme samples. We therefore use the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), with the mean and standard deviation of the chain, which gives $BF_{01}\approx1.1\times10^{-4}$ ($\ln BF_{10}\approx9.1$): decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys} ($BF_{10}>100$). As for any Bayes factor of a point null against a free parameter, the value scales with the prior width -- the Ockham factor built into the Bayes factor, which penalizes a free parameter in proportion to the prior volume it is allowed to explore, and the mechanism behind Lindley's paradox: with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_checks}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged. Figure~\ref{fig:bayes_sd} shows the two densities of the ratio.
 
 The same test on the background asymmetry shows the Ockham factor at work. $A_b=-0.040\pm0.018$ lies $2.3$ standard deviations from zero, yet the Savage-Dickey ratio gives $BF_{01}(A_b=0)\approx3.5$: the data mildly \emph{favor} a charge-symmetric background, because the gain in likelihood does not compensate for spreading the prior of $A_b$ over $(-1,1)$. $A_b$ is nevertheless kept free in the nominal model, which avoids imposing an assumption on the background that the frequentist analysis does not make; fixing $A_b=0$ is one of the variants of the systematic study (Sec.~\ref{sec:syst}).
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_savage_dickey.pdf}
+\caption{Savage-Dickey ratio for $A$ (left) and $A_b$ (right): marginal posterior (histogram of the chain and Gaussian approximation) and prior density, logarithmic scale. The Bayes factor $BF_{01}$ is the ratio of the two densities at zero (dots). For $A$ the posterior density at zero is $10^{-4}$ times the prior one; for $A_b$, $2.3$ standard deviations from zero, it is higher than the prior density, and the data favor $A_b=0$.}
+\label{fig:bayes_sd}
+\end{figure*}
 
 \subsection{Goodness of Fit and Model Choice}
 \label{sec:bayes_gof}
@@ -257,14 +264,14 @@ The sample contains $B^\pm$ decays through intermediate charm states, $B^\pm\to 
 
 \subsection{Toy-MC Coverage Validation}
 \label{sec:bayes_toymc}
-A credible interval states where the parameter lies given the data and the prior; nothing guarantees that it also has frequentist coverage, i.e.\ that over repeated experiments it contains the true value with the stated probability. To check this, 200 pseudo-datasets were generated from the fitted model (parametric bootstrap, with the posterior medians as ground truth and Poisson-fluctuated yields for each charge and component; the truncated Gaussian and exponential masses are drawn with the transformation method, i.e.\ by inverting their cumulative distributions) and each was refit with the nominal procedure and a $12{,}000$-step chain. The fraction of replicas whose interval contains the injected $A$ is $0.650\pm0.033$ for the 68\% CI and $0.930\pm0.015$ for the 95\% CI (binomial uncertainties), $1.0\sigma$ and $1.3\sigma$ below nominal: the coverage is consistent with nominal. The estimates themselves are unbiased and their spread matches the reported uncertainty (Fig.~\ref{fig:bayes_toys}): their mean differs from the injected value by $-0.0002\pm0.0006$, and their standard deviation, $0.0088$, agrees with the posterior standard deviation of the data fit, $0.0085$.
+A credible interval states where the parameter lies given the data and the prior; nothing guarantees that it also has frequentist coverage, i.e.\ that over repeated experiments it contains the true value with the stated probability. To check this, 200 pseudo-datasets were generated from the fitted model (parametric bootstrap, with the posterior medians as ground truth and Poisson-fluctuated yields for each charge and component; the truncated Gaussian and exponential masses are drawn with the transformation method, i.e.\ by inverting their cumulative distributions) and each was refit with the nominal procedure and a $12{,}000$-step chain. The fraction of replicas whose interval contains the injected $A$ is $0.650\pm0.033$ for the 68\% CI and $0.930\pm0.015$ for the 95\% CI (binomial uncertainties), $1.0\sigma$ and $1.3\sigma$ below nominal: the coverage is consistent with nominal. The estimates themselves are unbiased and their spread matches the reported uncertainty (Fig.~\ref{fig:bayes_toys}): their mean differs from the injected value by $-0.0002\pm0.0006$, their standard deviation, $0.0088$, agrees with the posterior standard deviation of the data fit, $0.0085$, and the pulls have mean $-0.03\pm0.07$ and standard deviation $1.04$.
 
 The toy chains are shorter than the nominal one, and in 124 of the 200 replicas the slowest-mixing parameter, always a background-shape parameter, has $N/\tau<50$ (median $48$, minimum $22$). The criterion on the slowest parameter is conservative for the quantity tested here: for $A$ itself the median autocorrelation time is $156$ steps, so each chain is at least $45$ autocorrelation times long in $A$ and provides $\gtrsim1400$ effectively independent samples of it. The Monte Carlo error on the percentiles of $A$ is then a few per cent of $\sigma(A)$, negligible against the binomial uncertainty of the coverage, and the replicas with $N/\tau<50$ do not show a lower coverage than the others. This is a closure test of the inference procedure: since the toys are generated from the same model that is fitted, it does not probe the model mismatch of Sec.~\ref{sec:bayes_gof}, which is instead addressed by the systematic study.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/bayes_nominal_toys.pdf}
-\caption{Posterior medians of $A$ in the 200 pseudo-datasets, compared with a Gaussian centerd on the injected value with width equal to the posterior standard deviation of the data fit.}
+\caption{Toy-MC validation, 200 pseudo-datasets. Left: pulls $(\hat A-A_{\mathrm{true}})/\sigma(\hat A)$, with $\hat A$ and $\sigma(\hat A)$ the posterior median and standard deviation of each replica, compared with a standard normal. Right: fraction of replicas whose 68\% and 95\% credible intervals contain the injected value, with binomial uncertainties, and the nominal coverage.}
 \label{fig:bayes_toys}
 \end{figure}
 
@@ -272,14 +279,14 @@ The toy chains are shorter than the nominal one, and in 124 of the 200 replicas 
 \label{sec:bayes_dalitz}
 To test whether the asymmetry is uniform over phase space or concentrated in specific regions, each candidate was placed in the Dalitz plane using the two opposite-sign $K^+K^-$ invariant masses $m^2(H1,H2)$ and $m^2(H1,H3)$ (Sec.~\ref{sec:data_presel}), sorted into $m^2_{\mathrm{lo}}$ and $m^2_{\mathrm{hi}}$ to remove the $H2/H3$ labeling ambiguity. The plane $[0,16]\times[0,30]\,\GeV^2$ in $(m^2_{\mathrm{lo}},m^2_{\mathrm{hi}})$ was divided into an $8\times8$ grid, fixed before looking at the asymmetries. In each bin with at least 20 candidates (32 of 64), the local asymmetry $A_i=(N_i^--N_i^+)/N_i$, with binomial uncertainty $\sigma(A_i)=\sqrt{(1-A_i^2)/N_i}$, was compared with the global counting asymmetry $A_{\mathrm{glob}}=-0.043$ through $S_i=(A_i-A_{\mathrm{glob}})/\sigma(A_i)$; a comparison with zero would instead mostly reflect the global asymmetry itself.
 
-Two of the 32 bins have $|S_i|>3$, both at $m^2_{\mathrm{lo}}<2\,\GeV^2$ and with $A_i$ more negative than the global value (Fig.~\ref{fig:bayes_dalitz}); about $0.09$ would be expected if the asymmetry were uniform, with a probability of $3\times10^{-3}$ for two or more. The largest positive deviations, close to $+3$, lie at high $m^2_{\mathrm{hi}}$. A global test of homogeneity, $\chi^2=\sum_i S_i^2=80.8$ for 31 degrees of freedom ($p=3\times10^{-6}$), confirms that the local asymmetry is not uniform. Restricting the sample to the signal window ($|m-\mu|<2\sigma$, $n=15{,}130$, where the fitted model gives a signal purity of $\approx$96\%) gives the same picture -- three bins with $|S_i|>3$, $\chi^2=95.6/28$ -- so the structure is not produced by the combinatorial background. Nor is it produced by the charm contributions: with the $D^0$ veto two bins still exceed $3\sigma$ ($\chi^2=79.2/31$), and with all three vetoes one remains ($\chi^2=74.4/31$, $p=2\times10^{-5}$). It does not depend on the binning either: $6\times6$, $10\times10$ and $12\times12$ grids give $\chi^2=81.0/19$, $97.1/43$ and $120.0/60$ ($p\leq7\times10^{-6}$).
+Two of the 32 bins have $|S_i|>3$, adjacent to each other at $m^2_{\mathrm{lo}}<4\,\GeV^2$ and $7.5<m^2_{\mathrm{hi}}<11.25\,\GeV^2$ ($S_i=-3.7$ and $-3.0$), with $A_i$ more negative than the global value; the bin below the first one ($m^2_{\mathrm{lo}}<2$, $3.75<m^2_{\mathrm{hi}}<7.5\,\GeV^2$) has $S_i=-2.98$, just under the threshold (Fig.~\ref{fig:bayes_dalitz}); about $0.09$ would be expected if the asymmetry were uniform, with a probability of $3\times10^{-3}$ for two or more. The largest positive deviations, close to $+3$, lie at high $m^2_{\mathrm{hi}}$. A global test of homogeneity, $\chi^2=\sum_i S_i^2=80.8$ for 31 degrees of freedom ($p=3\times10^{-6}$), confirms that the local asymmetry is not uniform. Restricting the sample to the signal window ($|m-\mu|<2\sigma$, $n=15{,}130$, where the fitted model gives a signal purity of $\approx$96\%) gives the same picture -- three bins with $|S_i|>3$, $\chi^2=95.6/28$ -- so the structure is not produced by the combinatorial background. Nor is it produced by the charm contributions: with the $D^0$ veto two bins still exceed $3\sigma$ ($\chi^2=79.2/31$), and with all three vetoes one remains ($\chi^2=74.4/31$, $p=2\times10^{-5}$). It does not depend on the binning either: $6\times6$, $10\times10$ and $12\times12$ grids give $\chi^2=81.0/19$, $97.1/43$ and $120.0/60$ ($p\leq7\times10^{-6}$).
 
 Two null tests check the procedure itself. Shuffling the charges among the candidates removes any local asymmetry while keeping the occupancy of the bins and the global asymmetry of the data: over $2000$ permutations the $8\times8$ grid gives $\chi^2=31.4\pm8.1$, as expected for 31 degrees of freedom, and no permutation reaches the observed value (permutation $p<5\times10^{-4}$; $p=1\times10^{-3}$ for the $12\times12$ grid). The phase-space simulation of the record, without asymmetry by construction, gives $\chi^2=40.0/30$ ($p=0.11$) with the same procedure. The homogeneity test therefore has its nominal behavior, and the non-uniformity is a property of the data. Three caveats apply: the binning is coarse and was not optimized; the asymmetries are computed on all candidates, without the sWeight-based background subtraction that a full analysis would use (Sec.~\ref{sec:limitations}); and, since $\Araw$ is not corrected for detection asymmetries, local variations can also be instrumental -- the $K^+$/$K^-$ detection asymmetry depends on the kaon momenta, which are correlated with the position in the Dalitz plane. Section~\ref{sec:ml_kmeans} revisits the same question with an adaptive, data-driven partition ($K$-means).
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/bayes_nominal_dalitz_maps.pdf}
-\caption{Fixed $8\times8$ Dalitz-plot binning, all candidates in the fit window: number of candidates per bin (left), local asymmetry $A_i$ for bins with $\geq20$ candidates (center), and local significance with respect to the global asymmetry, $(A_i-A_{\mathrm{glob}})/\sigma(A_i)$ (right). The two bins with $|S_i|>3$ (dark blue) lie at $m^2_{\mathrm{lo}}<2\,\GeV^2$.}
+\caption{Fixed $8\times8$ Dalitz-plot binning, all candidates in the fit window: number of candidates per bin (left), local asymmetry $A_i$ for bins with $\geq20$ candidates (center), and local significance with respect to the global asymmetry, $(A_i-A_{\mathrm{glob}})/\sigma(A_i)$ (right). The two bins with $|S_i|>3$ are outlined. Dashed lines: the squared masses of the $D^0$, $J/\psi$ and $\chi_{c0}$, in either opposite-sign pair.}
 \label{fig:bayes_dalitz}
 \end{figure*}
 
@@ -375,7 +382,7 @@ The three non-linear ensembles and the FFNN improve the AUC by $\sim$0.09 over t
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/ml_nominal_roc.pdf}
-\caption{ROC curves on the test set (AUC values in Table~\ref{tab:ml_models}). The two logistic regressions overlap.}
+\caption{ROC curves on the test set, with the test AUC of each model in the legend (Table~\ref{tab:ml_models}); the reference model is drawn thicker, and the two logistic regressions overlap. The circle marks the cut on the reference score used in Sec.~\ref{sec:ml_stability}.}
 \label{fig:ml_roc}
 \end{figure}
 
@@ -384,7 +391,7 @@ The two measures of the relevance of a feature available here -- the Random Fore
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_features.pdf}
-\caption{Random Forest feature importance (Gini, left axis) and magnitude of the Lasso coefficient of the standardized feature (right axis), for the 20 features, ordered by Random Forest importance.}
+\caption{Random Forest feature importance (Gini, left) and magnitude of the Lasso coefficient of the standardized feature (right) for the 20 features, both ordered by Random Forest importance; the two $B$-candidate variables are highlighted.}
 \label{fig:ml_features}
 \end{figure*}
 
@@ -410,7 +417,7 @@ instead of the true $p$, i.e.\ it describes a world in which the classes are re-
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/ml_nominal_calibration.pdf}
-\caption{Reliability diagram of the Random Forest on the test set: observed fraction of signal-like candidates vs.\ predicted probability, for the raw score and for the isotonic-recalibrated one.}
+\caption{Reliability diagram of the Random Forest on the test set: observed fraction of signal-like candidates vs.\ predicted probability, for the raw score (with binomial uncertainties) and for the isotonic-recalibrated one. Bottom: distribution of the raw score for the two weak-label classes; the low-probability bins contain few candidates.}
 \label{fig:ml_calibration}
 \end{figure}
 
@@ -423,7 +430,7 @@ The three estimators answer different questions, which explains the factor $\sim
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_uncertainty.pdf}
-\caption{Left: spread across the Random Forest trees vs.\ mean tree score, per test candidate (color: weak label). Center: distributions of the per-candidate uncertainty from the Random Forest trees, MC dropout and the deep ensemble. Right: mean Random Forest spread vs.\ training-set size, for all, background-like and signal-like test candidates.}
+\caption{Left: spread across the Random Forest trees vs.\ mean tree score, median and 16--84\% band of the test candidates of each weak-label class. Center: distributions of the per-candidate uncertainty from the Random Forest trees, MC dropout and the deep ensemble. Right: mean Random Forest spread vs.\ training-set size, for all, background-like and signal-like test candidates.}
 \label{fig:ml_uncertainty}
 \end{figure*}
 
@@ -436,13 +443,13 @@ The asymmetry of each cluster was compared with the global one as in Sec.~\ref{s
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/ml_nominal_kmeans.pdf}
-\caption{$K$-means partition ($K=8$) of the Dalitz plane, all candidates of the fit window, same axes as Fig.~\ref{fig:bayes_dalitz}. Labels: local significance of each cluster with respect to the global asymmetry, $(A_k-A_{\mathrm{glob}})/\sigma(A_k)$.}
+\caption{$K$-means partition ($K=8$) of the Dalitz plane, all candidates of the fit window, same axes as Fig.~\ref{fig:bayes_dalitz}. Color and labels: local significance of each cluster with respect to the global asymmetry, $S_k=(A_k-A_{\mathrm{glob}})/\sigma(A_k)$, on the same scale as the right panel of Fig.~\ref{fig:bayes_dalitz}.}
 \label{fig:ml_kmeans}
 \end{figure}
 
 \subsection{Stability of $\Araw$ under ML Selection}
 \label{sec:ml_stability}
-The reference (gradient-boosting) score was applied to all candidates of the fit window, not only to the labeled ones used in training, and the counting asymmetry was recomputed after cuts on the score from $0.1$ to $0.9$ (Fig.~\ref{fig:ml_threshold}). Since every selected sample is contained in the full one, the expected statistical spread of the difference is $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$, not the uncertainty of either estimate. Over all thresholds, which keep from $18{,}443$ to $2621$ candidates, the shift with respect to the full window ($A_{\mathrm{count}}=-0.0432$) stays within $1.4$ times this spread: the selection does not introduce a detectable bias in the counting asymmetry. Split by magnet polarity at a cut of $0.5$, the counting asymmetries are $-0.060\pm0.010$ (down) and $-0.024\pm0.012$ (up), $2.2\sigma$ apart; the frequentist fit of the same samples, which separates the background, gives $-0.054\pm0.011$ and $-0.032\pm0.013$, $1.3\sigma$ apart (against $0.7\sigma$ for the full sample, Sec.~\ref{sec:bayes_checks}), so most of the larger difference of the counting estimates comes from the background.
+The reference (gradient-boosting) score was applied to all candidates of the fit window (on the test set, a cut at $0.5$ keeps $88\%$ of the signal-like and $28\%$ of the background-like candidates, Fig.~\ref{fig:ml_roc}), not only to the labeled ones used in training, and the counting asymmetry was recomputed after cuts on the score from $0.1$ to $0.9$ (Fig.~\ref{fig:ml_threshold}). Since every selected sample is contained in the full one, the expected statistical spread of the difference is $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$, not the uncertainty of either estimate. Over all thresholds, which keep from $18{,}443$ to $2621$ candidates, the shift with respect to the full window ($A_{\mathrm{count}}=-0.0432$) stays within $1.4$ times this spread: the selection does not introduce a detectable bias in the counting asymmetry. Split by magnet polarity at a cut of $0.5$, the counting asymmetries are $-0.060\pm0.010$ (down) and $-0.024\pm0.012$ (up), $2.2\sigma$ apart; the frequentist fit of the same samples, which separates the background, gives $-0.054\pm0.011$ and $-0.032\pm0.013$, $1.3\sigma$ apart (against $0.7\sigma$ for the full sample, Sec.~\ref{sec:bayes_checks}), so most of the larger difference of the counting estimates comes from the background.
 
 \begin{figure}[h]
 \centering
