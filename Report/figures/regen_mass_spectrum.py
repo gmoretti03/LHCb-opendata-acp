@@ -42,16 +42,17 @@ print(f"read {n_read}, preselected {sel.sum()}, in [{LO:.0f},{HI:.0f}]: {len(m)}
       f"B+ {np.sum(q > 0)}  B- {np.sum(q < 0)}  down {np.sum(mag == 'down')}  up {np.sum(mag == 'up')}  "
       f"A_count {(np.sum(q < 0) - np.sum(q > 0)) / len(q):+.4f}")
 
-plt.rcParams.update({"font.size": 11, "axes.titlesize": 11, "axes.labelsize": 11, "legend.fontsize": 10,
-                     "savefig.dpi": 300, "savefig.bbox": "tight"})
+sys.path.insert(0, HERE)
+import plot_style as ps
+ps.use(); C = ps.COLORS
 bins = np.arange(LO, HI + 1e-9, BIN)
-fig, axs = plt.subplots(1, 2, figsize=(12, 4.5))
-for sel_, lab, col in ((q > 0, r"$B^+$", "tab:blue"), (q < 0, r"$B^-$", "tab:red")):
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.5))
+for sel_, lab, col in ((q > 0, r"$B^+$", C["pos"]), (q < 0, r"$B^-$", C["neg"])):
     axs[0].hist(m[sel_], bins=bins, histtype="step", lw=1.5, color=col, label=lab)
-for sel_, lab, col in ((mag == "down", "Magnet down", "tab:green"), (mag == "up", "Magnet up", "tab:orange")):
+for sel_, lab, col in ((mag == "down", "Magnet down", C["down"]), (mag == "up", "Magnet up", C["up"])):
     axs[1].hist(m[sel_], bins=bins, histtype="step", lw=1.5, color=col, label=lab)
-for a, t in zip(axs, ("Invariant mass, by charge", "Invariant mass, by magnet polarity")):
-    a.set_title(t); a.set_xlabel(r"$m(KKK)$ [MeV]"); a.set_ylabel(f"Candidates / {BIN:.0f} MeV"); a.legend()
+for a in axs:
+    a.set_xlabel(r"$m(KKK)$ [MeV]"); a.set_ylabel(f"Candidates / {BIN:.0f} MeV"); a.legend()
 plt.tight_layout()
 fig.savefig(os.path.join(OUT, "mass_spectrum.pdf"))
 print("saved mass_spectrum.pdf")

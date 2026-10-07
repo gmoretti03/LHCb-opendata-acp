@@ -51,8 +51,9 @@ cfg = bn.Config(**{k: (tuple(v) if k == "veto" else v) for k, v in summary["mode
 cands = bn.load_candidates(DATA_DIR)
 data = bn.select(cands, cfg)
 
-plt.rcParams.update({"font.size": 11, "axes.titlesize": 11, "axes.labelsize": 11,
-                     "legend.fontsize": 9, "savefig.dpi": 300, "savefig.bbox": "tight"})
+sys.path.insert(0, HERE)
+import plot_style as ps
+ps.use(); C = ps.COLORS
 def save(fig, name):
     fig.savefig(os.path.join(OUT, name)); plt.close(fig); print("saved", name)
 
@@ -64,11 +65,11 @@ labels = [r"$N_s$", r"$N_b$", r"$A$", r"$A_b$", r"$\mu$ [MeV]", r"$\sigma$ [MeV]
 fmts = [".0f", ".0f", ".4f", ".3f", ".2f", ".2f"]
 th = thinned[:, idx]
 fig = corner.corner(th, labels=labels, quantiles=[0.16, 0.5, 0.84], show_titles=False, plot_datapoints=False,
-                    label_kwargs={"fontsize": 12})
+                    label_kwargs={"fontsize": 14})
 ax = np.array(fig.axes).reshape(len(main), len(main))
 for k in range(len(main)):
-    q16, q50, q84 = np.percentile(th[:, k], [16, 50, 84]); f = fmts[k]
-    ax[k, k].set_title(f"{labels[k].split(' [')[0]} $= {q50:{f}}^{{+{q84-q50:{f}}}}_{{-{q50-q16:{f}}}}$", fontsize=11)
+    st = nom[main[k]]; q50 = st["median"]; q16, q84 = st["ci68"]; f = fmts[k]   # full chain, as in the text
+    ax[k, k].set_title(f"{labels[k].split(' [')[0]} $= {q50:{f}}^{{+{q84-q50:{f}}}}_{{-{q50-q16:{f}}}}$", fontsize=13)
 for a_ in fig.axes:   # plain tick labels (no "+5.284e3" offset on the mu axis)
     for axis in (a_.xaxis, a_.yaxis):
         fmt = axis.get_major_formatter()
@@ -83,7 +84,7 @@ d = post.unpack(theta)
 width = 10.0
 edges = np.arange(cfg.lo, cfg.hi + 1e-9, width); cen = 0.5 * (edges[1:] + edges[:-1])
 grid = np.linspace(cfg.lo, cfg.hi, 800)
-fig, axs = plt.subplots(2, 2, figsize=(12, 6), sharex=True, gridspec_kw={"height_ratios": [3, 1], "hspace": 0.05})
+fig, axs = plt.subplots(2, 2, figsize=(ps.DOUBLE, 6.2), sharex=True, gridspec_kw={"height_ratios": [3, 1], "hspace": 0.05})
 for col, (side, sg, lab) in enumerate((("pos", -1, r"$B^+$"), ("neg", +1, r"$B^-$"))):
     msk = post.plus if side == "pos" else ~post.plus
     obs, _ = np.histogram(post.m[msk], edges)
@@ -93,14 +94,14 @@ for col, (side, sg, lab) in enumerate((("pos", -1, r"$B^+$"), ("neg", +1, r"$B^-
            + d["N_b"] * (1 + sg * d["A_b"]) / 2 * bn._bkg_pdf(cen, d, side, cfg)) * width
     pull = (obs - exp) / np.sqrt(exp)
     a = axs[0, col]
-    a.errorbar(cen, obs, yerr=np.sqrt(obs), fmt="o", ms=3, color="k", label="Data")
-    a.plot(grid, s_c + b_c, color="crimson", lw=1.5, label="Total model")
-    a.plot(grid, s_c, color="steelblue", ls="--", lw=1.2, label="Signal")
-    a.fill_between(grid, 0.5, b_c, color="gray", alpha=0.35, label="Background")
+    a.errorbar(cen, obs, yerr=np.sqrt(obs), fmt="o", ms=3, color=C["data"], label="Data")
+    a.plot(grid, s_c + b_c, color=C["model"], lw=1.5, label="Total model")
+    a.plot(grid, s_c, color=C["signal"], ls="--", lw=1.2, label="Signal")
+    a.fill_between(grid, 0.5, b_c, color=C["background"], alpha=0.35, label="Background")
     a.set_yscale("log"); a.set_ylim(5, obs.max() * 3)
-    a.set_title(f"{lab}  ($\\chi^2 = {np.sum(pull**2):.1f}$ / {len(cen)} bins)")
+    ps.panel_label(a, f"{lab}:  $\\chi^2 = {np.sum(pull**2):.1f}$ / {len(cen)} bins")
     p = axs[1, col]
-    p.bar(cen, pull, width=width * 0.9, color="steelblue" if side == "pos" else "indianred")
+    p.bar(cen, pull, width=width * 0.9, color=C[side], alpha=0.7)
     p.axhline(0, color="k", lw=0.8); [p.axhline(y, color="gray", ls=":") for y in (2, -2)]
     p.set_xlabel(r"$m(KKK)$ [MeV]")
 axs[0, 0].set_ylabel(f"Candidates / {width:.0f} MeV"); axs[1, 0].set_ylabel("Pull")
@@ -108,9 +109,9 @@ axs[0, 1].legend(loc="upper right")
 save(fig, "bayes_nominal_mass_fit.pdf")
 
 # ---------------- magnet polarities
-fig, a = plt.subplots(figsize=(6, 4))
+fig, a = plt.subplots(figsize=(ps.SINGLE, 4.4))
 for pol in ("down", "up"):
-    a.hist(mag[pol], bins=60, density=True, histtype="step", lw=1.5,
+    a.hist(mag[pol], bins=60, density=True, histtype="step", lw=1.5, color=C[pol],
            label=f"Magnet {pol} ($n={summary['checks'][f'magnet_{pol}']['n']}$)")
 a.hist(thinned[:, names.index("A")], bins=60, density=True, histtype="step", color="k", lw=2,
        label=f"Combined ($n={nom['n']}$)")
@@ -121,14 +122,14 @@ save(fig, "bayes_nominal_magnet.pdf")
 # ---------------- toys
 from scipy.stats import norm
 est = np.array([t["A_median"] for t in toys]); a_true = nom["A"]["median"]; sd = nom["A"]["sd"]
-fig, a = plt.subplots(figsize=(6, 4.2))
-a.hist(est, bins=25, density=True, histtype="stepfilled", color="steelblue", alpha=0.5,
+fig, a = plt.subplots(figsize=(ps.SINGLE, 4.6))
+a.hist(est, bins=25, density=True, histtype="stepfilled", color=C["replica"], alpha=0.5,
        label=f"Toy estimates ($n={len(est)}$): mean $= {est.mean():.5f}$, sd $= {est.std(ddof=1):.5f}$")
 xs = np.linspace(est.min(), est.max(), 300)
-a.plot(xs, norm.pdf(xs, a_true, sd), color="crimson", label=f"Gaussian: injected $A$, posterior sd $= {sd:.5f}$")
+a.plot(xs, norm.pdf(xs, a_true, sd), color=C["model"], label=f"Gaussian: injected $A$, posterior sd $= {sd:.5f}$")
 a.axvline(a_true, color="k", ls=":", label=f"Injected $A = {a_true:.4f}$")
 a.set_xlabel(r"Posterior median of $A$ in each pseudo-dataset"); a.set_ylabel("Density")
-a.legend(loc="upper left", fontsize=8.5); a.set_ylim(0, a.get_ylim()[1] * 1.45)
+a.legend(loc="upper left", fontsize=10); a.set_ylim(0, a.get_ylim()[1] * 1.55)
 save(fig, "bayes_nominal_toys.pdf")
 
 # ---------------- Dalitz maps, nominal window, significance w.r.t. the global asymmetry
@@ -140,14 +141,13 @@ n = npl + nmi; ok = n >= 20
 with np.errstate(divide="ignore", invalid="ignore"):
     ai = np.where(ok, (nmi - npl) / n, np.nan); sg = (ai - ag) / np.sqrt((1 - ai ** 2) / n)
 ext = [0, 16, 0, 30]
-fig, axs = plt.subplots(1, 3, figsize=(17, 5))
+fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.3))
 im0 = axs[0].imshow(np.where(n > 0, n, np.nan).T, origin="lower", aspect="auto", extent=ext, cmap="Greys")
-axs[0].set_title("Candidates per bin"); plt.colorbar(im0, ax=axs[0])
+plt.colorbar(im0, ax=axs[0], label="Candidates per bin")
 im1 = axs[1].imshow(ai.T, origin="lower", aspect="auto", extent=ext, cmap="RdBu_r", vmin=-0.5, vmax=0.5)
-axs[1].set_title(r"Local asymmetry $A_i$ (bins with $\geq 20$ candidates)"); plt.colorbar(im1, ax=axs[1], label=r"$A_i$")
+plt.colorbar(im1, ax=axs[1], label=r"$A_i$")
 im2 = axs[2].imshow(sg.T, origin="lower", aspect="auto", extent=ext, cmap="RdBu_r", vmin=-4, vmax=4)
-axs[2].set_title(rf"$(A_i - A_{{\mathrm{{glob}}}})/\sigma(A_i)$,  $A_{{\mathrm{{glob}}}} = {ag:.3f}$")
-plt.colorbar(im2, ax=axs[2], label="local significance")
+plt.colorbar(im2, ax=axs[2], label=r"$S_i$")
 for a in axs:
     a.set_xlabel(r"$m^2_{\mathrm{lo}}(K^+K^-)$ [GeV$^2$]"); a.set_ylabel(r"$m^2_{\mathrm{hi}}(K^+K^-)$ [GeV$^2$]")
 plt.tight_layout()
@@ -155,13 +155,13 @@ save(fig, "bayes_nominal_dalitz_maps.pdf")
 
 # ---------------- posterior predictive check and trace plot (Bayesian_Nominal_Checks.ipynb)
 ppc = json.load(open(fetch("results/nominal/ppc.json")))
-fig, axs = plt.subplots(1, 3, figsize=(15, 4))
+fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.0))
 for a, key, lab in ((axs[0], "chi2", r"$\chi^2$ (10 MeV bins, both charges)"), (axs[1], "A_window", r"Counting asymmetry, fit window"),
-                    (axs[2], "A_sidebands", r"Counting asymmetry, sidebands $|m-\mu|>4\sigma$")):
+                    (axs[2], "A_sidebands", r"Counting asymmetry, $|m-\mu|>4\sigma$")):
     o = np.array([r["obs"][key] for r in ppc["rows"]]); r_ = np.array([r["rep"][key] for r in ppc["rows"]])
-    a.hist(r_, bins=40, histtype="stepfilled", color="steelblue", alpha=0.5, label="Replicated data")
-    a.axvline(np.median(o), color="crimson", lw=2, label=f"Observed ($p_B={ppc['p_B'][key]:.3g}$)" if ppc['p_B'][key] >= 0.01 else "Observed ($p_B<0.001$)")
-    a.set_xlabel(lab); a.legend(loc="upper right", fontsize=8.5)
+    a.hist(r_, bins=40, histtype="stepfilled", color=C["replica"], alpha=0.5, label="Replicated data")
+    a.axvline(np.median(o), color=C["observed"], lw=2, label=f"Observed ($p_B={ppc['p_B'][key]:.3g}$)" if ppc['p_B'][key] >= 0.01 else "Observed ($p_B<0.001$)")
+    a.set_xlabel(lab); a.legend(loc="upper right", fontsize=10)
 axs[0].set_ylabel("Replicas")
 plt.tight_layout()
 save(fig, "bayes_nominal_ppc.pdf")
@@ -171,7 +171,7 @@ ch, tnames, thin = tr["chain"], list(tr["names"]), int(tr["thin"])
 show = [("A", r"$A$"), ("N_s", r"$N_s$"), ("sigma", r"$\sigma$ [MeV]"), ("f_pos", r"$f_+$")]
 steps = np.arange(ch.shape[0]) * thin
 n_early = 3000 // thin
-fig, axs = plt.subplots(len(show), 2, figsize=(13, 7.5), sharex="col", gridspec_kw={"width_ratios": [1, 2.2]})
+fig, axs = plt.subplots(len(show), 2, figsize=(ps.DOUBLE, 7.5), sharex="col", gridspec_kw={"width_ratios": [1, 2.2]})
 for row, (k, lab) in enumerate(show):
     y = ch[:, :, tnames.index(k)]
     axs[row, 0].plot(steps[:n_early], y[:n_early], lw=0.4, alpha=0.6)
@@ -180,7 +180,6 @@ for row, (k, lab) in enumerate(show):
     axs[row, 1].set_ylim(lo_q - pad, hi_q + pad)
     axs[row, 1].axvline(ch.shape[0] * thin // 2, color="k", ls=":", lw=1)
     axs[row, 0].set_ylabel(lab)
-axs[0, 0].set_title("First 3000 steps (full range)"); axs[0, 1].set_title("Whole chain (zoom on the posterior); dotted: end of burn-in")
 axs[-1, 0].set_xlabel("Step"); axs[-1, 1].set_xlabel("Step")
 plt.tight_layout()
 save(fig, "bayes_nominal_trace.pdf")
