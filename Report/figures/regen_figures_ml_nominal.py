@@ -167,3 +167,24 @@ ax.set_xlabel(r"$A_{\mathrm{raw}}$"); ax.invert_yaxis()
 ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(6))
 ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, frameon=False)
 save(fig, "ml_nominal_three_methods.pdf")
+
+# ---------------- mass spectrum before/after the score cut and cut efficiency vs mass (from saved counts)
+orig = js("selection_mass_origin.json")
+fig, axs = plt.subplots(1, 2, figsize=(12, 4.3))
+for key, lab, sty in (("all_20", "Selected, 20 features", "-"), ("no_momenta", "Selected, no momentum features", "--")):
+    ev = orig[key]["efficiency_vs_mass"]
+    lo_ = np.array([e["lo"] for e in ev]); hi_ = np.array([e["hi"] for e in ev])
+    n_ = np.array([e["n"] for e in ev]); eff = np.array([e["eff"] for e in ev])
+    if key == "all_20":
+        axs[0].stairs(n_, np.append(lo_, hi_[-1]), color="k", lw=1.5, label="All candidates")
+    axs[0].stairs(n_ * eff, np.append(lo_, hi_[-1]), lw=1.5, ls=sty, label=lab)
+    axs[1].stairs(eff, np.append(lo_, hi_[-1]), lw=1.5, ls=sty, label=lab)
+mu_, sg_ = labels_info["mu"], labels_info["sigma"]
+for a in axs:
+    a.axvspan(5100, 5150, color="tab:orange", alpha=0.12)
+    a.axvspan(mu_ - 2 * sg_, mu_ + 2 * sg_, color="tab:green", alpha=0.10)
+    a.set_xlabel(r"$m(KKK)$ [MeV]")
+axs[0].set_yscale("log"); axs[0].set_ylabel("Candidates / 25 MeV"); axs[0].legend(loc="upper right")
+axs[1].set_ylabel(f"Fraction with {models['reference_model']} score $> 0.5$"); axs[1].set_ylim(0, 1); axs[1].legend(loc="upper right")
+plt.tight_layout()
+save(fig, "ml_nominal_mass_after_cut.pdf")

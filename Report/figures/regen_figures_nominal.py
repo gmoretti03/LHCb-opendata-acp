@@ -152,3 +152,35 @@ for a in axs:
     a.set_xlabel(r"$m^2_{\mathrm{lo}}(K^+K^-)$ [GeV$^2$]"); a.set_ylabel(r"$m^2_{\mathrm{hi}}(K^+K^-)$ [GeV$^2$]")
 plt.tight_layout()
 save(fig, "bayes_nominal_dalitz_maps.pdf")
+
+# ---------------- posterior predictive check and trace plot (Bayesian_Nominal_Checks.ipynb)
+ppc = json.load(open(fetch("results/nominal/ppc.json")))
+fig, axs = plt.subplots(1, 3, figsize=(15, 4))
+for a, key, lab in ((axs[0], "chi2", r"$\chi^2$ (10 MeV bins, both charges)"), (axs[1], "A_window", r"Counting asymmetry, fit window"),
+                    (axs[2], "A_sidebands", r"Counting asymmetry, sidebands $|m-\mu|>4\sigma$")):
+    o = np.array([r["obs"][key] for r in ppc["rows"]]); r_ = np.array([r["rep"][key] for r in ppc["rows"]])
+    a.hist(r_, bins=40, histtype="stepfilled", color="steelblue", alpha=0.5, label="Replicated data")
+    a.axvline(np.median(o), color="crimson", lw=2, label=f"Observed ($p_B={ppc['p_B'][key]:.3g}$)" if ppc['p_B'][key] >= 0.01 else "Observed ($p_B<0.001$)")
+    a.set_xlabel(lab); a.legend(loc="upper right", fontsize=8.5)
+axs[0].set_ylabel("Replicas")
+plt.tight_layout()
+save(fig, "bayes_nominal_ppc.pdf")
+
+tr = np.load(fetch("results/nominal/trace_dispersed.npz"))
+ch, tnames, thin = tr["chain"], list(tr["names"]), int(tr["thin"])
+show = [("A", r"$A$"), ("N_s", r"$N_s$"), ("sigma", r"$\sigma$ [MeV]"), ("f_pos", r"$f_+$")]
+steps = np.arange(ch.shape[0]) * thin
+n_early = 3000 // thin
+fig, axs = plt.subplots(len(show), 2, figsize=(13, 7.5), sharex="col", gridspec_kw={"width_ratios": [1, 2.2]})
+for row, (k, lab) in enumerate(show):
+    y = ch[:, :, tnames.index(k)]
+    axs[row, 0].plot(steps[:n_early], y[:n_early], lw=0.4, alpha=0.6)
+    axs[row, 1].plot(steps, y, lw=0.3, alpha=0.4)
+    lo_q, hi_q = np.percentile(y[ch.shape[0] // 2:], [0.5, 99.5]); pad = 0.5 * (hi_q - lo_q)
+    axs[row, 1].set_ylim(lo_q - pad, hi_q + pad)
+    axs[row, 1].axvline(ch.shape[0] * thin // 2, color="k", ls=":", lw=1)
+    axs[row, 0].set_ylabel(lab)
+axs[0, 0].set_title("First 3000 steps (full range)"); axs[0, 1].set_title("Whole chain (zoom on the posterior); dotted: end of burn-in")
+axs[-1, 0].set_xlabel("Step"); axs[-1, 1].set_xlabel("Step")
+plt.tight_layout()
+save(fig, "bayes_nominal_trace.pdf")
