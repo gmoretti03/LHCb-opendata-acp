@@ -102,15 +102,15 @@ Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit 
 
 \section{Frequentist Analysis}
 \label{sec:frequentist}
-\todo{Marco -- section intro: one or two sentences on the frequentist approach (unbinned ML fit with \texttt{iminuit}, profile likelihood). Subsections below still use ``planned'' wording; rewrite in the past tense with the results.}
+\todo{Marco -- intro, 1--2 sentences: unbinned extended maximum-likelihood fit with \texttt{iminuit}, profile likelihood and Wilks' theorem. Write in the past tense; call the asymmetry $\Araw$ (not $A_{CP}$). Figures with \texttt{Report/figures/plot\_style.py} (English, PDF).}
 
 \subsection{Mass Model and Fit Strategy}
 \label{sec:freq_model}
-The frequentist fit reuses the same physical mass model as the Bayesian analysis (Sec.~\ref{sec:bayes_model}), $f(m)=N_s\,S(m;\theta_s)+N_b\,B(m;\theta_b)$, estimated by unbinned maximum likelihood (\texttt{iminuit}~\cite{iminuit}, an interface to MINUIT~\cite{minuit}, with \texttt{iminuit.cost.UnbinnedNLL}) rather than by Markov chain Monte Carlo (MCMC) sampling. The plan is to start from the same minimal shapes as the Bayesian baseline (Gaussian signal, exponential background) and increase model complexity only if the residuals justify it -- mirroring the Bayesian goodness-of-fit study (Sec.~\ref{sec:bayes_gof}), where a single exponential background is rejected by the data and a Crystal Ball signal improves the fit without moving $\Araw$. \todo{Marco -- fill in once the mass fit is run: final signal/background shapes chosen, fitted yields $N_s,N_b$, and any residual-based justification for departing from the minimal model.}
+The frequentist fit uses the nominal mass model common to the two analyses (Sec.~\ref{sec:bayes_model}): window $[5100,5600]\,\MeV$, truncated Gaussian signal with shared $\mu,\sigma$, double-exponential background with a shape and a yield for each charge, extended unbinned likelihood. It is maximized with \texttt{iminuit}~\cite{iminuit}, an interface to MINUIT~\cite{minuit} (\texttt{iminuit.cost.ExtendedUnbinnedNLL}), instead of being sampled by Markov chain Monte Carlo (MCMC). \todo{Marco -- fitted yields and shapes, Hesse uncertainties, goodness of fit ($\chi^2=441.7/388$, 200 bins per charge), mass-fit figure with pulls; the sideband fit used for the starting values; the sideband-subtraction estimate of $\Araw$ compared with the fit (promised in the proposal).}
 
 \subsection{Separate vs.\ Simultaneous Fit}
 \label{sec:freq_simfit}
-Two parametrizations are planned: a \emph{separate} fit of $B^+$ and $B^-$ independently, giving $N_s^+$ and $N_s^-$ from which $\Araw$ is computed post hoc, and a \emph{simultaneous} fit using the shared parametrization $N_s^+=N_s(1-A)/2$, $N_s^-=N_s(1+A)/2$ (the same parametrization already used on the Bayesian side, Sec.~\ref{sec:bayes_model}) that estimates $A$ directly as a fit parameter. Mass, resolution, and background-shape parameters are treated as nuisance parameters, profiled out when reporting the uncertainty on $A$. \todo{Marco -- report $\Araw$ from both parametrizations (should agree if the model is well-specified) and flag any disagreement as a modeling issue rather than a physics result.}
+In the \emph{separate} fit the two charge samples are fitted independently and $\Araw$ is computed from the two signal yields; in the \emph{simultaneous} fit the parametrization $N_s^{\pm}=N_s(1\mp A)/2$ estimates $A$ directly, with mass, resolution and background parameters as nuisance parameters. \todo{Marco -- both results (simultaneous $-0.0441\pm0.0085$, separate $-0.0442\pm0.0087$ in the notebook snapshot; re-check after rerun) and their agreement.}
 
 \subsection{Profile Likelihood and Confidence Interval}
 \label{sec:freq_ci}
@@ -118,11 +118,15 @@ The profile likelihood ratio,
 \[
 q(A) = -2\log\frac{L(A,\hat{\hat\theta})}{L(\hat A,\hat\theta)},
 \]
-is used to derive a confidence interval on $A$ via Wilks' theorem~\cite{wilks}, and to test the null hypothesis $A=0$ -- the frequentist counterpart of the Bayesian Savage-Dickey test of Sec.~\ref{sec:bayes_factor}. \todo{Marco -- report the MLE $\hat A$, the 68\%/95\% profile-likelihood confidence intervals, and the $p$-value/significance against $A=0$; compare directly against the Bayesian credible interval of Sec.~\ref{sec:bayes_posterior} ($\Araw=-0.0443$, 68\% CI $[-0.0528,-0.0358]$) once available.}
+gives a confidence interval on $A$ via Wilks' theorem~\cite{wilks} and tests the null hypothesis $A=0$ -- the frequentist counterpart of the Savage-Dickey test of Sec.~\ref{sec:bayes_factor}. \todo{Marco -- profile-likelihood figure; MLE, 68\%/95\% intervals and significance of $A\neq0$ ($q(0)=27.0$, $5.2\sigma$ with the nominal model); comparison with the Bayesian interval ($-0.0443$, $[-0.0528,-0.0358]$).}
+
+\subsection{Coverage of the Wilks Intervals}
+\label{sec:freq_coverage}
+\todo{Marco -- toy coverage of the profile-likelihood intervals (1000 toys): the notebook value (67.2\%) comes from the old window $[5100,6000]$; rerun Frequentist\_Analysis\_Bis.ipynb top to bottom with the nominal model.}
 
 \subsection{Systematic Uncertainties}
 \label{sec:freq_syst}
-The systematic study is common to the frequentist and Bayesian fits and is presented in Sec.~\ref{sec:syst}. \todo{Marco -- anything specific to the frequentist fit (e.g.\ the window-edge grid scan of the notebook) as a stability check.}
+The systematic study is common to the frequentist and Bayesian fits and is presented in Sec.~\ref{sec:syst}. \todo{Marco -- optional: the window-edge grid scan as a stability check (not a systematic; overlapping samples, Barlow). If the Dalitz region $[5,10]\times[0,5]\,\GeV^2$ is shown: it was chosen after looking at the map, so present it as exploratory, use $m^2_{\mathrm{lo}}/m^2_{\mathrm{hi}}$, and test against the global asymmetry.}
 
 \section{Bayesian Analysis}
 \label{sec:bayesian}
