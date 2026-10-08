@@ -1,0 +1,48 @@
+\section{Systematic Uncertainties}
+\label{sec:syst}
+The frequentist and Bayesian fits share one systematic study: the same thirteen variants of the nominal choices, in four groups, and the same rule to combine them. Each variant is fitted by both methods on exactly the same candidates.
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item \emph{Window}: lower edge at $5050$ or $5150\,\MeV$, upper edge at $5450$ or $5700\,\MeV$.
+\item \emph{Background}: a single exponential per charge; a double exponential with the shape shared between charges; a charge-symmetric background ($A_b=0$).
+\item \emph{Signal}: a Crystal Ball shape with free tail parameters, Eq.~\eqref{eq:cb}; $\mu$ and $\sigma$ separate for the two charges.
+\item \emph{Preselection}: one cut at a time loosened or tightened, $\texttt{ProbK}>0.4$ or $>0.6$, $\texttt{ProbPi}<0.4$ or $<0.6$, on all three tracks.
+\end{itemize}
+
+The shift $\Delta=\Araw^{\mathrm{var}}-\Araw^{\mathrm{nom}}$ of a variant is not necessarily a systematic effect. When a variant changes the sample (window, preselection), the two samples are nested and part of the shift is a statistical fluctuation, with expected size $\sigma_B=\sqrt{|\sigma_{\mathrm{var}}^2-\sigma_{\mathrm{nom}}^2|}$, $\sigma$ being the statistical uncertainty of each fit~\cite{barlow}; such a variant contributes only if $|\Delta|>\sigma_B$. A variant that the data reject, with a $\chi^2$ worse than the nominal one by more than $25$ on the same data, is not a plausible alternative and is excluded: this removes the single exponential ($\Delta\chi^2=134$, Sec.~\ref{sec:bayes_gof}). The largest remaining $|\Delta|$ of each group is taken as its uncertainty, since the variants of a group are alternative descriptions of the same choice, and the four groups are added in quadrature.
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{llrrrrr}
+\toprule
+Group & Variant & $n$ & $\Delta$ Bayes & $\sigma_B$ Bayes & $\Delta$ freq. & $\sigma_B$ freq. \\
+\midrule
+Window & $[5050,5600]$ & $21164$ & $-0.0003$ & $0.0009$ & $-0.0004$ & $0.0005$ \\
+ & $[5150,5600]$ & $18566$ & $-0.0001$ & $0.0007$ & $-0.0005$ & $0.0021$ \\
+ & $[5100,5450]$ & $19004$ & $+0.0002$ & $0.0009$ & $-0.0001$ & $0.0003$ \\
+ & $[5100,5700]$ & $20191$ & $\mathbf{-0.0014}$ & $0.0010$ & $\mathbf{-0.0014}$ & $0.0001$ \\
+Background & single exponential (rejected) & $19731$ & $-0.0037$ & -- & $-0.0039$ & -- \\
+ & shape shared between charges & $19731$ & $\mathbf{-0.0037}$ & -- & $\mathbf{-0.0040}$ & -- \\
+ & symmetric, $A_b=0$ & $19731$ & $-0.0028$ & -- & $-0.0031$ & -- \\
+Signal & Crystal Ball & $19731$ & $\mathbf{-0.0002}$ & -- & $\mathbf{-0.0006}$ & -- \\
+ & $\mu,\sigma$ per charge & $19731$ & $-0.0000$ & -- & $-0.0001$ & -- \\
+Preselection & $\texttt{ProbK}>0.4$ & $26553$ & $-0.0032$ & $0.0038$ & $-0.0032$ & $0.0037$ \\
+ & $\texttt{ProbK}>0.6$ & $13981$ & $\mathbf{+0.0058}$ & $0.0048$ & $\mathbf{+0.0058}$ & $0.0050$ \\
+ & $\texttt{ProbPi}<0.4$ & $17984$ & $+0.0022$ & $0.0022$ & $+0.0020$ & $0.0023$ \\
+ & $\texttt{ProbPi}<0.6$ & $20953$ & $-0.0004$ & $0.0020$ & $-0.0006$ & $0.0017$ \\
+\midrule
+\multicolumn{3}{l}{Group uncertainties: window / background / signal / preselection} & \multicolumn{2}{c}{$0.0014/0.0037/0.0002/0.0058$} & \multicolumn{2}{c}{$0.0014/0.0040/0.0006/0.0058$} \\
+\multicolumn{3}{l}{Total (quadrature)} & \multicolumn{2}{c}{$0.0070$} & \multicolumn{2}{c}{$0.0072$} \\
+\bottomrule
+\end{tabular}
+\caption{Systematic study common to the Bayesian and frequentist fits: shift of $\Araw$ for each variant and, for the variants that change the sample, the expected statistical spread $\sigma_B$ of the shift. The largest contributing shift of each group is in bold. The single exponential is rejected by the data and excluded. For the window $[5150,5600]$ the frequentist uncertainty is scaled from the number of events, since the Hesse matrix of that fit is not accurate.}
+\label{tab:syst}
+\end{table*}
+
+The results are in Table~\ref{tab:syst}, and all the Bayesian fits, with their intervals and goodness of fit, in Table~\ref{tab:bayes_all} of the Appendix. The two methods give the same shifts to within $\sim$$0.0005$ and the same group uncertainties, with total systematic uncertainties of $0.0070$ (Bayesian) and $0.0072$ (frequentist). The final results are
+\begin{gather*}
+\text{Bayesian:}\\ \Araw=-0.0443\pm0.0085\,(\text{stat})\pm0.0070\,(\text{syst}),\\[2pt]
+\text{frequentist:}\\ \Araw=-0.0441\pm0.0085\,(\text{stat})\pm0.0072\,(\text{syst}).
+\end{gather*}
+The preselection dominates, through the single variant $\texttt{ProbK}>0.6$ ($+0.0058$, $1.2\,\sigma_B$). To tell a dependence on the PID requirement from a fluctuation of that single value, the frequentist fit was repeated in steps of $0.05$ of each cut, from $\texttt{ProbK}>0.30$ to $>0.85$ and from $\texttt{ProbPi}<0.15$ to $<0.70$. On the tight side of the kaon requirement the shifts scatter around zero without a trend ($+0.0009$, $+0.0058$, $-0.0017$, $-0.0112$, $-0.0054$, $+0.0010$, $+0.0022$ for $\texttt{ProbK}>0.55$--$0.85$, all within $1.3\,\sigma_B$), and the pion requirement gives a flat scan within $1.3\,\sigma_B$: the $\texttt{ProbK}>0.6$ value is a statistical fluctuation, and the preselection uncertainty is a conservative estimate. Loosening the kaon requirement, instead, moves $\Araw$ monotonically ($-0.0019$, $-0.0032$, $-0.0067$, $-0.0111$ for $\texttt{ProbK}>0.45$--$0.30$, the last at $2.5\,\sigma_B$), as expected if misidentified $B\to K\pi\pi$ and $B\to\pi KK$ decays, with asymmetries of their own and not included in the mass model, enter the sample; this supports the nominal requirement. The combination rule was fixed before this scan and is not changed by it. The background group is the second contribution and is driven by the assumptions on the charge dependence of the background, the window the third.
+
+Each method computes $\sigma_B$ from its own uncertainties (posterior standard deviation, Hesse error). Since $\sigma_B$ is the difference of two nearly equal uncertainties, it is sensitive to small differences between them, including the Monte Carlo noise of the posterior standard deviation (1--3\%), and a variant close to the threshold can be classified differently by the two methods: $\texttt{ProbPi}<0.4$ counts for the Bayesian fit ($|\Delta|=0.00223$, $\sigma_B=0.00220$) and not for the frequentist one ($0.00204$ vs $0.00229$). This does not affect the result, since the uncertainty of each group is set by its largest shift, the same in both methods.

@@ -1,0 +1,31 @@
+% Packages and macros of the report (included by main.tex)
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{comment}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{colorlinks = false}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{xspace}
+
+\renewcommand{\thefigure}{\Roman{figure}}
+
+% unit / symbol macros, mirroring the style used in lhc_anomaly_detection/main.tex
+\newcommand{\GeV}{\ensuremath{\,\text{Ge\hspace{-.08em}V}}\xspace}
+\newcommand{\MeV}{\ensuremath{\,\text{Me\hspace{-.08em}V}}\xspace}
+\newcommand{\Araw}{\ensuremath{A_{\mathrm{raw}}}\xspace}
+\newcommand{\ACP}{\ensuremath{A_{CP}}\xspace}
+
+% TODO markers -- remove once every section has real content
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}

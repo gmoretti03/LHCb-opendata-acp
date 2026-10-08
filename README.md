@@ -48,7 +48,7 @@ Bayesian notebook has to be run first.
 
 ## Report and figures
 
-`Report/main.tex` (compile with `tectonic main.tex`). The figures are rebuilt from the saved results, without
+`Report/main.tex` (compile with `tectonic main.tex`) only sets the document up: packages and macros are in `Report/preamble.tex`, and each section is a separate file in `Report/sections/` (`introduction.tex`, `data.tex`, `frequentist.tex`, `bayesian.tex`, `systematics.tex`, `ml.tex`, `comparison.tex`, `limitations.tex`, `conclusions.tex`, `contributions.tex`, `code.tex`, `appendix.tex`, `abstract.tex`), included with `\input`. The figures are rebuilt from the saved results, without
 rerunning any fit:
 
 | Script | Figures |
