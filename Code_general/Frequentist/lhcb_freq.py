@@ -982,6 +982,7 @@ def scan_gof_bins(data, curve, window, n_free, bin_values):
 class CoverageResult:
     t_values: np.ndarray
     estimates: Dict[str, np.ndarray]
+    err_estimates: Dict[str, np.ndarray]
     coverage: float
     t_crit: float
     ndof: int
@@ -1007,7 +1008,7 @@ def run_coverage_study(data: pd.DataFrame, cfg: Config, best: Minuit, n_exp: int
     keep_fixed = {p: start[p] for p in fix_in_free_fit}
     t_crit, ndof = chi2_dist(len(pois)).ppf(0.6827), len(pois)
 
-    t_values, estimates, failed = [], {p: [] for p in pois}, 0
+    t_values, estimates, err_estimates, failed = [], {p: [] for p in pois}, {p: [] for p in pois}, 0
     for _ in tqdm(range(n_toys)):
         boot = data.iloc[rng.integers(0, len(data), len(data))]
         samples = split_by_charge(boot, col='B_Mass')
@@ -1021,27 +1022,34 @@ def run_coverage_study(data: pd.DataFrame, cfg: Config, best: Minuit, n_exp: int
         t_values.append(max(null.fval - free.fval, 0.0))
         for p in pois:
             estimates[p].append(free.values[p])
+            err_estimates[p].append(free.errors[p])
 
     t_values = np.array(t_values)
-    return CoverageResult(t_values, {p: np.array(v) for p, v in estimates.items()},
+    return CoverageResult(t_values, {p: np.array(v) for p, v in estimates.items()}, {p: np.array(v) for p, v in err_estimates.items()},
                           float(np.mean(t_values <= t_crit)), t_crit, ndof, failed)
 
 
-def plot_coverage(res: CoverageResult, bins: int = 30):
+def plot_coverage(res: CoverageResult, best: Minuit, bins: int = 40):
     """Toy distribution of t against the Wilks chi2 pdf, plus the toy estimates of the POIs."""
     n = 1 + len(res.estimates)
-    fig, axes = plt.subplots(1, n, figsize=(5 * n, 5), squeeze=False)
+    fig, axes = plt.subplots(1, n, figsize=(5 * n, 4), squeeze=False)
     ax = axes[0, 0]
-    x = np.linspace(0, max(15, res.t_values.max()), 300)
-    ax.hist(res.t_values, bins=bins, density=True, alpha=0.6, label="Toys")
+    x = np.linspace(0, max(8, res.t_values.max()), 300)
+    ax.hist(res.t_values, bins=bins*2, density=True, alpha=0.5, label="Toys")
     ax.plot(x, chi2_dist(res.ndof).pdf(x), "k--", lw=2, label=rf"Wilks: $\chi^2$(df={res.ndof})")
     ax.axvline(res.t_crit, color="red", ls=":", lw=2, label=f"68.3% limit ({res.t_crit:.2f})")
     ax.set(title=f"Coverage = {res.coverage * 100:.1f}%  ({len(res.t_values)} toys, {res.n_failed} failed)",
            xlabel=r"$t = -2\ln(L_0/L_{best})$", ylabel="Probability density")
     ax.legend()
-    for ax, (name, vals) in zip(axes[0, 1:], res.estimates.items()):
-        ax.hist(vals, bins=bins)
-        ax.set(xlabel=name, ylabel="toys")
+    for ax, (name, vals), err_vals in zip(axes[0, 1:], res.estimates.items(), res.err_estimates.values()):
+        pulls = (vals - best.values[name]) / err_vals
+        ax.hist(pulls, bins=bins, density=True, alpha=0.5, label=f'{len(vals)} toys')
+        x = np.linspace(np.min(pulls), np.max(pulls), 1000)
+        ax.plot(x, norm.pdf(x), color='red', label='Standard normal')
+        ax.set(xlabel=r"Pull $(\hat{A} - A_{true})/\sigma(\hat{A})$", ylabel="Density")
+        ax.text(0.03, 0.95, rf"mean = {np.mean(pulls):.2f} $\pm$ {(np.std(pulls)/np.sqrt(len(pulls))):.2f}"+ f"\nsd = {np.std(pulls):.2f}",
+            transform=ax.transAxes, fontsize=11, verticalalignment="top")
+        ax.legend()
     fig.tight_layout()
     return fig
 
