@@ -22,7 +22,7 @@ The double exponential is required by the data: the background rises towards the
 
 The asymmetry was estimated in two ways. In the \emph{simultaneous} fit the two charge samples share the signal parametrization $N_s^+=N_s(1-A)/2$, $N_s^-=N_s(1+A)/2$ (the same one used on the Bayesian side, Sec.~\ref{sec:bayes_model}) and the signal mean and width, so that $A$ is a parameter of the likelihood; mass, resolution and background-shape parameters are nuisance parameters, profiled out when reporting uncertainty on $A$. In the \emph{separate} fit each charge was fitted on its own with the same model and no parameter in common (seven free parameters per charge), and $\Araw=(N_s^--N_s^+)/(N_s^-+N_s^+)$ was computed afterwards from the two signal yields, with the uncertainty propagated from those of the yields, which are independent because the two samples are. The simultaneous fit gives $\Araw=-0.0441\pm0.0085$ and the separate fits $\Araw=-0.0442\pm0.0087$.
 
-The two estimates agree, because sharing $\mu$ and $\sigma$ between $B^+$ and $B^-$, as expected for a particle and its antiparticle, is adequate.
+The two estimates agree, because sharing $\mu$ and $\sigma$ between $B^+$ and $B^-$, as expected for a particle and its antiparticle and a symmetric detector, is adequate.
 Therefore the simultaneous fit, which estimates $A$ directly and gives the profile-likelihood interval of the next subsection, is taken as the nominal one.
 
 \subsection{Profile Likelihood and Confidence Interval}
@@ -56,9 +56,20 @@ The result agrees with the Bayesian one (Sec.~\ref{sec:bayes_posterior}: $\Araw=
 
 \subsection{Coverage of the Wilks Intervals}
 \label{sec:freq_coverage}
-\todo{Marco -- coverage of the profile-likelihood interval on $A$ alone (1000 bootstrap replicas, nominal model, re-run notebook): $68.4\pm1.5\%$ for the 68.3\% interval; describe the procedure and compare with the Bayesian coverage of Sec.~\ref{sec:bayes_toymc}.}
+% \todo{Marco -- coverage of the profile-likelihood interval on $A$ alone (1000 bootstrap replicas, nominal model, re-run notebook): $68.4\pm1.5\%$ for the 68.3\% interval; describe the procedure and compare with the Bayesian coverage of Sec.~\ref{sec:bayes_toymc}.}
 
-\subsection{Systematic Uncertainties}
+Wilks' theorem~\cite{wilks} is an asymptotic result, so the coverage of the profile-likelihood interval on $A$ was checked directly on the data with a bootstrap. $1000$ replicas of the $19{,}731$ candidates of the fit window were drawn with replacement, which reproduces the statistical fluctuations of the sample, including those of the charge counts, and the nominal fit was repeated on each of them. The reference value of the asymmetry in the replicas is the best-fit value of the original data, $A_{\mathrm{true}}=-0.0441$. For each replica the statistic $q(A_{\mathrm{true}})$ was computed as the difference of $-2\log L$ between the fit with $A$ fixed to $A_{\mathrm{true}}$ and the fit with $A$ free and the other eleven parameters profiled. The $68\%$ interval of a replica contains $A_{\mathrm{true}}$ if and only if $q(A_{\mathrm{true}})\leq1$; replicas in which a fit did not converge were discarded.
+
+The fraction of replicas with $q(A_{\mathrm{true}})\leq1$ is $68.4\pm1.5\%$ (binomial uncertainty), against the nominal $68.3\%$: the interval has the nominal coverage (Fig.~\ref{fig:freq_toys}). This agrees with the toy-MC check of the Bayesian credible interval (Sec.~\ref{sec:bayes_toymc}, $65.0\pm3.3\%$ for the $68\%$ interval); the two values differ by less than one standard deviation, and the uncertainty here is smaller because of the larger number of replicas ($1000$ against $200$). The two checks are not equivalent. The Bayesian pseudo-datasets are generated from the fitted model, which makes that check a closure test, while the replicas here are resampled from the data and therefore carry the features of the spectrum that the model does not describe, such as the shape of the signal tails (Sec.~\ref{sec:bayes_gof}). %That the nominal coverage is obtained nevertheless suggests that the imperfect description of the spectrum does not invalidate the profile-likelihood interval of $A$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{Report/figures/frequentist_wilks_coverage.pdf}
+\caption{Coverage check, 1000 toys. Left: the statistics $q(A_{\mathrm{true}})$ following a $\chi^2_{dof=1}$ distribution as expected from Wilks theorem. Right: pulls $(\hat A-A_{\mathrm{true}})/\sigma(\hat A)$, with $\hat A$ and $\sigma(\hat A)$ the fit results of each toy, compared with a standard normal. }
+\label{fig:freq_toys}
+\end{figure}
+
+\subsection{Systematic Uncertainties and Stability Checks}
 \label{sec:freq_syst}
 While the systematic uncertainties study is shared with the Bayesian approach -- and discussed in detail in Sec.~\ref{sec:syst} -- three specific stability checks were performed within the frequentist one, to evaluate the robustness of the fitted raw asymmetry $\Araw$. Each test consists of a two-dimensional grid scan in which two selection or fit parameters are varied simultaneously, performing a simultaneous fit with the nominal double-exponential background model at each point and observing the stability of $\Araw$.
 
