@@ -25,3 +25,5 @@ Given the data $D=\{(m_i,q_i)\}_{i=1}^{N}$ (mass and charge of each candidate), 
 \label{eq:likelihood}
 \end{multline}
 where $S(m_i)\equiv S(m_i;\mu,\sigma)$. The likelihood is extended because the signal and background yields are parameters of the fit, which is what the Poisson term $e^{-(N_s+N_b)}$ accounts for. It is the common ground of the two mass analyses: Sec.~\ref{sec:frequentist} maximizes it, and Sec.~\ref{sec:bayesian} multiplies it by a prior to obtain a posterior.
+
+The extended form differs from a mixture of signal and background with a fixed total number of candidates and a signal fraction only through the Poisson term for the total yield, which carries no information on $A$ and does not change its estimate; it is used because the yields of the two charges are the natural parameters of the model. Bayes' theorem applied to the fitted yields gives the probability that a candidate in the signal window $|m-\mu|<2\sigma$ is a signal decay, about $96\%$: a purity, not a property of the single candidate, which depends on the signal fraction of the sample (here $78\%$ of the candidates in the fit window).

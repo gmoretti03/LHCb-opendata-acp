@@ -6,11 +6,28 @@
 \emph{In short: $8{,}556{,}118$ candidates are reduced to $23{,}895$ by a kaon-identification and muon-veto requirement, common to the three analyses.}
 The dataset is the CERN Open Data record 4900, ``Matter Antimatter Differences -- B meson decays to three hadrons''~\cite{opendata_record}: candidates for $B^{\pm}\to h^{\pm}h^{+}h^{-}$ decays collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, reconstructed with the LHCb software and already passed through trigger and offline selection. The data are distributed as ROOT \texttt{TTree}s (\texttt{DecayTree}) containing only the most relevant reconstructed branches, split across two files by magnet polarity (magnet up/down), for a combined $8{,}556{,}118$ candidates. The same record also includes a simplified, detector-response-free phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ ($50{,}000$ decays, half of each charge); it is used only as a sample without asymmetry to test the local-asymmetry procedure (Sec.~\ref{sec:bayes_dalitz}).
 
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Requirement & alone & cumulative & down & up \\
+\midrule
+All candidates & -- & $8{,}556{,}118$ & $5{,}135{,}823$ & $3{,}420{,}295$ \\
+$\lnot\texttt{isMuon}$, three tracks & $6{,}311{,}517$ & $6{,}311{,}517$ & $3{,}806{,}297$ & $2{,}505{,}220$ \\
+$\texttt{ProbPi}<0.5$, three tracks & $975{,}724$ & $481{,}101$ & $288{,}908$ & $192{,}193$ \\
+$\texttt{ProbK}>0.5$, three tracks & $28{,}812$ & $23{,}895$ & $14{,}178$ & $9717$ \\
+Mass window $[5100,5600]\,\MeV$ & -- & $19{,}731$ & $11{,}636$ & $8095$ \\
+\bottomrule
+\end{tabular}
+\caption{Number of candidates passing each requirement alone and after the cumulative selection, in the order of the table, and by magnet polarity. The kaon-identification requirement on the three tracks is by far the most selective.}
+\label{tab:cutflow}
+\end{table}
+
 For each of the three final-state tracks ($H1$, $H2$, $H3$) the analysis reads momentum components (\texttt{PX}, \texttt{PY}, \texttt{PZ}), particle-identification (PID) likelihoods (\texttt{ProbK}, \texttt{ProbPi}), a muon flag (\texttt{isMuon}), and the track charge. The same preselection is used in all three analyses: a kaon-PID requirement and a muon veto on every track,
 \[
 \texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
 \]
-which retains $23{,}895$ of the $8{,}556{,}118$ candidates ($0.28\%$), the PID requirement being by far the dominant reduction. The files contain no event identifier; as a proxy for multiple candidates from the same collision, only $42$ of the candidates in the fit window ($0.2\%$) share an identical track with another candidate, a negligible effect on the statistical uncertainties, and all are kept.
+which retains $23{,}895$ of the $8{,}556{,}118$ candidates ($0.28\%$), the PID requirement being by far the dominant reduction (Table~\ref{tab:cutflow}). The files contain no event identifier; as a proxy for multiple candidates from the same collision, only $42$ of the candidates in the fit window ($0.2\%$) share an identical track with another candidate, a negligible effect on the statistical uncertainties, and all are kept.
 
 In this dataset only the charge combinations $(+1,-1,-1)$ and $(-1,+1,+1)$ occur for $(H1,H2,H3)$: $H1$ is always the kaon of charge opposite to the $B$, and $H2$, $H3$ are the interchangeable same-sign pair. The Dalitz-plot variables are therefore the invariant masses of the two opposite-sign pairs, $m^2(H1,H2)$ and $m^2(H1,H3)$.
 

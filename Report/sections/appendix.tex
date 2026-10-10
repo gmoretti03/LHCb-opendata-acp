@@ -88,7 +88,7 @@ For $n$ independent candidates the likelihood contains the information on the pa
 
 \paragraph{Test of $A=0$.}
 The null hypothesis $H_0$: $A=0$ is tested against the alternative $H_1$: $A$ free, the other parameters being free in both. The test statistic is the profile likelihood ratio,
-$q(0)=-2\ln\big[L(0,\hat{\hat\theta})/L(\hat A,\hat\theta)\big]=2\Delta\mathrm{NLL}$, large when the data disfavor $H_0$. For two simple hypotheses the likelihood ratio is the most powerful test of a given size, i.e.\ the one with the highest probability of rejecting $H_0$ when $H_1$ is true (Neyman-Pearson lemma~\cite{neyman_pearson}); the profile likelihood ratio is its extension to hypotheses with unspecified parameters, with no optimality guarantee in general. By Wilks' theorem~\cite{wilks}, under $H_0$ the statistic follows a $\chi^2$ distribution with one degree of freedom, the number of parameters fixed by $H_0$, whatever the number of nuisance parameters, so the $p$-value is $P(\chi^2_1\geq q_{\mathrm{obs}})$; this is the probability, under $H_0$, of a result at least as discrepant as the data, not the probability of $H_0$.
+$q(0)=-2\ln\big[L(0,\hat{\hat\theta})/L(\hat A,\hat\theta)\big]=2\Delta\mathrm{NLL}$ (NLL: negative log-likelihood), large when the data disfavor $H_0$. For two simple hypotheses the likelihood ratio is the most powerful test of a given size, i.e.\ the one with the highest probability of rejecting $H_0$ when $H_1$ is true (Neyman-Pearson lemma~\cite{neyman_pearson}); the profile likelihood ratio is its extension to hypotheses with unspecified parameters, with no optimality guarantee in general. By Wilks' theorem~\cite{wilks}, under $H_0$ the statistic follows a $\chi^2$ distribution with one degree of freedom, the number of parameters fixed by $H_0$, whatever the number of nuisance parameters, so the $p$-value is $P(\chi^2_1\geq q_{\mathrm{obs}})$; this is the probability, under $H_0$, of a result at least as discrepant as the data, not the probability of $H_0$.
 
 \paragraph{Significance.}
 A $\chi^2_1$ variable is the square of a standard normal one, so $p=P(|N|\geq\sqrt{q})$ and the significance quoted is $Z=\sqrt{q(0)}$ ($q\simeq27$, $p=2.05\times10^{-7}$, $Z=5.20$). This is a two-sided convention: the one-sided one, $Z=\Phi^{-1}(1-p)$, applied to the same $p$ would give $5.06$. For a parabolic likelihood $\sqrt{q}$ coincides with the Hesse significance $|\hat A|/\sigma(A)=5.19$.
@@ -99,3 +99,6 @@ The Bayes factor of $H_0$ ($A=0$) against $H_1$ ($A$ free) is the ratio of the e
 BF_{01}=\frac{P(D\mid H_0)}{P(D\mid H_1)}=\frac{p(A=0\mid D)}{\pi(A=0)},
 \]
 the density of the posterior at $A=0$ divided by that of the prior: how much the data have lowered the probability density of the null value. No integral over the twelve parameters is needed, only the marginal posterior of $A$ from the chain.
+
+\input{sections/appendix_checks}
+\input{sections/notation}
