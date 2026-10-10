@@ -1,0 +1,5 @@
+
+F. RIORGANIZZAZIONE (2026-10-10): nuova sezione condivisa "Mass Model and Likelihood" (Sec. III, sections/model.tex) con mistura e verosimiglianza estesa
+   (prima nella sezione Bayes). I tuoi riferimenti \ref{sec:bayes_model}, \eqref{eq:mixture}, \eqref{eq:likelihood} puntano ancora li' (alias mantenuto),
+   ma il testo "the same physical mass model as the Bayesian analysis (Sec. III, Eq. (3))" ora dovrebbe dire "the common mass model (Sec. III, Eq. (3))".
+   Da modificare tu (o dirmi di farlo). La sezione Dalitz e' ora separata (Sec. VII), fuori da Bayes.

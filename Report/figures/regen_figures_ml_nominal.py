@@ -55,9 +55,7 @@ def save(fig, name):
 from sklearn.metrics import roc_curve, roc_auc_score
 y = scores[:, 0]
 ref = models["reference_model"]
-styles = {"Logistic Regression": ("tab:gray", "-"), "Logistic Regression (L1)": ("tab:gray", "--"),
-          "Decision Tree": ("tab:olive", "-"), "Random Forest": ("tab:green", "-"),
-          "Gradient Boosting": ("tab:purple", "-"), "FFNN": ("tab:brown", "-")}
+styles = {n_: (ps.MODELS[n_], "--" if n_.endswith("(L1)") else "-") for n_ in ps.MODELS}
 fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.4))
 for k, name in enumerate(models["order"], 1):
     fpr, tpr, _ = roc_curve(y, scores[:, k]); col, ls_ = styles[name]
@@ -80,11 +78,12 @@ fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 6.2), sharey=True)
 yy = np.arange(len(names))
 is_b = np.array([names[i].startswith("B_") for i in order])
 for a, val, lab in ((axs[0], imp, "Random Forest importance (Gini)"), (axs[1], coef, "|Lasso coefficient| (standardized features)")):
-    a.barh(yy, val[order], color=np.where(is_b, C["model"], C["signal"]), height=0.7)
+    a.barh(yy, val[order], color=np.where(is_b, C["ml"], C["signal"]), height=0.7)
     a.set_xlabel(lab); a.grid(axis="x", alpha=0.3)
 axs[0].set_yticks(yy); axs[0].set_yticklabels([names[i].replace("_", r"\_") if False else names[i] for i in order], fontsize=11)
 for t_, b_ in zip(axs[0].get_yticklabels(), is_b):
-    if b_: t_.set_color(C["model"])
+    if b_: t_.set_color(C["ml"])
+ps.letter(axs[0], "a"); ps.letter(axs[1], "b")
 ps.panel_label(axs[1], f"Spearman $\\rho = {feats['spearman_importance_vs_lasso']:.2f}$", loc="lower right")
 plt.tight_layout()
 save(fig, "ml_nominal_features.pdf")
@@ -93,12 +92,12 @@ save(fig, "ml_nominal_features.pdf")
 bv = bvc["bias_variance"]
 fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.3))
 n = np.arange(1, len(bv["accuracy_train"]) + 1)
-axs[0].plot(n, bv["accuracy_train"], label="Train"); axs[0].plot(n, bv["accuracy_test"], label="Test")
+axs[0].plot(n, bv["accuracy_train"], color=C["count"], label="Train"); axs[0].plot(n, bv["accuracy_test"], color=C["ml"], label="Test")
 axs[0].axhline(bv["accuracy_always_signal"], color="gray", ls=":", label="Always signal-like")
 axs[0].set_ylabel("Accuracy")
-axs[1].plot(n, bv["auc_train"], label="Train"); axs[1].plot(n, bv["auc_test"], label="Test"); axs[1].set_ylabel("AUC")
-for a in axs:
-    a.set_xlabel("Number of boosting stages"); a.legend()
+axs[1].plot(n, bv["auc_train"], color=C["count"], label="Train"); axs[1].plot(n, bv["auc_test"], color=C["ml"], label="Test"); axs[1].set_ylabel("AUC")
+for k_, a in enumerate(axs):
+    a.set_xlabel("Number of boosting stages"); a.legend(); ps.letter(a, "ab"[k_])
 plt.tight_layout()
 save(fig, "ml_nominal_bias_variance.pdf")
 
@@ -109,12 +108,12 @@ edges10 = np.linspace(0, 1, 11)
 cnt, _ = np.histogram(rf_s, edges10); cnt = cnt[cnt > 0]                 # calibration_curve drops empty bins
 obs_r = np.array(cal["raw"]["obs"]); err_r = np.sqrt(obs_r * (1 - obs_r) / cnt)
 fig, (ax, axh) = plt.subplots(2, 1, figsize=(ps.SINGLE, 6.4), sharex=True, gridspec_kw={"height_ratios": [3, 1.1], "hspace": 0.06})
-ax.errorbar(cal["raw"]["pred"], obs_r, yerr=err_r, fmt="o-", capsize=3, color=C["signal"],
+ax.errorbar(cal["raw"]["pred"], obs_r, yerr=err_r, fmt="o-", capsize=3, color=C["count"],
             label=f"Raw RF score (Brier = {cal['brier_raw_rf']:.3f})")
-ax.plot(cal["isotonic"]["pred"], cal["isotonic"]["obs"], "s-", color=C["up"], label=f"Isotonic-recalibrated (Brier = {cal['brier_isotonic_rf']:.3f})")
+ax.plot(cal["isotonic"]["pred"], cal["isotonic"]["obs"], "s-", color=C["ml"], label=f"Isotonic-recalibrated (Brier = {cal['brier_isotonic_rf']:.3f})")
 ax.plot([0, 1], [0, 1], "k:", label="Perfect calibration")
 ax.set_ylabel("Observed signal-like fraction"); ax.legend(loc="lower right", fontsize=10)
-for lab_, msk, col in (("signal-like", y == 1, C["signal"]), ("background-like", y == 0, C["model"])):
+for lab_, msk, col in (("signal-like", y == 1, C["sig_like"]), ("background-like", y == 0, C["bkg_like"])):
     axh.hist(rf_s[msk], bins=edges10, histtype="step", lw=1.5, color=col, label=lab_)
 axh.set_yscale("log"); axh.set_xlabel("Predicted probability (raw RF score)"); axh.set_ylabel("Test\ncandidates")
 axh.legend(loc="upper left", fontsize=9, ncol=2)
@@ -124,7 +123,7 @@ save(fig, "ml_nominal_calibration.pdf")
 yt, rf_mean, rf_std, mc_std, de_std = unc_arr.T
 fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.3))
 eb = np.linspace(0, 1, 21); cb_ = 0.5 * (eb[1:] + eb[:-1])
-for lab_, msk, col in (("signal-like", yt == 1, C["signal"]), ("background-like", yt == 0, C["model"])):
+for lab_, msk, col in (("signal-like", yt == 1, C["sig_like"]), ("background-like", yt == 0, C["bkg_like"])):
     med, lo_, hi_ = [], [], []
     for x0, x1 in zip(eb[:-1], eb[1:]):
         v = rf_std[msk & (rf_mean >= x0) & (rf_mean < x1)]
@@ -134,14 +133,16 @@ for lab_, msk, col in (("signal-like", yt == 1, C["signal"]), ("background-like"
     axs[0].fill_between(cb_, lo_, hi_, color=col, alpha=0.2)
 axs[0].set_xlabel("Mean RF score (over trees)"); axs[0].set_ylabel("Spread across trees"); axs[0].legend(loc="lower center", fontsize=10)
 bins = np.linspace(0, max(rf_std.max(), mc_std.max(), de_std.max()), 50)
-for arr, lab, col in ((rf_std, "RF trees", "tab:green"), (mc_std, "MC dropout (FFNN)", "tab:brown"), (de_std, "Deep ensemble (FFNN)", "tab:purple")):
+for arr, lab, col in ((rf_std, "RF trees", ps.ESTIMATORS["rf"]), (mc_std, "MC dropout (FFNN)", ps.ESTIMATORS["mc"]), (de_std, "Deep ensemble (FFNN)", ps.ESTIMATORS["de"])):
     axs[1].hist(arr, bins=bins, histtype="step", density=True, lw=1.5, label=lab, color=col)
 axs[1].set_xlabel("Estimated per-event uncertainty"); axs[1].set_ylabel("Density"); axs[1].set_ylim(0, axs[1].get_ylim()[1] * 1.35); axs[1].legend(loc="upper right")
 ts = unc["training_size"]
 axs[2].plot([t["n_train"] for t in ts], [t["rf_std_mean"] for t in ts], "o-", color="k", label="all")
-axs[2].plot([t["n_train"] for t in ts], [t["rf_std_bkg"] for t in ts], "s--", color=C["model"], label="background-like")
-axs[2].plot([t["n_train"] for t in ts], [t["rf_std_sig"] for t in ts], "^--", color=C["signal"], label="signal-like")
+axs[2].plot([t["n_train"] for t in ts], [t["rf_std_bkg"] for t in ts], "s--", color=C["bkg_like"], label="background-like")
+axs[2].plot([t["n_train"] for t in ts], [t["rf_std_sig"] for t in ts], "^--", color=C["sig_like"], label="signal-like")
 axs[2].set_xlabel("Training-set size"); axs[2].set_ylabel("Mean RF spread across trees"); axs[2].legend()
+for k_, a in enumerate(axs):
+    ps.letter(a, "abc"[k_])
 plt.tight_layout()
 save(fig, "ml_nominal_uncertainty.pdf")
 
@@ -174,23 +175,26 @@ sb = np.array([r["sigma_shift_nested"] for r in rows]); sbin = np.array([r["sigm
 fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.4))
 ax.fill_between(t_, a_full - sb, a_full + sb, color="gray", alpha=0.25, label="Expected spread (nested subsample)")
 ax.axhline(a_full, color="k", ls=":", label="Counting, full fit window")
-ax.errorbar(t_, a_, yerr=sbin, fmt="o-", capsize=3, color="steelblue", label="Counting after the score cut")
+ax.errorbar(t_, a_, yerr=sbin, fmt="o-", capsize=3, color=C["ml"], label="Counting after the score cut")
 ax.set_xlabel(f"{models['reference_model']} score threshold"); ax.set_ylabel(r"$A_{\mathrm{raw}}$ (counting)")
 ax.legend(loc="lower left")
 save(fig, "ml_nominal_threshold.pdf")
 
 # ---------------- three approaches, full vs selected sample
 fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.2))
+_ab, _sb = three["bayes"]["full"]["A"], three["bayes"]["full"]["sd"]
+ax.axvspan(_ab - _sb, _ab + _sb, color=C["shade"], alpha=0.6, zorder=0, label=r"Bayesian, full sample, $\pm1\sigma$")
+ax.axvline(_ab, color=C["background"], ls=":", lw=1, zorder=0)
 lab = [("bayes", "Bayesian fit", "sd"), ("frequentist", "Frequentist fit", "A_err"), ("counting", "Counting", "sd")]
 for i, (k, name, e) in enumerate(lab):
     f, s_ = three[k]["full"], three[k]["selected"]
     ax.errorbar([f["A"]], [i + 0.12], xerr=[f[e]], fmt="o", color="k", capsize=3, label="Full sample" if i == 0 else None)
-    ax.errorbar([s_["A"]], [i - 0.12], xerr=[s_[e]], fmt="s", color=C["model"], capsize=3,
+    ax.errorbar([s_["A"]], [i - 0.12], xerr=[s_[e]], fmt="s", color=C["ml"], capsize=3,
                 label=f"Selected (score > {three['threshold']})" if i == 0 else None)
 ax.set_yticks(range(len(lab))); ax.set_yticklabels([n for _, n, _ in lab])
 ax.set_xlabel(r"$A_{\mathrm{raw}}$"); ax.invert_yaxis()
 ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(6))
-ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, frameon=False)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, frameon=False, fontsize=10)
 save(fig, "ml_nominal_three_methods.pdf")
 
 # ---------------- mass spectrum before/after the score cut and cut efficiency vs mass (from saved counts)
@@ -202,15 +206,19 @@ for key, lab, sty in (("all_20", "Selected, 20 features", "-"), ("no_momenta", "
     n_ = np.array([e["n"] for e in ev]); eff = np.array([e["eff"] for e in ev])
     if key == "all_20":
         axs[0].stairs(n_, np.append(lo_, hi_[-1]), color="k", lw=1.5, label="All candidates")
-    axs[0].stairs(n_ * eff, np.append(lo_, hi_[-1]), lw=1.5, ls=sty, label=lab)
-    axs[1].stairs(eff, np.append(lo_, hi_[-1]), lw=1.5, ls=sty, label=lab)
+    axs[0].stairs(n_ * eff, np.append(lo_, hi_[-1]), lw=1.5, ls=sty, color=C["ml"], label=lab)
+    axs[1].stairs(eff, np.append(lo_, hi_[-1]), lw=1.5, ls=sty, color=C["ml"], label=lab)
 mu_, sg_ = labels_info["mu"], labels_info["sigma"]
-for a in axs:
-    a.axvspan(5100, 5150, color="tab:orange", alpha=0.12)
-    a.axvspan(mu_ - 2 * sg_, mu_ + 2 * sg_, color="tab:green", alpha=0.10)
-    a.set_xlabel(r"$m(KKK)$ [MeV]")
-axs[0].set_yscale("log"); axs[0].set_ylabel("Candidates / 25 MeV"); axs[0].legend(loc="upper right")
-axs[1].set_ylabel("Fraction passing the cut"); axs[1].set_ylim(0, 1); axs[1].legend(loc="upper right")
+for k_, a in enumerate(axs):
+    a.axvspan(5100, 5150, facecolor="none", edgecolor="0.55", hatch="////", lw=0, alpha=0.7,
+              label="Excluded from the background-like labels" if k_ == 0 else None)
+    a.axvspan(mu_ - 2 * sg_, mu_ + 2 * sg_, color=C["shade"], alpha=0.7, zorder=0,
+              label=r"Signal-like window ($\pm2\sigma$)" if k_ == 0 else None)
+    a.set_xlabel(r"$m(KKK)$ [MeV]"); ps.letter(a, "ab"[k_])
+axs[0].set_yscale("log"); axs[0].set_ylabel("Candidates / 25 MeV")
+axs[0].set_ylim(axs[0].get_ylim()[0], axs[0].get_ylim()[1] * 40); axs[0].legend(loc="upper right", fontsize=9)
+axs[1].set_ylabel("Fraction passing the cut"); axs[1].set_ylim(0, 1.45); axs[1].set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+axs[1].legend(loc="upper right", fontsize=10)
 plt.tight_layout()
 save(fig, "ml_nominal_mass_after_cut.pdf")
 
@@ -234,6 +242,7 @@ for sgn, lab_, col in ((+1, r"$B^+$", C["pos"]), (-1, r"$B^-$", C["neg"])):
     mm = reg_mq[reg_mq[:, 1] == sgn, 0]
     a.hist(mm, bins=eb, histtype="step", lw=1.8, color=col, label=f"{lab_} ({len(mm)} candidates)")
 a.set_xlabel(r"$m(KKK)$ [MeV]"); a.set_ylabel("Candidates / 10 MeV"); a.legend(loc="center right")
+ps.letter(axs[0], "a"); ps.letter(axs[1], "b")
 ps.panel_label(a, "LHCb 2013 region", loc="upper left")
 plt.tight_layout()
 save(fig, "ml_nominal_dalitz_region.pdf")
@@ -242,7 +251,7 @@ save(fig, "ml_nominal_dalitz_region.pdf")
 hb = js("high_background.json")
 ns0 = hb["pid"][0]["N_sig"]
 fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.2))
-for kind, lab, col, mk in (("pid", r"Tighter PID cut (ProbK $>$ 0.3 ... 0.8)", C["signal"], "o"), ("ml", "Cut on the GBM score (0 ... 0.9)", C["model"], "s")):
+for kind, lab, col, mk in (("pid", r"Tighter PID cut (ProbK $>$ 0.3 ... 0.8)", C["signal"], "o"), ("ml", "Cut on the GBM score (0 ... 0.9)", C["ml"], "s")):
     rows = [r for r in hb[kind] if r["N_sig"] / ns0 > 0.15]
     eff = np.array([r["N_sig"] / ns0 for r in rows])
     axs[0].plot(eff, [r["A_err"] for r in rows], mk + "-", color=col, label=lab)
@@ -253,6 +262,7 @@ for a in axs:
     a.set_xlabel("Signal efficiency (fitted $N_s$ relative to ProbK $>$ 0.3)")
 axs[0].set_ylabel(r"$\sigma(A_{\mathrm{raw}})$"); axs[0].legend(loc="upper right", fontsize=10)
 axs[1].set_ylabel(r"$A_{\mathrm{raw}}$ (frequentist fit)")
+ps.letter(axs[0], "a"); ps.letter(axs[1], "b")
 ps.panel_label(axs[0], "dotted: nominal selection", loc="lower left")
 plt.tight_layout()
 save(fig, "ml_nominal_high_background.pdf")

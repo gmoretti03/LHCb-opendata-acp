@@ -1,36 +1,15 @@
 \section{Bayesian Analysis}
 \label{sec:bayesian}
 
-\subsection{Model and Priors}
-\label{sec:bayes_model}
-The mass spectrum of each charge sample is described by a signal-plus-background mixture on the nominal fit window $[5100,5600]\,\MeV$ (Sec.~\ref{sec:data_mass}),
-\begin{equation}
-f^{\pm}(m)=N_s^{\pm}\,S(m;\mu,\sigma)+N_b^{\pm}\,B^{\pm}(m),
-\label{eq:mixture}
-\end{equation}
-where $S$ is a Gaussian truncated to the window, with mean $\mu$ and width $\sigma$ shared by the two charges, and the background is a double exponential with a shape of its own for each charge,
-\[
-B^{\pm}(m)=f_{\pm}\,E(m;\lambda_{1}^{\pm})+(1-f_{\pm})\,E(m;\lambda_{2}^{\pm}),
-\]
-with $E(m;\lambda)\propto e^{-\lambda m}$ a truncated exponential normalized on the window. The steep component ($\lambda_1$) describes the rise of the background towards the lower edge of the window, the slow one ($\lambda_2$) the combinatorial background under and above the peak. The mixture is invariant under the exchange $(\lambda_1,f)\leftrightarrow(\lambda_2,1-f)$, which would give the posterior two identical modes (label switching); the ordering $\lambda_1>\lambda_2$ removes this symmetry. Signal and background yields are split between the charges as
-\[
-N_s^{\pm}=\tfrac{N_s}{2}(1\mp A),\qquad N_b^{\pm}=\tfrac{N_b}{2}(1\mp A_b),
-\]
-so that $A=(N_s^--N_s^+)/(N_s^-+N_s^+)$, the raw asymmetry \Araw of Eq.~\eqref{eq:araw}, is a fit parameter rather than being derived from two independent yields, and the background asymmetry $A_b$ is free. The parameter vector has twelve components, $\theta=(N_s,N_b,A,A_b,\mu,\sigma,\lambda_1^{\pm},\lambda_2^{\pm},f_{\pm})$.
-
-Given the data $D=\{(m_i,q_i)\}_{i=1}^{N}$ (mass and charge of each candidate), Bayes' theorem gives the posterior
+\subsection{Priors and Posterior}
+\label{sec:bayes_prior}
+\emph{In short: uniform bounded priors on twelve parameters; with $\sim2\times10^4$ candidates the posterior is dominated by the likelihood.}
+Bayes' theorem combines the likelihood of Eq.~\eqref{eq:likelihood} (Sec.~\ref{sec:model}) with a prior $\pi(\theta)$ into the posterior
 \begin{equation}
 p(\theta\mid D)=\frac{\mathcal{L}(D\mid\theta)\,\pi(\theta)}{p(D)},
 \label{eq:bayes}
 \end{equation}
-with the extended unbinned likelihood of the two charge samples
-\begin{multline}
-\mathcal{L}(D\mid\theta)\propto e^{-(N_s+N_b)}
-\prod_{i:\,q_i=+1}\Big[N_s^{+}S(m_i)+N_b^{+}B^{+}(m_i)\Big] \\
-\times\prod_{i:\,q_i=-1}\Big[N_s^{-}S(m_i)+N_b^{-}B^{-}(m_i)\Big],
-\label{eq:likelihood}
-\end{multline}
-where $S(m_i)\equiv S(m_i;\mu,\sigma)$. The priors are uniform, with independent ranges except for the ordering of the background slopes: $N_s,N_b\in(0,5N)$ with $N=19{,}731$, $A,A_b\in(-1,1)$, $\mu\in(5260,5310)\,\MeV$, $\sigma\in(3,40)\,\MeV$, $\lambda_1^{\pm}\in(10^{-5},0.1)\,\MeV^{-1}$, $\lambda_2^{\pm}\in(10^{-5},\lambda_1^{\pm})$, $f_{\pm}\in(0,1)$. The prior density is therefore a constant on the allowed region $\Theta$,
+The priors are uniform, with independent ranges except for the ordering of the background slopes: $N_s,N_b\in(0,5N)$ with $N=19{,}731$, $A,A_b\in(-1,1)$, $\mu\in(5260,5310)\,\MeV$, $\sigma\in(3,40)\,\MeV$, $\lambda_1^{\pm}\in(10^{-5},0.1)\,\MeV^{-1}$, $\lambda_2^{\pm}\in(10^{-5},\lambda_1^{\pm})$, $f_{\pm}\in(0,1)$. The prior density is therefore a constant on the allowed region $\Theta$,
 \begin{equation}
 \pi(\theta)\propto\mathbf{1}\left[\theta\in\Theta\right],
 \label{eq:prior}
@@ -39,10 +18,19 @@ and inside it the posterior is proportional to the likelihood. A flat prior is n
 
 \subsection{MCMC Sampling and Convergence Diagnostics}
 \label{sec:bayes_mcmc}
+\emph{In short: 32 walkers for $25{,}000$ steps; the chain is at least $113$ autocorrelation times long for every parameter and independent runs from dispersed starting points agree.}
 The posterior was sampled with the affine-invariant ensemble sampler of Goodman and Weare~\cite{goodman_weare} as implemented in \texttt{emcee}~\cite{emcee}. The maximum of the posterior was first located numerically (Nelder-Mead), and 32 walkers were initialized in a narrow ball around it and run for $25{,}000$ steps, with the first $4166$ ($1/6$) discarded as burn-in, leaving $6.7\times10^5$ samples; the mean acceptance fraction is $0.38$. Convergence was checked through the integrated autocorrelation time of each parameter, $\tau=1+2\sum_{t\geq1}\rho(t)$, with $\rho(t)$ the autocorrelation of the chain at lag $t$. We find $\tau\in[147,183]$ steps, the longest for the background-shape parameters: the post-burn-in chain is $N/\tau\geq113$ autocorrelation times long for every parameter, above the threshold of $50$ recommended for a reliable estimate of $\tau$~\cite{emcee}, and corresponds to $\gtrsim3600$ effectively independent samples per parameter. To check that the chain is not trapped near its starting point, the fit was repeated twice with the walkers initialized uniformly over the whole prior box and the first half of the chain discarded: both runs converge to the same single mode, with $\Araw=-0.0446$ and $-0.0442$, the same intervals and the same values of all other parameters as the nominal fit. The trace plot of such a run (Fig.~\ref{fig:bayes_trace}, Appendix~\ref{sec:appendix}) shows all walkers reaching the bulk of the posterior within $\sim$2000 steps, the background fraction $f_+$ last, well inside the discarded half of the chain.
 
 \subsection{Posterior Results and Credible Intervals}
 \label{sec:bayes_posterior}
+\emph{In short: $\Araw=-0.0443$, 68\% credible interval $[-0.0528,-0.0358]$ and 95\% $[-0.0608,-0.0276]$; the posterior is Gaussian.}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/bayes_nominal_corner.pdf}
+\caption{Posterior of the six physics parameters of the nominal fit (the six background-shape parameters are marginalized). Diagonal: marginal posteriors with the 16th, 50th and 84th percentiles (dashed lines and titles). Off-diagonal: 2D marginals, contours enclosing the regions of the $1\sigma$ and $2\sigma$ levels of a 2D Gaussian ($39\%$ and $86\%$).}
+\label{fig:bayes_corner}
+\end{figure*}
+
 The marginal posterior on the raw asymmetry gives (median and equal-tailed credible intervals, CI)
 \begin{gather*}
 \Araw = -0.0443, \\
@@ -50,48 +38,32 @@ The marginal posterior on the raw asymmetry gives (median and equal-tailed credi
 \end{gather*}
 The posterior is very close to Gaussian, with standard deviation $0.0085$; its 68\% interval is symmetric about the median to within $2\times10^{-5}$, so the equal-tailed intervals coincide with the highest-posterior-density ones at the quoted precision. Since the priors are uniform, the posterior mode (the maximum a posteriori, MAP, estimate, $-0.0441$) coincides with the maximum-likelihood estimate, so this result can be compared directly with the frequentist fit of the same model (Sec.~\ref{sec:frequentist}; the quantities it uses are summarized in Appendix~\ref{sec:appendix_freq}). The published analysis of the same 2011 data, with its own selection (which includes a $D^0$ veto) and a mass model with partially reconstructed and misidentified backgrounds, finds $\Araw=-0.060\pm0.007$~\cite{lhcb_cpv_2013}; with the $D^0$ veto our fit gives $-0.0496\pm0.0088$ (Sec.~\ref{sec:bayes_checks}), compatible within the statistical uncertainties, although the two selections overlap and differ. After the corrections of Eq.~\eqref{eq:acp}, the published asymmetry is $\ACP=-0.043\pm0.009\pm0.003\pm0.007$~\cite{lhcb_cpv_2013}, and the most precise later measurement, on a larger data set, is $\ACP=-0.037\pm0.002\pm0.002\pm0.003$~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}. The other physics parameters are $N_s=15{,}328\pm133$, $N_b=4404\pm82$, $A_b=-0.040\pm0.018$, $\mu=5284.39\pm0.16\,\MeV$ and $\sigma=18.00\pm0.14\,\MeV$ (Fig.~\ref{fig:bayes_corner}). $A$ is almost uncorrelated with the other parameters: its largest correlation, $-0.17$, is with $A_b$.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.85\textwidth]{figures/bayes_nominal_corner.pdf}
-\caption{Posterior of the six physics parameters of the nominal fit (the six background-shape parameters are marginalized). Diagonal: marginal posteriors with the 16th, 50th and 84th percentiles (dashed lines and titles). Off-diagonal: 2D marginals, contours at the $0.5,1,1.5,2\sigma$ levels of a 2D Gaussian.}
-\label{fig:bayes_corner}
-\end{figure*}
+
 
 \subsection{Bayes Factors}
 \label{sec:bayes_factor}
-Computing the evidence of each hypothesis by direct numerical integration is impractical for a 12-parameter posterior. When the null hypothesis fixes one parameter, $H_0$: $A=0$, nested in $H_1$ ($A$ free), and the priors on the other parameters are shared, the Bayes factor reduces to the Savage-Dickey density ratio~\cite{dickey1971},
-\[
-BF_{01} = \frac{p(A=0\mid D)}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
-\]
-With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the posterior odds of $H_0$ against $H_1$. $A=0$ lies $5.2$ posterior standard deviations from the median, in a tail where the chain contains essentially no samples, so a kernel density estimate of $p(A=0\mid D)$ would only reflect the kernel tails of the few most extreme samples. We therefore use the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), with the mean and standard deviation of the chain, which gives $BF_{01}\approx1.1\times10^{-4}$ ($\ln BF_{10}\approx9.1$): decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys} ($BF_{10}>100$). As for any Bayes factor of a point null against a free parameter, the value scales with the prior width -- the Ockham factor built into the Bayes factor, which penalizes a free parameter in proportion to the prior volume it is allowed to explore, and the mechanism behind Lindley's paradox: with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_checks}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged. Figure~\ref{fig:bayes_sd} shows the two densities of the ratio.
-
-The same test on the background asymmetry shows the Ockham factor at work. $A_b=-0.040\pm0.018$ lies $2.3$ standard deviations from zero, yet the Savage-Dickey ratio gives $BF_{01}(A_b=0)\approx3.5$: the data mildly \emph{favor} a charge-symmetric background, because the gain in likelihood does not compensate for spreading the prior of $A_b$ over $(-1,1)$. A negative background asymmetry is plausible: besides combinatorial background, the sample contains misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $B^\pm\to\pi^\pm K^+K^-$ decays, with $\ACP$ values of their own, whose contribution grows when the kaon identification is loosened (Sec.~\ref{sec:syst}). $A_b$ is nevertheless kept free in the nominal model, which avoids imposing an assumption on the background that the frequentist analysis does not make; fixing $A_b=0$ is one of the variants of the systematic study (Sec.~\ref{sec:syst}).
-
+\emph{In short: decisive evidence against $A=0$ ($BF_{10}\approx9\times10^3$); the evidence for a background asymmetry is not significant, and depends on the prior width.}
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/bayes_nominal_savage_dickey.pdf}
-\caption{Savage-Dickey ratio for $A$ (left) and $A_b$ (right): marginal posterior (histogram of the chain and Gaussian approximation) and prior density, logarithmic scale. The Bayes factor $BF_{01}$ is the ratio of the two densities at zero (dots). For $A$ the posterior density at zero is $10^{-4}$ times the prior one; for $A_b$, $2.3$ standard deviations from zero, it is higher than the prior density, and the data favor $A_b=0$.}
+\caption{Savage-Dickey ratio for (a) $A$ and (b) $A_b$: marginal posterior (histogram of the chain and Gaussian approximation) and prior density, logarithmic scale. The Bayes factor $BF_{01}$ is the ratio of the two densities at zero (dots). For $A$ the posterior density at zero is $10^{-4}$ times the prior one; for $A_b$, $2.3$ standard deviations from zero, it is higher than the prior density, and the data favor $A_b=0$.}
 \label{fig:bayes_sd}
 \end{figure*}
 
-\subsection{Goodness of Fit and Model Choice}
+The Bayes factor compares two hypotheses through their evidences (marginal likelihoods), $BF_{10}=P(D\mid H_1)/P(D\mid H_0)$ with $P(D\mid H_i)=\int\mathcal{L}(D\mid\theta,H_i)\,\pi(\theta\mid H_i)\,d\theta$: it is the factor by which the data update the prior odds of the two hypotheses, and it requires proper priors. Computing the evidence of each hypothesis by direct numerical integration is impractical for a 12-parameter posterior. When the null hypothesis fixes one parameter, $H_0$: $A=0$, nested in $H_1$ ($A$ free), and the priors on the other parameters are shared, the Bayes factor reduces to the Savage-Dickey density ratio~\cite{dickey1971} (Appendix~\ref{sec:appendix_freq}),
+\[
+BF_{01} = \frac{p(A=0\mid D)}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
+\]
+With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the posterior odds of $H_0$ against $H_1$. $A=0$ lies $5.2$ posterior standard deviations from the median, in a tail where the chain contains essentially no samples, so a kernel density estimate of $p(A=0\mid D)$ would only reflect the kernel tails of the few most extreme samples. We therefore use the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), with the mean and standard deviation of the chain, which gives $BF_{01}\approx1.1\times10^{-4}$ ($BF_{10}\approx9\times10^{3}$, $\ln BF_{10}\approx9.1$): decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys} ($BF_{10}>100$). As for any Bayes factor of a point null against a free parameter, the value scales with the prior width -- the Ockham factor built into the Bayes factor, which penalizes a free parameter in proportion to the prior volume it is allowed to explore, and the mechanism behind Lindley's paradox: with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_checks}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged. Figure~\ref{fig:bayes_sd} shows the two densities of the ratio.
+
+The same test on the background asymmetry shows the Ockham factor at work. $A_b=-0.040\pm0.018$ lies $2.3$ standard deviations from zero, yet the Savage-Dickey ratio gives $BF_{01}(A_b=0)\approx3.5$: the data mildly \emph{favor} a charge-symmetric background, because the gain in likelihood does not compensate for spreading the prior of $A_b$ over $(-1,1)$. A negative background asymmetry is plausible: besides combinatorial background, the sample contains misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $B^\pm\to\pi^\pm K^+K^-$ decays, with $\ACP$ values of their own, whose contribution grows when the kaon identification is loosened (Sec.~\ref{sec:syst}). $A_b$ is nevertheless kept free in the nominal model, which avoids imposing an assumption on the background that the frequentist analysis does not make; fixing $A_b=0$ is one of the variants of the systematic study (Sec.~\ref{sec:syst}).
+
+
+
+\subsection{Model Adequacy: Goodness of Fit and Posterior Predictive Check}
 \label{sec:bayes_gof}
-A binned comparison of data and posterior-median model ($\chi^2=\sum(\text{obs}-\text{exp})^2/\text{exp}$ over 50 bins of $10\,\MeV$ per charge, $100-12=88$ degrees of freedom) gives $\chi^2=164.1/88$ ($p=1.6\times10^{-6}$), with $95.4$ for $B^+$ and $68.7$ for $B^-$. The largest pulls, in the $B^+$ sample, sit on the two flanks of the peak, about $\pm3\sigma$ from $\mu$ (Fig.~\ref{fig:bayes_fit}): the observed signal shape has heavier tails than a Gaussian. Replacing the Gaussian by a Crystal Ball shape~\cite{skwarnicki}, a Gaussian core with a power-law low-mass tail,
-\begin{equation}
-S_{\mathrm{CB}}(x)\propto
-\begin{cases}
-e^{-x^2/2}, & x>-\beta,\\[2pt]
-\left(\frac{\kappa}{\beta}\right)^{\kappa} e^{-\beta^2/2}\left(\frac{\kappa}{\beta}-\beta-x\right)^{-\kappa}, & x\leq-\beta,
-\end{cases}
-\label{eq:cb}
-\end{equation}
-with $x=(m-\mu)/\sigma$, $\beta$ the point where the tail starts (in units of $\sigma$) and $\kappa$ its power, both free, improves the fit to $\chi^2=131.0/86$ ($p=1.3\times10^{-3}$, $\beta=1.71$, $\kappa=35$) but moves $\Araw$ by only $-0.0002$ (Table~\ref{tab:gof}). The asymmetry does not depend on the signal shape even though none of the models reaches $\chi^2/\text{ndof}\approx1$. The Gaussian is nevertheless kept as the nominal signal model, common to the two analyses: the Crystal Ball adds two tail parameters that are poorly constrained (its power $\kappa$ runs to large values), and the effect of the signal shape on $\Araw$ is covered by the systematic study (Sec.~\ref{sec:syst}).
-
-The background model is constrained by the data much more strongly. A single exponential per charge is rejected ($\chi^2=297.7/92$, $\Delta\chi^2=134$ for four fewer parameters), and so it is not used even as a systematic variant (Sec.~\ref{sec:syst}). A shape shared between the two charges ($\Delta\chi^2=10.0$ for three fewer parameters) and a charge-symmetric background ($\Delta\chi^2=5.7$ for one fewer) are acceptable descriptions and shift $\Araw$ by $-0.0037$ and $-0.0028$: the background treatment is the largest model dependence of the fit. The lower edge of the window is a compromise between two failures. Extending the window to $5050\,\MeV$ degrades the fit ($\chi^2=217.4/98$), because the double exponential no longer follows the background further below the peak; raising it to $5150\,\MeV$ removes most of the region that constrains the steep component, which becomes poorly identified -- the chain for its fraction $f_+$ mixes slowly ($N/\tau=10$) -- while $\Araw$ itself is unchanged ($-0.0444$).
-
-The binned $\chi^2$ uses the posterior medians only. A posterior predictive check~\cite{gelman_ppc} accounts for the posterior uncertainty and tests specific features of the data: for $1000$ parameter sets $\theta_j$ drawn from the posterior, a dataset $y^{\mathrm{rep}}_j$ is generated from the model, and a discrepancy $T(y,\theta_j)$ is computed both on the replica and on the data; the posterior predictive $p$-value is $p_B=P\big(T(y^{\mathrm{rep}},\theta)\geq T(y,\theta)\mid y\big)$. For the binned $\chi^2$ the replicas give $104\pm15$ and the data $175$ (median over $\theta_j$): none of the replicas reaches the observed value ($p_B<10^{-3}$), with the misfit concentrated in the $B^+$ sample ($p_B<10^{-3}$, against $0.03$ for $B^-$). The counting asymmetries of the whole window ($p_B=0.996$) and of the signal window ($0.99$) are reproduced, but this is expected and not informative: $A$ is a free parameter, so the replicas are centred on the observed value by construction. The asymmetry of the sidebands ($0.73$), which the fit constrains less directly, is also reproduced (Fig.~\ref{fig:bayes_ppc}). The check therefore shows that the model misdescribes the shape of the spectrum, mainly the signal tails, and does not reveal a charge-dependent distortion of the sidebands; that $\Araw$ does not depend on the signal shape is shown directly by its stability under the Crystal Ball model (Table~\ref{tab:gof}).
-
-\begin{table}[h]
+\emph{In short: the model does not reach $\chi^2/\mathrm{ndof}\approx1$ ($164.1/88$), mainly because the signal tails are heavier than a Gaussian, but $\Araw$ changes by only $-0.0002$ with a Crystal Ball signal.}
+\begin{table}[!t]
 \centering
 \begin{tabular}{lccc}
 \toprule
@@ -112,21 +84,41 @@ Single exponential & $-0.0480$ & $297.7/92$ & $2\times10^{-23}$ \\
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/bayes_nominal_mass_fit.pdf}
-\caption{Mass distributions of $B^+$ (left) and $B^-$ (right) candidates with the nominal model (posterior medians, logarithmic scale): total, signal and background components. Bottom: pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$.}
+\caption{Mass distributions of (a) $B^+$ and (b) $B^-$ candidates with the nominal model (posterior medians, logarithmic scale): total, signal and background components. Bottom: pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$.}
 \label{fig:bayes_fit}
 \end{figure*}
+
+A binned comparison of data and posterior-median model ($\chi^2=\sum(\text{obs}-\text{exp})^2/\text{exp}$ over 50 bins of $10\,\MeV$ per charge, $100-12=88$ degrees of freedom) gives $\chi^2=164.1/88$ ($p=1.6\times10^{-6}$), with $95.4$ for $B^+$ and $68.7$ for $B^-$. The largest pulls, in the $B^+$ sample, sit on the two flanks of the peak, about $\pm3\sigma$ from $\mu$ (Fig.~\ref{fig:bayes_fit}): the observed signal shape has heavier tails than a Gaussian. Replacing the Gaussian by a Crystal Ball shape~\cite{skwarnicki}, a Gaussian core with a power-law low-mass tail,
+\begin{equation}
+S_{\mathrm{CB}}(x)\propto
+\begin{cases}
+e^{-x^2/2}, & x>-\beta,\\[2pt]
+\left(\frac{\kappa}{\beta}\right)^{\kappa} e^{-\beta^2/2}\left(\frac{\kappa}{\beta}-\beta-x\right)^{-\kappa}, & x\leq-\beta,
+\end{cases}
+\label{eq:cb}
+\end{equation}
+with $x=(m-\mu)/\sigma$, $\beta$ the point where the tail starts (in units of $\sigma$) and $\kappa$ its power, both free, improves the fit to $\chi^2=131.0/86$ ($p=1.3\times10^{-3}$, $\beta=1.71$, $\kappa=35$) but moves $\Araw$ by only $-0.0002$ (Table~\ref{tab:gof}). The asymmetry does not depend on the signal shape even though none of the models reaches $\chi^2/\text{ndof}\approx1$. The Gaussian is nevertheless kept as the nominal signal model, common to the two analyses: the Crystal Ball adds two tail parameters that are poorly constrained (its power $\kappa$ runs to large values), and the effect of the signal shape on $\Araw$ is covered by the systematic study (Sec.~\ref{sec:syst}).
+
+The background model is constrained by the data much more strongly. A single exponential per charge is rejected ($\chi^2=297.7/92$, $\Delta\chi^2=134$ for four fewer parameters), and so it is not used even as a systematic variant (Sec.~\ref{sec:syst}). A shape shared between the two charges ($\Delta\chi^2=10.0$ for three fewer parameters) and a charge-symmetric background ($\Delta\chi^2=5.7$ for one fewer) are acceptable descriptions and shift $\Araw$ by $-0.0037$ and $-0.0028$: the background treatment is the largest model dependence of the fit. The lower edge of the window is a compromise between two failures. Extending the window to $5050\,\MeV$ degrades the fit ($\chi^2=217.4/98$), because the double exponential no longer follows the background further below the peak; raising it to $5150\,\MeV$ removes most of the region that constrains the steep component, which becomes poorly identified -- the chain for its fraction $f_+$ mixes slowly ($N/\tau=10$) -- while $\Araw$ itself is unchanged ($-0.0444$).
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/bayes_nominal_ppc.pdf}
-\caption{Posterior predictive check: distributions of three discrepancies over $1000$ datasets replicated from posterior draws, compared with the observed values. Left: binned $\chi^2$; center and right: counting asymmetry of the fit window and of the sidebands.}
+\caption{Posterior predictive check: distributions of three discrepancies over $1000$ datasets replicated from posterior draws, compared with the observed values. (a) binned $\chi^2$; (b) and (c) counting asymmetry of the fit window and of the sidebands.}
 \label{fig:bayes_ppc}
 \end{figure*}
 
-\subsection{Cross-Checks}
-\label{sec:bayes_checks}
-The fit was repeated separately on the two magnet polarities, whose left-right detection asymmetries are opposite and partially cancel in the combined sample: $\Araw(\text{down})=-0.0497\pm0.0112$ ($n=11{,}636$) and $\Araw(\text{up})=-0.0378\pm0.0129$ ($n=8095$). They differ by $0.7\sigma$, so there is no indication that the asymmetry is an artifact of one polarity (Fig.~\ref{fig:bayes_magnet}). A narrower prior, $A\in(-0.3,0.3)$, leaves the posterior unchanged ($\Araw=-0.0443$), as expected for a posterior far from the prior bounds; the prior width matters only for the Bayes factor (Sec.~\ref{sec:bayes_factor}).
+The binned $\chi^2$ uses the posterior medians only. A posterior predictive check~\cite{gelman_ppc} accounts for the posterior uncertainty and tests specific features of the data: for $1000$ parameter sets $\theta_j$ drawn from the posterior, a dataset $y^{\mathrm{rep}}_j$ is generated from the model, and a discrepancy $T(y,\theta_j)$ is computed both on the replica and on the data; the posterior predictive $p$-value is $p_B=P\big(T(y^{\mathrm{rep}},\theta)\geq T(y,\theta)\mid y\big)$. For the binned $\chi^2$ the replicas give $104\pm15$ and the data $175$ (median over $\theta_j$): none of the replicas reaches the observed value ($p_B<10^{-3}$), with the misfit concentrated in the $B^+$ sample ($p_B<10^{-3}$, against $0.03$ for $B^-$). The counting asymmetries of the whole window ($p_B=0.996$) and of the signal window ($0.99$) are reproduced, but this is expected and not informative: $A$ is a free parameter, so the replicas are centred on the observed value by construction. The asymmetry of the sidebands ($0.73$), which the fit constrains less directly, is also reproduced (Fig.~\ref{fig:bayes_ppc}). The check therefore shows that the model misdescribes the shape of the spectrum, mainly the signal tails, and does not reveal a charge-dependent distortion of the sidebands; that $\Araw$ does not depend on the signal shape is shown directly by its stability under the Crystal Ball model (Table~\ref{tab:gof}).
 
+
+
+
+
+
+
+\subsection{Robustness Checks: Polarity, Prior and Charm Vetoes}
+\label{sec:bayes_checks}
+\emph{In short: $\Araw$ agrees between the two magnet polarities ($0.7\sigma$) and does not depend on the prior; the $D^0$ veto moves it by $2.3$ times the expected statistical spread.}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/bayes_nominal_magnet.pdf}
@@ -134,60 +126,24 @@ The fit was repeated separately on the two magnet polarities, whose left-right d
 \label{fig:bayes_magnet}
 \end{figure}
 
-The sample contains $B^\pm$ decays through intermediate charm states, $B^\pm\to D^0K^\pm$, $J/\psi K^\pm$ and $\chi_{c0}K^\pm$ with $D^0$, $J/\psi$, $\chi_{c0}\to K^+K^-$, which are visible as peaks in the opposite-sign $m(K^+K^-)$ spectra. They are part of the $B^\pm\to K^\pm K^+K^-$ final state and are kept in the nominal sample; removing them changes the observable, from the asymmetry of all $B^\pm\to K^\pm K^+K^-$ decays to that of the charmless ones, so the vetoes are reported as an informative check rather than as a systematic variation. A candidate is vetoed if either opposite-sign pair, $m(H1,H2)$ or $m(H1,H3)$, lies within $\pm30\,\MeV$ of the $D^0$ or $J/\psi$ mass or within $\pm60\,\MeV$ of the $\chi_{c0}$ mass (world-average masses; the wider window for the $\chi_{c0}$ reflects its natural width). The $D^0$ veto alone keeps $18{,}744$ candidates and gives $\Araw=-0.0496\pm0.0088$; the three vetoes together keep $16{,}367$ and give $-0.0423\pm0.0094$. The shifts with respect to the nominal fit, $-0.0053$ and $+0.0020$, compare with expected statistical fluctuations of $0.0023$ and $0.0040$ for a subsample of the nominal one (Sec.~\ref{sec:syst}); the $D^0$ veto moves $\Araw$ by $2.3$ times this amount, i.e.\ the vetoed $D^0K^\pm$ candidates have a less negative asymmetry than the rest of the sample.
+The fit was repeated separately on the two magnet polarities, whose left-right detection asymmetries are opposite and partially cancel in the combined sample: $\Araw(\text{down})=-0.0497\pm0.0112$ ($n=11{,}636$) and $\Araw(\text{up})=-0.0378\pm0.0129$ ($n=8095$). They differ by $0.7\sigma$, so there is no indication that the asymmetry is an artifact of one polarity (Fig.~\ref{fig:bayes_magnet}). A narrower prior, $A\in(-0.3,0.3)$, leaves the posterior unchanged ($\Araw=-0.0443$), as expected for a posterior far from the prior bounds; the prior width matters only for the Bayes factor (Sec.~\ref{sec:bayes_factor}).
+
+
+
+The sample contains $B^\pm$ decays through intermediate charm states, $B^\pm\to D^0K^\pm$, $J/\psi K^\pm$ and $\chi_{c0}K^\pm$ with $D^0$, $J/\psi$, $\chi_{c0}\to K^+K^-$, which are visible as peaks in the opposite-sign $m(K^+K^-)$ spectra. They are part of the $B^\pm\to K^\pm K^+K^-$ final state and are kept in the nominal sample; removing them changes the observable, from the asymmetry of all $B^\pm\to K^\pm K^+K^-$ decays to that of the charmless ones, so the vetoes are reported as an informative check rather than as a systematic variation. A candidate is vetoed if either opposite-sign pair, $m(H1,H2)$ or $m(H1,H3)$, lies within $\pm30\,\MeV$ of the $D^0$ or $J/\psi$ mass or within $\pm60\,\MeV$ of the $\chi_{c0}$ mass (world-average masses; the wider window for the $\chi_{c0}$ reflects its natural width). The $D^0$ veto alone keeps $18{,}744$ candidates and gives $\Araw=-0.0496\pm0.0088$; the three vetoes together keep $16{,}367$ and give $-0.0423\pm0.0094$. The shifts with respect to the nominal fit, $-0.0053$ and $+0.0020$, compare with expected statistical fluctuations of $0.0023$ and $0.0040$ for a subsample of the nominal one (Sec.~\ref{sec:syst}); the $D^0$ veto moves $\Araw$ by $2.3$ times this amount, i.e.\ the vetoed $D^0K^\pm$ candidates have a less negative asymmetry than the rest of the sample. The analysis was also carried out with a minimal six-parameter model, with a narrower window and a single exponential background, before the nominal model was fixed; it gives a compatible result (Appendix~\ref{sec:bayes_minimal}).
 
 \subsection{Toy-MC Coverage Validation}
 \label{sec:bayes_toymc}
+\emph{In short: $200$ pseudo-experiments give coverage $0.65\pm0.03$ ($68\%$) and $0.93\pm0.02$ ($95\%$), consistent with nominal, with unbiased estimates and pulls of width $1.04$.}
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{figures/bayes_nominal_toys.pdf}
+\caption{Toy-MC validation, 200 pseudo-datasets. (a) Pulls $(\hat A-A_{\mathrm{true}})/\sigma(\hat A)$, with $\hat A$ and $\sigma(\hat A)$ the posterior median and standard deviation of each replica, compared with a standard normal. (b) Fraction of replicas whose 68\% and 95\% credible intervals contain the injected value, with binomial uncertainties, and the nominal coverage.}
+\label{fig:bayes_toys}
+\end{figure}
+
 The two kinds of interval have different meanings. A Bayesian credible interval is a statement about the parameter given the observed data and the prior: the true $A$ lies in it with the stated probability. A frequentist confidence interval, such as the profile-likelihood interval of Sec.~\ref{sec:frequentist}, is obtained by inverting a hypothesis test: the parameter is fixed and the interval is the random quantity, which changes from one repetition of the experiment to the next, and the confidence level is the fraction of repetitions in which it contains the true value (its coverage); it is not the probability that the true value lies in the interval observed. With flat priors and $\sim2\times10^4$ events the two intervals coincide numerically (Sec.~\ref{sec:bayes_posterior}), but only the confidence interval has the nominal coverage by construction, and only asymptotically; nothing guarantees it for the credible interval. To check this, 200 pseudo-datasets were generated from the fitted model (parametric bootstrap, with the posterior medians as ground truth and Poisson-fluctuated yields for each charge and component; the truncated Gaussian and exponential masses are drawn with the transformation method, i.e.\ by inverting their cumulative distributions) and each was refit with the nominal procedure and a $12{,}000$-step chain. The fraction of replicas whose interval contains the injected $A$ is $0.650\pm0.033$ for the 68\% CI and $0.930\pm0.015$ for the 95\% CI (binomial uncertainties), $1.0\sigma$ and $1.3\sigma$ below nominal: the coverage is consistent with nominal. The estimates themselves are unbiased and their spread matches the reported uncertainty (Fig.~\ref{fig:bayes_toys}): their mean differs from the injected value by $-0.0002\pm0.0006$, their standard deviation, $0.0088$, agrees with the posterior standard deviation of the data fit, $0.0085$, and the pulls have mean $-0.03\pm0.07$ and standard deviation $1.04$.
 
 The toy chains are shorter than the nominal one, and in 124 of the 200 replicas the slowest-mixing parameter, always a background-shape parameter, has $N/\tau<50$ (median $48$, minimum $22$). The criterion on the slowest parameter is conservative for the quantity tested here: for $A$ itself the median autocorrelation time is $156$ steps, so each chain is at least $45$ autocorrelation times long in $A$ and provides $\gtrsim1400$ effectively independent samples of it. The Monte Carlo error on the percentiles of $A$ is then a few per cent of $\sigma(A)$, negligible against the binomial uncertainty of the coverage, and the replicas with $N/\tau<50$ do not show a lower coverage than the others ($0.69$ for the $68\%$ interval, against $0.58\pm0.06$ for the $76$ replicas with $N/\tau\geq50$, whose coverage is $1.9$ standard deviations below nominal: the split was made after the fact and $200$ replicas cannot tell a trend from a fluctuation, and the check on the data of Sec.~\ref{sec:freq_coverage} gives the nominal coverage). This is a closure test of the inference procedure: since the toys are generated from the same model that is fitted, it does not probe the model mismatch of Sec.~\ref{sec:bayes_gof}, which is instead addressed by the systematic study.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/bayes_nominal_toys.pdf}
-\caption{Toy-MC validation, 200 pseudo-datasets. Left: pulls $(\hat A-A_{\mathrm{true}})/\sigma(\hat A)$, with $\hat A$ and $\sigma(\hat A)$ the posterior median and standard deviation of each replica, compared with a standard normal. Right: fraction of replicas whose 68\% and 95\% credible intervals contain the injected value, with binomial uncertainties, and the nominal coverage.}
-\label{fig:bayes_toys}
-\end{figure}
 
-\subsection{Local Dalitz-Plot Asymmetry (Fixed Binning)}
-\label{sec:bayes_dalitz}
-To test whether the asymmetry is uniform over phase space or concentrated in specific regions, each candidate was placed in the Dalitz plane using the two opposite-sign $K^+K^-$ invariant masses $m^2(H1,H2)$ and $m^2(H1,H3)$ (Sec.~\ref{sec:data_presel}), sorted into $m^2_{\mathrm{lo}}$ and $m^2_{\mathrm{hi}}$ to remove the $H2/H3$ labeling ambiguity. The plane $[0,16]\times[0,30]\,\GeV^2$ in $(m^2_{\mathrm{lo}},m^2_{\mathrm{hi}})$ was divided into an $8\times8$ grid, fixed before looking at the asymmetries. In each bin with at least 20 candidates (32 of 64), the local asymmetry $A_i=(N_i^--N_i^+)/N_i$, with binomial uncertainty $\sigma(A_i)=\sqrt{(1-A_i^2)/N_i}$, was compared with the global counting asymmetry $A_{\mathrm{glob}}=-0.043$ through $S_i=(A_i-A_{\mathrm{glob}})/\sigma(A_i)$; a comparison with zero would instead mostly reflect the global asymmetry itself.
-
-Two of the 32 bins have $|S_i|>3$, adjacent to each other at $m^2_{\mathrm{lo}}<4\,\GeV^2$ and $7.5<m^2_{\mathrm{hi}}<11.25\,\GeV^2$ ($S_i=-3.7$ and $-3.0$), with $A_i$ more negative than the global value; the bin below the first one ($m^2_{\mathrm{lo}}<2$, $3.75<m^2_{\mathrm{hi}}<7.5\,\GeV^2$) has $S_i=-2.98$, just under the threshold (Fig.~\ref{fig:bayes_dalitz}); about $0.09$ would be expected if the asymmetry were uniform, with a probability of $3\times10^{-3}$ for two or more. Because the bins are examined together this is a look-elsewhere situation: the number refers to any two of the $32$ bins, not to the two found, and the global homogeneity test that follows does not depend on which bins are singled out. The largest positive deviations, close to $+3$, lie at high $m^2_{\mathrm{hi}}$. A global test of homogeneity, $\chi^2=\sum_i S_i^2=80.8$ for 31 degrees of freedom ($p=3\times10^{-6}$), confirms that the local asymmetry is not uniform. Restricting the sample to the signal window ($|m-\mu|<2\sigma$, $n=15{,}130$, where the fitted model gives a signal purity of $\approx$96\%) gives the same picture -- three bins with $|S_i|>3$, $\chi^2=95.6/28$ -- so the structure is not produced by the combinatorial background. Nor is it produced by the charm contributions: with the $D^0$ veto two bins still exceed $3\sigma$ ($\chi^2=79.2/31$), and with all three vetoes one remains ($\chi^2=74.4/31$, $p=2\times10^{-5}$). It does not depend on the binning either: $6\times6$, $10\times10$ and $12\times12$ grids give $\chi^2=81.0/19$, $97.1/43$ and $120.0/60$ ($p\leq7\times10^{-6}$).
-
-Two null tests check the procedure itself. Shuffling the charges among the candidates removes any local asymmetry while keeping the occupancy of the bins and the global asymmetry of the data: over $2000$ permutations the $8\times8$ grid gives $\chi^2=31.4\pm8.1$, as expected for 31 degrees of freedom, and no permutation reaches the observed value (permutation $p<5\times10^{-4}$; $p=1\times10^{-3}$ for the $12\times12$ grid). The phase-space simulation of the record, without asymmetry by construction, gives $\chi^2=40.0/30$ ($p=0.11$) with the same procedure on the whole sample; on $500$ subsamples of the size of the data the mean $\chi^2/\mathrm{ndof}$ is $1.16$ and $13\%$ have $p<0.05$, so the $\chi^2$ $p$-values are slightly optimistic (the binomial uncertainty is evaluated at the observed $A_i$). The permutation test, whose null distribution is exact, gives the same conclusion: the non-uniformity is a property of the data.
-
-The structure does not depend on the magnet polarity either. The left-right part of the detection asymmetry changes sign when the polarity is reversed, so a local asymmetry produced by it would appear with opposite deviations in the two samples. In the region of the two significant bins ($m^2_{\mathrm{lo}}<4\,\GeV^2$, $7.5<m^2_{\mathrm{hi}}<11.25\,\GeV^2$) the counting asymmetry is $-0.129\pm0.023$ with the magnet down and $-0.126\pm0.028$ with the magnet up, although the global asymmetries of the two samples differ ($-0.051$ and $-0.032$), and the two maps agree bin by bin ($\chi^2=23.0$ for 29 bins, $p=0.78$). This split does not test the part of the detection asymmetry that does not change sign with the polarity, the different interaction of $K^+$ and $K^-$ with the detector material.
-
-The ordered Dalitz plot (Fig.~\ref{fig:dalitz_region}, left) shows the two-body resonances of the decay: the narrow $\phi(1020)$ band at the kinematic edge, $m^2_{\mathrm{lo}}\approx1.04\,\GeV^2$, and the charm bands of the $D^0$, $J/\psi$ and $\chi_{c0}$. The negative local asymmetry is not produced by the $\phi(1020)$: its band ($|m_{\mathrm{lo}}-m_\phi|<10\,\MeV$, $1964$ candidates) has $A_{\mathrm{count}}=-0.004\pm0.023$, while the significant bins without it have $-0.145\pm0.019$. The asymmetry sits in the low-mass $K^+K^-$ region just above the $\phi$, which is where the published analysis of the same data located it, defining the region $1.2<m^2_{\mathrm{lo}}<2.0\,\GeV^2$, $m^2_{\mathrm{hi}}<15\,\GeV^2$ and measuring there $\Araw=-0.239\pm0.020$~\cite{lhcb_cpv_2013}. Since that region is fixed by the paper and not chosen on our data, it allows an unbiased comparison: fitting the $2146$ candidates in it with the nominal model gives $\Araw=-0.234\pm0.025$ (Bayesian; the chain mixes slowly in the poorly constrained second background exponential, $N/\tau=15$) and $-0.237\pm0.025$ (frequentist, $9.4\sigma$ from zero), reproducing the published value; the mass spectra of the two charges in the region (Fig.~\ref{fig:dalitz_region}, right) show the difference directly. Three caveats apply: the binning is coarse and was not optimized; the asymmetries are computed on all candidates, without the sWeight-based background subtraction that a full analysis would use (Sec.~\ref{sec:limitations}); and, since $\Araw$ is not corrected for detection asymmetries, local variations can still be partly instrumental -- the $K^+$/$K^-$ interaction asymmetry depends on the kaon momenta, which are correlated with the position in the Dalitz plane, and is not removed by the polarity split. Section~\ref{sec:ml_kmeans} revisits the same question with an adaptive, data-driven partition ($K$-means).
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_dalitz_maps.pdf}
-\caption{Fixed $8\times8$ Dalitz-plot binning, all candidates in the fit window: number of candidates per bin (left), local asymmetry $A_i$ for bins with $\geq20$ candidates (center), and local significance with respect to the global asymmetry, $(A_i-A_{\mathrm{glob}})/\sigma(A_i)$ (right). The two bins with $|S_i|>3$ are outlined. Dashed lines: the squared masses of the $D^0$, $J/\psi$ and $\chi_{c0}$, in either opposite-sign pair.}
-\label{fig:bayes_dalitz}
-\end{figure*}
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/ml_nominal_dalitz_region.pdf}
-\caption{Left: ordered Dalitz plot of the candidates in the fit window, with the squared masses of the $\phi(1020)$, $D^0$, $J/\psi$ and $\chi_{c0}$ (dashed) and the region of the published analysis of the same data~\cite{lhcb_cpv_2013} (box). Right: mass spectra of $B^+$ and $B^-$ candidates in that region, same binning: the $B^-$ peak is visibly smaller.}
-\label{fig:dalitz_region}
-\end{figure*}
-
-\subsection{Bayesian and Frequentist Intervals at Low Statistics}
-\label{sec:bayes_lowstat}
-With $\sim$$2\times10^4$ candidates the posterior is Gaussian and, with flat priors, the Bayesian and frequentist results coincide by construction (Sec.~\ref{sec:bayes_posterior}). To find where they could differ, the same likelihood was analysed with both methods on pseudo-datasets of $N=50$, $150$, $500$ and $2000$ candidates, $300$ for each size. The model is the six-parameter one of Sec.~\ref{sec:bayes_minimal} (Gaussian signal, one exponential background shared by the charges), which stays identifiable down to a few tens of events; the parameters are those of its fit to the data, with the yields rescaled. Each replica is analysed with the MCMC (median and equal-tailed credible intervals) and by maximum likelihood with \texttt{iminuit} (Hesse intervals, and Minos intervals from the profile likelihood and Wilks' theorem).
-
-The two methods agree at every size (Fig.~\ref{fig:bayes_lowstat}). The coverages of the three intervals are compatible with nominal and with each other, the posterior median and the maximum-likelihood estimate differ on average by $5\%$ of the statistical uncertainty at $N=50$ and by less above, and the credible intervals stay symmetric (at $N=50$ the shortest chain is only $\approx10$ autocorrelation times long, so the Monte Carlo error on the interval endpoints is larger there). The asymmetry is a ratio of Poisson yields, whose likelihood is close to Gaussian already with a few tens of signal events: in this problem flat-prior credible intervals and profile-likelihood confidence intervals give the same answer, and Wilks' theorem holds, down to $N=50$. The two approaches differ in what the interval means and in hypothesis testing (Sec.~\ref{sec:bayes_factor}), not in the numbers. At $N=2000$ all three intervals over-cover slightly ($0.98$--$0.99$ for the 95\% interval); since the effect is the same for the three methods, it is a feature of this set of replicas rather than of either inference.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_lowstat.pdf}
-\caption{Coverage of the 68\% (left) and 95\% (right) intervals on $A$ vs the number of candidates, for the Bayesian credible interval, the profile-likelihood (Minos) interval and the Hesse interval of the same likelihood; 300 pseudo-datasets per point, binomial uncertainties. The dashed lines mark the nominal coverage ($1\sigma$, $2\sigma$; the Bayesian 95\% interval is the 2.5--97.5\% one).}
-\label{fig:bayes_lowstat}
-\end{figure*}
-
-\subsection{A Minimal Model as Cross-Check}
-\label{sec:bayes_minimal}
-Before the nominal model was fixed, the same analysis was carried out with a minimal six-parameter model: a narrower window, $[5150,5450]\,\MeV$, which excludes most of the rising background below the peak, a single exponential background with a shape and a yield shared by the two charges, and the same Gaussian signal. On its $17{,}839$ candidates it gives $\Araw=-0.0497$ (68\% CI $[-0.058,-0.041]$) with $\chi^2/\text{ndof}=127.4/54$, and $-0.0457$ when the background yields of the two charges are left free. Its toy validation, with 500 pseudo-datasets, gives coverage consistent with nominal (0.664 and 0.962 for the 68\% and 95\% intervals). The difference from the nominal result, $0.005$, is driven by the background treatment, as in the systematic study of Sec.~\ref{sec:syst}, and is smaller than the statistical uncertainty.

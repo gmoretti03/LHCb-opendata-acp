@@ -51,8 +51,9 @@ for sel_, lab, col in ((q > 0, r"$B^+$", C["pos"]), (q < 0, r"$B^-$", C["neg"]))
     axs[0].hist(m[sel_], bins=bins, histtype="step", lw=1.5, color=col, label=lab)
 for sel_, lab, col in ((mag == "down", "Magnet down", C["down"]), (mag == "up", "Magnet up", C["up"])):
     axs[1].hist(m[sel_], bins=bins, histtype="step", lw=1.5, color=col, label=lab)
-for a in axs:
+for k_, a in enumerate(axs):
     a.set_xlabel(r"$m(KKK)$ [MeV]"); a.set_ylabel(f"Candidates / {BIN:.0f} MeV"); a.legend()
+    ps.letter(a, "ab"[k_])
 plt.tight_layout()
 fig.savefig(os.path.join(OUT, "mass_spectrum.pdf"))
 print("saved mass_spectrum.pdf")
