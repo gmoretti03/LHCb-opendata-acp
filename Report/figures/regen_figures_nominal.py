@@ -204,7 +204,7 @@ for a, key, lab in ((axs[0], "chi2", r"$\chi^2$ (10 MeV bins, both charges)"), (
     a.hist(r_, bins=40, histtype="stepfilled", color=C["replica"], alpha=0.5, label="Replicated data")
     a.axvline(np.median(o), color=C["observed"], lw=2, label=f"Observed ($p_B={ppc['p_B'][key]:.3g}$)" if ppc['p_B'][key] >= 0.01 else "Observed ($p_B<0.001$)")
     a.set_xlabel(lab); a.legend(loc="upper right", fontsize=10)
-axs[0].set_ylabel("Replicas")
+axs[0].set_ylabel("Replicates")
 plt.tight_layout()
 save(fig, "bayes_nominal_ppc.pdf")
 

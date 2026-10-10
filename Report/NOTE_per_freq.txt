@@ -1,0 +1,38 @@
+NOTE PER FREQ - review di Report/sections/frequentist.tex e del notebook Frequentist_Analysis_Bis.ipynb
+(2026-10-10; tutti i numeri sono stati ricalcolati dai dati grezzi / dai JSON / dagli output del notebook)
+
+A. AFFERMAZIONI DA CORREGGERE
+1. Sezione "Systematic Uncertainties and Stability Checks" (riga ~81 e ~84): "always within the 68% CI" e
+   "maximum observed variation ... below the statistical uncertainty (Delta A < sigma_stat)".
+   Falso per la scansione PID: nella cella del notebook "max |A_CP - nominal| = 0.01263" contro sigma_stat = 0.0085.
+   (Scansione finestra: 0.0048, regione di segnale: 0.00006 -> quelle vanno bene.)
+   I campioni sono annidati, quindi il confronto corretto non e' con sigma_stat ma con sigma_B = sqrt(|sigma_var^2 - sigma_nom^2|)
+   (Barlow); vedi Sec. Systematics: scansione fine, tutti gli shift entro 1.3 sigma_B sul lato stretto, 2.5 sigma_B a ProbK > 0.30.
+2. Scansione PID: i tagli non sono variati solo "verso piu' purezza": la griglia comprende anche tagli piu' larghi.
+3. "Signal Region Scan": manca il numero (max |Delta A| = 6e-5) e la frase e' poco chiara
+   ("Changing the extremes of the signal region not significant fluctation...").
+
+B. NUMERI
+4. N_s = 15,328 (non 15,327): il fit da 15327.95. Il valore bayesiano e' 15,328 +- 133.
+5. chi2/ndof = 160/88: ricalcolato 159.4/88 -> p = 4.9e-6 (non 4.8e-6; con 160 verrebbe 4.3e-6).
+6. Le cifre chi2/ndof = 160/88 (10 MeV, 2x50 bin) e 294/92 (singola esponenziale) NON sono nel notebook pubblicato:
+   gli output pubblicati sono 441.7/388 (p = 0.031) e 576.3/392 con 200 bin. Aggiungere le celle (o pubblicare la versione locale).
+   Idem per il Minos al 95% ([-0.0607, -0.0275]) se non e' prodotto dal notebook pubblicato.
+
+C. TESTO / NOTAZIONE
+7. Z-score: il corso definisce Z = Phi^-1(1-p) a una coda. Il p-value da q(0) = 27 e' 2.05e-7 e 5.20 sigma = sqrt(q) (bilatero):
+   scrivere esplicitamente "Z = sqrt(q)". Con la formula a una coda verrebbero 5.06 sigma.
+8. Vocabolario: dire che q(A) = 2 Delta NLL; la figura di coverage usa "t" e "toys", il testo "q" e "replicas" -> uniformare.
+   Citare almeno H0/H1 e che il rapporto di verosimiglianza e' il test ottimale (Neyman-Pearson).
+9. Mancano: la sideband subtraction (A_raw = -0.0503 +- 0.0083, notebook cella 29) e il paragrafo sulla coverage.
+10. Refusi: "fluctation", "preliminar", "Confidence Interval, CI"; righe % commentate da ripulire (alcune contengono numeri vecchi,
+    es. 407/386, -0.0006).
+
+D. CODICE (modello "uguale" al bayesiano solo nella forma)
+11. Limiti del fit frequentista: mu in (5200, 5350), lam in (1e-6, 1), nessun ordinamento lam1 > lam2;
+    prior bayesiano: mu in (5260, 5310), lam1 <= 0.1, lam2 < lam1. Allineare o dirlo nel testo.
+
+E. FIGURA frequentist_wilks_coverage.pdf
+12. Percorso gia' corretto (figures/...). Resta lo stile: usa matplotlib di default invece di Report/figures/plot_style.py;
+    asse "t = 2ln(L0/Lbest)" -> q(A_true); legenda "Toys" -> "Replicas (bootstrap)".
+13. Aggiungere il PDF al commit (non e' ancora tracciato).
