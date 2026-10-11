@@ -48,10 +48,23 @@ The preselection dominates, through the single variant $\texttt{ProbK}>0.6$ ($+0
 
 Each method computes $\sigma_B$ from its own uncertainties (posterior standard deviation, Hesse error). Since $\sigma_B$ is the difference of two nearly equal uncertainties, it is sensitive to small differences between them, including the Monte Carlo noise of the posterior standard deviation (1--3\%), and a variant close to the threshold can be classified differently by the two methods: $\texttt{ProbPi}<0.4$ counts for the Bayesian fit ($|\Delta|=0.00223$, $\sigma_B=0.00220$) and not for the frequentist one ($0.00204$ vs $0.00229$). This does not affect the result, since the uncertainty of each group is set by its largest shift, the same in both methods.
 
-\subsection{Stability Scans of the Frequentist Analysis}
+\subsection{Stability Checks of the Frequentist Fit}
+\label{sec:freq_syst}
 \label{sec:syst_scans}
 \emph{In short: the fit does not depend on the fit window or on the signal region, and the only dependence that matters is the one on the particle-identification requirements.}
-The frequentist fit was also repeated on two-dimensional grids of the selection and fit settings (Sec.~\ref{sec:freq_syst}), with the nominal double-exponential model at each point. These scans test the stability of $\Araw$ and do not enter the systematic uncertainty, whose variants and combination rule are those above. Three results are used here, from the same notebook as the nominal fit.
+While the systematic uncertainties study is shared with the Bayesian approach -- and discussed in detail in Sec.~\ref{sec:syst} -- three specific stability checks were performed within the frequentist one, to evaluate the robustness of the fitted raw asymmetry $\Araw$. Each test consists of a two-dimensional grid scan in which two selection or fit parameters are varied simultaneously, performing a simultaneous fit with the nominal double-exponential background model at each point and observing the stability of $\Araw$.
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Fit Window Scan:} The lower and upper boundaries of the invariant mass fit window, nominally set to $[5100, 5600]\,\MeV$, were scanned over the ranges $[5000, 5200]\,\MeV$ and $[5350, 6100]\,\MeV$, respectively, with a 50 \MeV step. This test evaluates the sensitivity of $\Araw$ to the exponential background parametrization, and is useful to choose the nominal window: too small or too asymmetric fit window produces unstable fit, due to worse background estimation.
+
+    \item \textbf{Signal Region Scan:} Changing the extremes of the signal region not significant fluctation in $\Araw$ are observed, suggesting that the sideband preliminar fit could be avoided.
+
+    \item \textbf{Particle Identification Cut Scan:} The preselection cuts on the final-state kaon PID likelihoods (\texttt{ProbK} and \texttt{ProbPi}) were varied simultaneously towards a better kaon purity (larger than $0.5$ for kaons, smaller than $0.5$ for pions). This influences significantly the $\Araw$ estimation, but always within the $68\%$ CI, confirming the cut selection as reasonable.
+\end{enumerate}
+
+Across all scan configurations, the maximum observed variation in $\Araw$ remains below the statistical uncertainty ($\Delta \Araw < \sigma_{\mathrm{stat}}$), demonstrating the stability of the nominal fit result.
+
+\paragraph*{Numbers.} Three results are used here, from the same notebook as the nominal fit; they do not enter the systematic uncertainty, whose variants and combination rule are those above.
 \begin{itemize}[leftmargin=*,itemsep=1pt]
 \item \emph{Fit window}: the maximum shift with respect to the nominal fit is $0.0048$ over the grid of lower and upper edges (standard deviation $0.0018$, mean statistical uncertainty $0.0085$); the extreme corners are the smallest and most asymmetric windows, where the background shape is least constrained.
 \item \emph{Signal region} (used only to start the sideband fit): the shift is at most $6\times10^{-5}$, so the result does not depend on it.

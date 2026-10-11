@@ -53,3 +53,30 @@ I. TEORIA (2026-10-11): nel corpo (sottosezione "Profile Likelihood and Confiden
    nella nuova Appendix D "Statistical and Machine-Learning Background"; la tua sottosezione puo' rimandare ad esse.
    Vocabolario: nel resto del report ora si dice "toy-MC experiments"; nella tua parte restano "toys"/"replicas" (bootstrap): va bene
    "replicas" solo per il ricampionamento dai dati, "toy MC" per le simulazioni dal modello.
+
+J. [FATTO da Giacomo/Claude, 2026-10-11] ATTENZIONE: frequentist.tex e' stato modificato due volte (rifai il pull prima di toccarlo):
+   1. "the nominal model is the Bayesian one" -> "the nominal model is the common one of Sec. III"; "the same physical mass model as the
+      Bayesian analysis (Sec. III)" -> "the common mass model of Sec. III". Il modello nominale e' uno solo, i due approcci sono sullo
+      stesso piano.
+   2. La sottosezione "Systematic Uncertainties and Stability Checks" (tre scansioni) e' stata SPOSTATA IN BLOCCO, parola per parola,
+      nella Sec. VI (Systematic Uncertainties and Result), sottosezione "Stability Checks of the Frequentist Fit", sorgente
+      Report/split_body_appendix/sections_full/systematics.tex. NON reintrodurla in frequentist.tex. Se correggi A1-A3 modifica li' il
+      testo (stesse parole nelle tre voci dell'elenco; la frase "ΔA < σ_stat" in fondo e' ancora tua, il paragrafo "Numbers" che segue
+      riporta i numeri corretti: max PID 0.0126 vs σ_stat 0.0085 -> confronto con σ_B).
+
+L. [FATTO da Giacomo/Claude, 2026-10-11: inseriti in frequentist.tex, correggi i numeri se cambiano] RIASSUNTI IN CORSIVO: tutte le altre sottosezioni del report hanno, subito dopo il titolo e l'etichetta, una riga
+   \emph{In short: ...} con il risultato. Mancano nelle tue quattro. Proposta, da mettere dopo \label{...} di ciascuna (numeri dal tuo
+   testo; correggi se cambiano):
+
+   Mass Model and Fit Strategy:
+   \emph{In short: the nominal model of Sec.~\ref{sec:model}, fitted by extended unbinned maximum likelihood with a background started from the sidebands, gives $N_s=15{,}328\pm133$ and $N_b=4{,}403\pm82$; a single-exponential background is rejected.}
+
+   Separate vs. Simultaneous Fit:
+   \emph{In short: fitting the two charges separately gives $\Araw=-0.0442\pm0.0087$ and fitting them simultaneously with $A$ as a parameter gives $-0.0441\pm0.0085$: the two parametrizations agree.}
+
+   Profile Likelihood and Confidence Interval:
+   \emph{In short: $\hat A=-0.0441$ with 68\% and 95\% Minos intervals $[-0.0526,-0.0356]$ and $[-0.0607,-0.0275]$; $A=0$ is rejected with $q(0)\simeq27$, $p=2.05\times10^{-7}$ ($5.20\sigma$).}
+
+   Coverage of the Wilks Intervals:
+   \emph{In short: in $1000$ bootstrap replicas the $68\%$ interval contains the fitted value in $68.4\pm1.5\%$ of the cases, the nominal coverage.}
+   (N_s: usa 15,328, vedi B4; "Separate vs. Simultaneous": le due stime e le incertezze sono quelle del tuo testo.)

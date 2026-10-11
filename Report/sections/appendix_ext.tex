@@ -110,22 +110,6 @@ The toy chains are shorter than the nominal one, and in 124 of the 200 replicas 
 \FloatBarrier
 
 
-\section{Stability Scans of the Frequentist Analysis}
-\label{app:ext_syst}
-\subsection{Stability Scans of the Frequentist Analysis}
-\label{sec:syst_scans}
-\emph{In short: the fit does not depend on the fit window or on the signal region, and the only dependence that matters is the one on the particle-identification requirements.}
-The frequentist fit was also repeated on two-dimensional grids of the selection and fit settings (Sec.~\ref{sec:freq_syst}), with the nominal double-exponential model at each point. These scans test the stability of $\Araw$ and do not enter the systematic uncertainty, whose variants and combination rule are those above. Three results are used here, from the same notebook as the nominal fit.
-\begin{itemize}[leftmargin=*,itemsep=1pt]
-\item \emph{Fit window}: the maximum shift with respect to the nominal fit is $0.0048$ over the grid of lower and upper edges (standard deviation $0.0018$, mean statistical uncertainty $0.0085$); the extreme corners are the smallest and most asymmetric windows, where the background shape is least constrained.
-\item \emph{Signal region} (used only to start the sideband fit): the shift is at most $6\times10^{-5}$, so the result does not depend on it.
-\item \emph{Particle-identification requirements}: on the grid of the two cuts the maximum shift is $0.0126$ (standard deviation $0.0046$). This is larger than the statistical uncertainty of the nominal fit, $0.0085$, but the grid contains much smaller samples, with a mean statistical uncertainty of $0.0112$; the relevant comparison for nested samples is with $\sigma_B$, as in the one-cut-at-a-time scan above, where no shift exceeds $1.3\,\sigma_B$ on the tight side.
-\end{itemize}
-The window and signal-region scans are therefore consistent with a fit that does not depend on these choices, and the preselection remains the dominant contribution, as quantified by the systematic study.
-
-\FloatBarrier
-
-
 \section{Extended Validation of the Estimator}
 \label{app:ext_valid}
 \subsection{Size and Power of the Test of $A=0$}
@@ -168,6 +152,7 @@ The $p$-values of the binned $\chi^2$ rely on the asymptotic distribution with $
 \label{app:ext_dalitz}
 \subsection{Null Tests of the Local-Asymmetry Procedure}
 \label{sec:dalitz_null}
+\emph{In short: permuting the charges gives $\chi^2=31.4\pm8.1$, as expected, and never reaches the observed $80.8$; the phase-space simulation is consistent with no asymmetry, with slightly optimistic $\chi^2$ $p$-values.}
 Two null tests check the procedure itself. Shuffling the charges among the candidates removes any local asymmetry while keeping the occupancy of the bins and the global asymmetry of the data: over $2000$ permutations the $8\times8$ grid gives $\chi^2=31.4\pm8.1$, as expected for 31 degrees of freedom, and no permutation reaches the observed value (permutation $p<5\times10^{-4}$; $p=1\times10^{-3}$ for the $12\times12$ grid). The phase-space simulation of the record, without asymmetry by construction, gives $\chi^2=40.0/30$ ($p=0.11$) with the same procedure on the whole sample; on $500$ subsamples of the size of the data the mean $\chi^2/\mathrm{ndof}$ is $1.16$ and $13\%$ have $p<0.05$, so the $\chi^2$ $p$-values are slightly optimistic (the binomial uncertainty is evaluated at the observed $A_i$). The permutation test, whose null distribution is exact, gives the same conclusion: the non-uniformity is a property of the data.
 
 \FloatBarrier
@@ -316,6 +301,7 @@ Architecture & Layers & Dropout & Learning rate & CV AUC \\
 
 \subsection{High-Background Sample}
 \label{sec:ml_highbkg}
+\emph{In short: with a looser identification ($33{,}328$ candidates, purity $94\%$) the classifier raises the purity to $99\%$ and $\sigma(\Araw)$ from $0.0072$ to $0.0070$ at best, but cannot remove the misidentified background that moves $\Araw$ to $-0.055$.}
 In the nominal sample the selection cannot improve the precision because there is little background to remove. To test it where the background is larger, the same study was repeated on a sample with a looser kaon identification, $\texttt{ProbK}>0.3$ ($33{,}328$ candidates, signal purity $94\%$ within $\pm2\sigma$ of the peak), with the reference classifier retrained on the weak labels of this sample (test AUC $0.895$). Cleaning it with a cut on the classifier score is compared with tightening the identification cut, at equal signal efficiency (Fig.~\ref{fig:ml_high_bkg}). The classifier removes the combinatorial background with little signal loss -- a cut at $0.5$ keeps $93\%$ of the signal and raises the purity to $99\%$ -- and at any efficiency gives a slightly smaller $\sigma(\Araw)$ than the identification cut. The gain is small ($0.0072\to0.0070$ at best): loosening the identification adds mostly signal ($+47\%$ with respect to the nominal selection), and the background under the peak stays a small fraction. The classifier also cannot remove the background that matters for $\Araw$. With the looser identification the asymmetry moves to $-0.055$, as expected from misidentified $B^\pm\to\pi^\pm K^+K^-$ decays (Sec.~\ref{sec:syst}); tightening the identification cut to $\texttt{ProbK}>0.4$ moves it back by $+0.008$ ($3.3$ times the nested-sample spread), while the score cut that keeps $93\%$ of the signal moves it by $-0.001$. Misidentified $B$ decays peak close to the $B$ mass, so the mass-based weak labels mark them as signal-like: the CWoLa classifier, by construction, cannot learn to reject a background that sits under the peak, and particle identification remains necessary.
 
 
@@ -351,12 +337,14 @@ The main text cites Fig.~\ref{fig:ml_threshold}, Fig.~\ref{fig:ml_mass_cut}; the
 \label{app:ext_comp}
 \subsection{Numerical Agreement}
 \label{sec:comparison_numbers}
+\emph{In short: the two fits agree to the quoted digits (estimates differ by $0.0002$, both uncertainties are $0.0085$, systematic uncertainties $0.0070$ and $0.0072$); sideband subtraction gives $-0.0503\pm0.0083$.}
 The two fits of the same model agree to the precision of the quoted digits: the estimates differ by $0.0002$ ($0.02$ standard deviations), the uncertainties are both $0.0085$, the $68\%$ and $95\%$ intervals differ by at most $0.0002$, and the shifts of the thirteen systematic variants agree within $0.0005$, with the same group uncertainties for the window ($0.0014$) and the preselection ($0.0058$) and slightly different ones for the background ($0.0037$ against $0.0040$) and the signal model ($0.0002$ against $0.0006$), so that the total systematic uncertainties are $0.0070$ and $0.0072$ (Sec.~\ref{sec:syst}). A third estimate, by sideband subtraction (counting in the signal region after removing the background expected from the sideband fit), gives $-0.0503\pm0.0083$, which differs from the nominal value by $0.006$, less than one standard deviation, on the same candidates. This is expected, and it is not by itself a validation of the model. With $\sim2\times10^4$ candidates and flat priors the posterior is proportional to the likelihood, the likelihood is close to a Gaussian in $A$, and the posterior mode coincides with the maximum-likelihood estimate; the posterior median, the posterior mean and the mode differ by less than $2\times10^{-4}$. What the agreement does show is that neither the sampling (MCMC) nor the asymptotic approximations (Hesse, Wilks) introduce a bias: the Bayesian intervals have the coverage of the frequentist ones (Sec.~\ref{sec:bayes_toymc}) and the profile-likelihood interval has the coverage assumed by Wilks' theorem (Sec.~\ref{sec:freq_coverage}).
 
 The agreement does not extend to the validity of the model itself. Both methods describe the same spectrum with the same Gaussian signal and double-exponential background, and neither reaches $\chi^2/\mathrm{ndof}\approx1$ (Sec.~\ref{sec:bayes_gof}); what protects $\Araw$ is that its value does not depend on the signal shape (shift $-0.0002$ with a Crystal Ball) and that the background treatment, the largest model dependence, is included in the systematic uncertainty.
 
 \subsection{Machine Learning and the Fits}
 \label{sec:comparison_ml}
+\emph{In short: the machine-learning selection is a cross-check: a cut at $0.5$ leaves $\Araw$ within its expected spread with both methods, does not improve the precision, and cannot remove the misidentified decays.}
 The machine-learning selection was used as a cross-check of the fits, not as a replacement. A cut on the gradient-boosting score at $0.5$ keeps $92\%$ of the fitted signal and $36\%$ of the background and does not change $\Araw$ beyond its expected statistical spread, with both inference methods ($-0.0451\pm0.0087$ Bayesian, $-0.0447\pm0.0086$ frequentist, against $-0.0443$ and $-0.0441$ for the full window). It does not improve the precision, $0.0087$ against $0.0085$, because the nominal sample contains little background. In a sample with a looser kaon identification ($33{,}328$ candidates) the classifier raises the purity from $94\%$ to $99\%$ and reduces $\sigma(\Araw)$ from $0.0072$ to $0.0070$ at best, and it cannot remove the misidentified decays that move $\Araw$ to $-0.055$: they peak under the signal, and weak labels derived from the mass spectrum mark them as signal-like (Sec.~\ref{sec:ml_stability}). The useful role of the machine-learning module is therefore that of a consistency test of the asymmetry under a different event selection, and the partition of the Dalitz plane that it provides (below). Gaining precision or controlling the peaking background would require labels that carry information beyond the mass, such as simulation.
 
 \subsection{Bayesian and Frequentist Intervals at Low Statistics}

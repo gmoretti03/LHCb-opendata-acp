@@ -13,7 +13,6 @@ SRC=HERE+'/sections_full'; DST=os.path.abspath(HERE+'/../sections')
 SPEC = {
  'data':       ('Dataset and Selection Details','app:ext_data',[],['tab:cutflow']),
  'bayesian':   ('Extended Bayesian Analysis','app:ext_bayes',['Model Adequacy','Robustness Checks','Toy-MC Coverage'],[]),
- 'systematics':('Stability Scans of the Frequentist Analysis','app:ext_syst',['Stability Scans'],[]),
  'validation': ('Extended Validation of the Estimator','app:ext_valid',['Size and Power','Goodness of Fit'],['fig:validation_injection','fig:validation_null']),
  'dalitz':     ('Extended Dalitz-Plane Analysis','app:ext_dalitz',[],[]),
  'ml':         ('Extended Machine Learning Module','app:ext_ml',['Model Comparison','Regularization','Uncertainty Quantification','K-means','Hyperparameter'],['fig:ml_features','fig:ml_threshold','fig:ml_mass_cut','fig:ml_high_bkg']),
@@ -45,12 +44,14 @@ for f,(title,lab,subs,floats) in SPEC.items():
     if f=='dalitz':
         m_=re.search(r'\n(Two null tests check the procedure itself.*?)\n\n',body,re.S)
         if m_:
-            moved.append('\\subsection{Null Tests of the Local-Asymmetry Procedure}\n\\label{sec:dalitz_null}\n'+m_.group(1)+'\n'); leads.append(('Null Tests of the Local-Asymmetry Procedure',''))
+            _L='\\emph{In short: permuting the charges gives $\\chi^2=31.4\\pm8.1$, as expected, and never reaches the observed $80.8$; the phase-space simulation is consistent with no asymmetry, with slightly optimistic $\\chi^2$ $p$-values.}'
+            moved.append('\\subsection{Null Tests of the Local-Asymmetry Procedure}\n\\label{sec:dalitz_null}\n'+_L+'\n'+m_.group(1)+'\n'); leads.append(('Null Tests of the Local-Asymmetry Procedure',_L))
             body=body.replace(m_.group(1)+'\n','')
     if f=='ml':
         m_=re.search(r'\n(In the nominal sample the selection cannot improve.*?)\n\n',body,re.S)
         if m_:
-            moved.append('\\subsection{High-Background Sample}\n\\label{sec:ml_highbkg}\n'+m_.group(1)+'\n'); leads.append(('High-Background Sample',''))
+            _L='\\emph{In short: with a looser identification ($33{,}328$ candidates, purity $94\\%$) the classifier raises the purity to $99\\%$ and $\\sigma(\\Araw)$ from $0.0072$ to $0.0070$ at best, but cannot remove the misidentified background that moves $\\Araw$ to $-0.055$.}'
+            moved.append('\\subsection{High-Background Sample}\n\\label{sec:ml_highbkg}\n'+_L+'\n'+m_.group(1)+'\n'); leads.append(('High-Background Sample',_L))
             body=body.replace(m_.group(1)+'\n','')
     def take(mm):
         for l in floats:
@@ -87,7 +88,7 @@ for f,(title,lab,subs,floats) in SPEC.items():
         refs=', '.join(('Fig.' if l.startswith('fig') else 'Table')+'~\\ref{%s}'%l for l in fl_cited)
         tail+='\\clearpage\n\\subsection{Float%s Cited in the Main Text}\nThe main text cites %s; %s placed here to keep the main text within its page limit.\n\n'%('s' if len(fb)>1 else '',refs,'they are' if len(fb)>1 else 'it is')+'\n'.join(fb)+'\n'
     e+='\n'.join(moved)+tail+'\n\\FloatBarrier\n'; ext.append((f,e))
-order=['data','bayesian','systematics','validation','dalitz','ml','comparison']
+order=['data','bayesian','validation','dalitz','ml','comparison']
 open(DST+'/appendix_ext.tex','w').write('\n\n'.join(e for k in order for (f,e) in ext if f==k))
 m=open(DST+'/../main.tex').read()
 for n in WHOLE: m=m.replace('\\input{sections/%s}\n'%n,'')

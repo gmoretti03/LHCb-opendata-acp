@@ -1,6 +1,7 @@
 \appendix
 \section{Full results tables}
 \label{sec:appendix}
+\emph{In short: all the fits of the nominal model and of its variants, with the Bayesian and frequentist results side by side.}
 
 \begin{table*}[t]
 \centering
@@ -77,10 +78,12 @@ Architecture & Layers & Dropout & Learning rate & CV AUC \\
 
 \section{Minimal Model as a Cross-Check}
 \label{sec:bayes_minimal}
+\emph{In short: a six-parameter model on a narrower window gives $\Araw=-0.0497$ (68\% CI $[-0.058,-0.041]$), compatible with the nominal result within its uncertainty; it is the model used for the low-statistics comparison.}
 Before the nominal model was fixed, the same analysis was carried out with a minimal six-parameter model: a narrower window, $[5150,5450]\,\MeV$, which excludes most of the rising background below the peak, a single exponential background with a shape and a yield shared by the two charges, and the same Gaussian signal. On its $17{,}839$ candidates it gives $\Araw=-0.0497$ (68\% CI $[-0.058,-0.041]$) with $\chi^2/\text{ndof}=127.4/54$, and $-0.0457$ when the background yields of the two charges are left free. Its toy validation, with 500 pseudo-datasets, gives coverage consistent with nominal (0.664 and 0.962 for the 68\% and 95\% intervals). The difference from the nominal result, $0.005$, is driven by the background treatment, as in the systematic study of Sec.~\ref{sec:syst}, and is smaller than the statistical uncertainty.
 
 \section{Frequentist and Bayesian Quantities Used in the Text}
 \label{sec:appendix_freq}
+\emph{In short: what the Hesse and Minos uncertainties are, the test statistic and the $p$-value of $A=0$, the convention $Z=\sqrt{q}$ for the significance, and the Savage-Dickey derivation of the Bayes factor.}
 This appendix states in plain terms what the frequentist uncertainties and the test of $A=0$ are (Sec.~\ref{sec:frequentist}), and how the Bayes factor of Sec.~\ref{sec:bayes_factor} follows from the evidence.
 
 \paragraph{Hesse uncertainties.}

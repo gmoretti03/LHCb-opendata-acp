@@ -43,18 +43,19 @@ The posterior is very close to Gaussian, with standard deviation $0.0085$; its 6
 \subsection{Bayes Factors}
 \label{sec:bayes_factor}
 \emph{In short: decisive evidence against $A=0$ (Bayes factor $BF_{10}\approx9\times10^3$); the evidence for a background asymmetry is not significant, and depends on the prior width.}
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_savage_dickey.pdf}
-\caption{Savage-Dickey ratio for (a) $A$ and (b) $A_b$: marginal posterior (histogram of the chain and Gaussian approximation) and prior density, logarithmic scale. The Bayes factor $BF_{01}$ is the ratio of the two densities at zero (dots). For $A$ the posterior density at zero is $10^{-4}$ times the prior one; for $A_b$, $2.3$ standard deviations from zero, it is higher than the prior density, and the data favor $A_b=0$.}
-\label{fig:bayes_sd}
-\end{figure*}
 
 The Bayes factor compares two hypotheses through their evidences (marginal likelihoods), $BF_{10}=P(D\mid H_1)/P(D\mid H_0)$ with $P(D\mid H_i)=\int\mathcal{L}(D\mid\theta,H_i)\,\pi(\theta\mid H_i)\,d\theta$: it is the factor by which the data update the prior odds of the two hypotheses, and it requires proper priors. Computing the evidence of each hypothesis by direct numerical integration is impractical for a 12-parameter posterior. When the null hypothesis fixes one parameter, $H_0$: $A=0$, nested in $H_1$ ($A$ free), and the priors on the other parameters are shared, the Bayes factor reduces to the Savage-Dickey density ratio~\cite{dickey1971} (Appendix~\ref{sec:appendix_freq}),
 \[
 BF_{01} = \frac{p(A=0\mid D)}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
 \]
 With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the posterior odds of $H_0$ against $H_1$. $A=0$ lies $5.2$ posterior standard deviations from the median, in a tail where the chain contains essentially no samples, so a kernel density estimate of $p(A=0\mid D)$ would only reflect the kernel tails of the few most extreme samples. We therefore use the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), with the mean and standard deviation of the chain, which gives $BF_{01}\approx1.1\times10^{-4}$ ($BF_{10}\approx9\times10^{3}$, $\ln BF_{10}\approx9.1$): decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys} ($BF_{10}>100$). As for any Bayes factor of a point null against a free parameter, the value scales with the prior width -- the Ockham factor built into the Bayes factor, which penalizes a free parameter in proportion to the prior volume it is allowed to explore, and the mechanism behind Lindley's paradox: with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_checks}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged. Figure~\ref{fig:bayes_sd} shows the two densities of the ratio; the dependence on the prior width, the evidence computed by direct integration and the equality of the background shapes of the two charges are in Appendix~\ref{sec:appendix_checks}.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_savage_dickey.pdf}
+\caption{Savage-Dickey ratio for (a) $A$ and (b) $A_b$: marginal posterior (histogram of the chain and Gaussian approximation) and prior density, logarithmic scale. The Bayes factor $BF_{01}$ is the ratio of the two densities at zero (dots). For $A$ the posterior density at zero is $10^{-4}$ times the prior one; for $A_b$, $2.3$ standard deviations from zero, it is higher than the prior density, and the data favor $A_b=0$.}
+\label{fig:bayes_sd}
+\end{figure*}
 
 The same test on the background asymmetry shows the Ockham factor at work. $A_b=-0.040\pm0.018$ lies $2.3$ standard deviations from zero, yet the Savage-Dickey ratio gives $BF_{01}(A_b=0)\approx3.5$: the data mildly \emph{favor} a charge-symmetric background, because the gain in likelihood does not compensate for spreading the prior of $A_b$ over $(-1,1)$. A negative background asymmetry is plausible: besides combinatorial background, the sample contains misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $B^\pm\to\pi^\pm K^+K^-$ decays, with $\ACP$ values of their own, whose contribution grows when the kaon identification is loosened (Sec.~\ref{sec:syst}). $A_b$ is nevertheless kept free in the nominal model, which avoids imposing an assumption on the background that the frequentist analysis does not make; fixing $A_b=0$ is one of the variants of the systematic study (Sec.~\ref{sec:syst}).
 
