@@ -1,0 +1,29 @@
+\section{Mass Model and Likelihood}
+\label{sec:model}
+\label{sec:bayes_model}
+\emph{In short: a Gaussian signal and a double-exponential background for each charge, with the raw asymmetry $A$ as a parameter of the fit; both inference methods use the same likelihood.}
+The mass spectrum of each charge sample is described by a signal-plus-background mixture on the nominal fit window $[5100,5600]\,\MeV$ (Sec.~\ref{sec:data_mass}),
+\begin{equation}
+f^{\pm}(m)=N_s^{\pm}\,S(m;\mu,\sigma)+N_b^{\pm}\,B^{\pm}(m),
+\label{eq:mixture}
+\end{equation}
+where $S$ is a Gaussian truncated to the window, with mean $\mu$ and width $\sigma$ shared by the two charges, and the background is a double exponential with a shape of its own for each charge,
+\[
+B^{\pm}(m)=f_{\pm}\,E(m;\lambda_{1}^{\pm})+(1-f_{\pm})\,E(m;\lambda_{2}^{\pm}),
+\]
+with $E(m;\lambda)\propto e^{-\lambda m}$ a truncated exponential normalized on the window. The steep component ($\lambda_1$) describes the rise of the background towards the lower edge of the window, the slow one ($\lambda_2$) the combinatorial background under and above the peak. The mixture is invariant under the exchange $(\lambda_1,f)\leftrightarrow(\lambda_2,1-f)$, which would give the posterior two identical modes (label switching); the ordering $\lambda_1>\lambda_2$ removes this symmetry. Signal and background yields are split between the charges as
+\[
+N_s^{\pm}=\tfrac{N_s}{2}(1\mp A),\qquad N_b^{\pm}=\tfrac{N_b}{2}(1\mp A_b),
+\]
+so that $A=(N_s^--N_s^+)/(N_s^-+N_s^+)$, the raw asymmetry \Araw of Eq.~\eqref{eq:araw}, is a fit parameter rather than being derived from two independent yields (it is the parameter of interest, POI; all the other parameters are nuisance parameters), and the background asymmetry $A_b$ is free. The parameter vector has twelve components, $\theta=(N_s,N_b,A,A_b,\mu,\sigma,\lambda_1^{\pm},\lambda_2^{\pm},f_{\pm})$.
+
+Given the data $D=\{(m_i,q_i)\}_{i=1}^{N}$ (mass and charge of each candidate), the extended unbinned likelihood of the two charge samples is
+\begin{multline}
+\mathcal{L}(D\mid\theta)\propto e^{-(N_s+N_b)}
+\prod_{i:\,q_i=+1}\Big[N_s^{+}S(m_i)+N_b^{+}B^{+}(m_i)\Big] \\
+\times\prod_{i:\,q_i=-1}\Big[N_s^{-}S(m_i)+N_b^{-}B^{-}(m_i)\Big],
+\label{eq:likelihood}
+\end{multline}
+where $S(m_i)\equiv S(m_i;\mu,\sigma)$. The likelihood is extended because the signal and background yields are parameters of the fit, which is what the Poisson term $e^{-(N_s+N_b)}$ accounts for. It is the common ground of the two mass analyses: Sec.~\ref{sec:frequentist} maximizes it, and Sec.~\ref{sec:bayesian} multiplies it by a prior to obtain a posterior.
+
+The extended form differs from a mixture of signal and background with a fixed total number of candidates and a signal fraction only through the Poisson term for the total yield, which carries no information on $A$ and does not change its estimate; it is used because the yields of the two charges are the natural parameters of the model. Bayes' theorem applied to the fitted yields gives the probability that a candidate in the signal window $|m-\mu|<2\sigma$ is a signal decay, about $96\%$: a purity, not a property of the single candidate, which depends on the signal fraction of the sample (here $78\%$ of the candidates in the fit window).

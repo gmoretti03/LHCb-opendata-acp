@@ -13,7 +13,7 @@ The shift $\Delta=\Araw^{\mathrm{var}}-\Araw^{\mathrm{nom}}$ of a variant is not
 
 \begin{table*}[t]
 \centering
-\begin{tabular}{llrrrrr}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{llrrrrr}
 \toprule
 Group & Variant & $n$ & $\Delta$ Bayes & $\sigma_B$ Bayes & $\Delta$ freq. & $\sigma_B$ freq. \\
 \midrule
@@ -34,7 +34,7 @@ Preselection & $\texttt{ProbK}>0.4$ & $26553$ & $-0.0032$ & $0.0038$ & $-0.0032$
 \multicolumn{3}{l}{Group uncertainties: window / background / signal / preselection} & \multicolumn{2}{c}{$0.0014/0.0037/0.0002/0.0058$} & \multicolumn{2}{c}{$0.0014/0.0040/0.0006/0.0058$} \\
 \multicolumn{3}{l}{Total (quadrature)} & \multicolumn{2}{c}{$0.0070$} & \multicolumn{2}{c}{$0.0072$} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Systematic study common to the Bayesian and frequentist fits: shift of $\Araw$ for each variant and, for the variants that change the sample, the expected statistical spread $\sigma_B$ of the shift. The largest contributing shift of each group is in bold. The single exponential is rejected by the data and excluded. For the window $[5150,5600]$ the frequentist uncertainty is scaled from the number of events, since the Hesse matrix of that fit is not accurate.}
 \label{tab:syst}
 \end{table*}
@@ -48,13 +48,4 @@ The preselection dominates, through the single variant $\texttt{ProbK}>0.6$ ($+0
 
 Each method computes $\sigma_B$ from its own uncertainties (posterior standard deviation, Hesse error). Since $\sigma_B$ is the difference of two nearly equal uncertainties, it is sensitive to small differences between them, including the Monte Carlo noise of the posterior standard deviation (1--3\%), and a variant close to the threshold can be classified differently by the two methods: $\texttt{ProbPi}<0.4$ counts for the Bayesian fit ($|\Delta|=0.00223$, $\sigma_B=0.00220$) and not for the frequentist one ($0.00204$ vs $0.00229$). This does not affect the result, since the uncertainty of each group is set by its largest shift, the same in both methods.
 
-\subsection{Stability Scans of the Frequentist Analysis}
-\label{sec:syst_scans}
-\emph{In short: the fit does not depend on the fit window or on the signal region, and the only dependence that matters is the one on the particle-identification requirements.}
-The frequentist fit was also repeated on two-dimensional grids of the selection and fit settings (Sec.~\ref{sec:freq_syst}), with the nominal double-exponential model at each point. These scans test the stability of $\Araw$ and do not enter the systematic uncertainty, whose variants and combination rule are those above. Three results are used here, from the same notebook as the nominal fit.
-\begin{itemize}[leftmargin=*,itemsep=1pt]
-\item \emph{Fit window}: the maximum shift with respect to the nominal fit is $0.0048$ over the grid of lower and upper edges (standard deviation $0.0018$, mean statistical uncertainty $0.0085$); the extreme corners are the smallest and most asymmetric windows, where the background shape is least constrained.
-\item \emph{Signal region} (used only to start the sideband fit): the shift is at most $6\times10^{-5}$, so the result does not depend on it.
-\item \emph{Particle-identification requirements}: on the grid of the two cuts the maximum shift is $0.0126$ (standard deviation $0.0046$). This is larger than the statistical uncertainty of the nominal fit, $0.0085$, but the grid contains much smaller samples, with a mean statistical uncertainty of $0.0112$; the relevant comparison for nested samples is with $\sigma_B$, as in the one-cut-at-a-time scan above, where no shift exceeds $1.3\,\sigma_B$ on the tight side.
-\end{itemize}
-The window and signal-region scans are therefore consistent with a fit that does not depend on these choices, and the preselection remains the dominant contribution, as quantified by the systematic study.
+\paragraph*{Further material} is in Appendix~\ref{app:ext_syst}. \emph{Stability Scans of the Frequentist Analysis.} the fit does not depend on the fit window or on the signal region, and the only dependence that matters is the one on the particle-identification requirements.

@@ -16,17 +16,17 @@ The frequentist way of eliminating the nuisance parameters is to profile them, $
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lcc}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lcc}
 \toprule
  & Frequentist & Bayesian \\
 \midrule
 Magnet down & $-0.0492\pm0.0111$ & $-0.0497\pm0.0112$ \\
 Magnet up & $-0.0374\pm0.0131$ & $-0.0378\pm0.0129$ \\
-Combination of the two & $-0.0443\pm0.0084$ (sum of profiles) & $-0.0446\pm0.0086$ (sequential update) \\
+Combination of the two & $-0.0443\pm0.0084$ & $-0.0446\pm0.0086$ \\
 Joint fit & $-0.0441\pm0.0085$ & $-0.0443\pm0.0085$ \\
 \bottomrule
-\end{tabular}
-\caption{$\Araw$ for the two magnet polarities and their combination, by the two methods.}
+\end{tabular}}
+\caption{$\Araw$ for the two magnet polarities and their combination, by the two methods; the frequentist combination is the sum of the profile likelihoods of the two polarities, the Bayesian one the sequential update of the posterior.}
 \label{tab:checks_polarity}
 \end{table}
 
@@ -49,7 +49,7 @@ The posterior was reweighted, without new sampling, to other priors: logarithmic
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lccc}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lccc}
 \toprule
 Prior & $A$ (median) & $68\%$ interval & ESS \\
 \midrule
@@ -60,7 +60,7 @@ Uniform in $1/\lambda$ & $-0.0444$ & $[-0.0526,-0.0360]$ & $153$ \\
 Flat in $(N_s^+,N_s^-)$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $19999$ \\
 Flat in $(N_s^\pm)$ and $(N_b^\pm)$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $19993$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Posterior of $A$ under alternative priors, by importance reweighting of the chain; ESS: effective sample size of the $20{,}000$ thinned samples.}
 \label{tab:checks_prior}
 \end{table}
@@ -83,7 +83,7 @@ Table~\ref{tab:checks_hpd} compares the equal-tailed interval (percentiles $15.9
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lcccc}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lcccc}
 \toprule
 Parameter & median & equal-tailed & HPD & skewness \\
 \midrule
@@ -93,7 +93,7 @@ $f_+$ & $0.114$ & $[0.089,0.145]$ & $[0.084,0.138]$ & $+0.90$ \\
 $f_-$ & $0.209$ & $[0.174,0.248]$ & $[0.168,0.241]$ & $+0.33$ \\
 $\lambda_1^+$ [MeV$^{-1}$] & $0.0350$ & $[0.0281,0.0431]$ & $[0.0274,0.0423]$ & $+0.52$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Equal-tailed and highest-posterior-density $68\%$ intervals and skewness of the marginal posteriors.}
 \label{tab:checks_hpd}
 \end{table}
@@ -113,11 +113,11 @@ Section~\ref{sec:bayes_gof} noted that the counting asymmetries of the window ar
 \subsection{Asymptotic Behavior of the Estimator}
 \label{sec:checks_scaling}
 \emph{In short: with the number of candidates the bias tends to zero, the spread scales as $N^{-1/2}$ and the distribution of $\hat A$ becomes Gaussian, as the central limit theorem and the asymptotic properties of the maximum-likelihood estimate predict.}
-The $300$ pseudo-datasets for each size of the low-statistics study (Sec.~\ref{sec:bayes_lowstat}) show the approach to the asymptotic limit (Table~\ref{tab:checks_scaling}): the bias decreases from $-0.0085$ at $N=50$ to $+0.0009$ at $N=2000$, the product of the spread and $\sqrt N$ is constant, and the distribution of $\hat A$ is compatible with a Gaussian from $N=150$ (Shapiro-Wilk $p>0.3$), with a mild excess kurtosis at $N=50$ ($p=0.03$). Linear propagation of the Poisson uncertainty of the signal yield, $\sigma(A)=\sqrt{(1-A^2)/N_s}$ with $N_s=0.86\,N$, gives $0.153$ at $N=50$ and $0.024$ at $N=2000$, against spreads of $0.161$ and $0.023$: it is correct at the few-per-cent level, because the fit also has to determine the background, and the first-order expansion is not the limiting approximation. At the full sample the spread of the estimator equals the Hesse uncertainty (Sec.~\ref{sec:validation_estimator}).
+The $300$ toy-MC datasets for each size of the low-statistics study (Sec.~\ref{sec:bayes_lowstat}) show the approach to the asymptotic limit (Table~\ref{tab:checks_scaling}): the bias decreases from $-0.0085$ at $N=50$ to $+0.0009$ at $N=2000$, the product of the spread and $\sqrt N$ is constant, and the distribution of $\hat A$ is compatible with a Gaussian from $N=150$ (Shapiro-Wilk $p>0.3$), with a mild excess kurtosis at $N=50$ ($p=0.03$). Linear propagation of the Poisson uncertainty of the signal yield, $\sigma(A)=\sqrt{(1-A^2)/N_s}$ with $N_s=0.86\,N$, gives $0.153$ at $N=50$ and $0.024$ at $N=2000$, against spreads of $0.161$ and $0.023$: it is correct at the few-per-cent level, because the fit also has to determine the background, and the first-order expansion is not the limiting approximation. At the full sample the spread of the estimator equals the Hesse uncertainty (Sec.~\ref{sec:validation_estimator}).
 
 \begin{table}[h]
 \centering
-\begin{tabular}{rcccccc}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{rcccccc}
 \toprule
 $N$ & bias & sd$(\hat A)$ & sd$\cdot\sqrt N$ & skewness & ex.\ kurtosis & Shapiro $p$ \\
 \midrule
@@ -126,8 +126,8 @@ $150$ & $-0.0051$ & $0.0920$ & $1.13$ & $+0.16$ & $+0.31$ & $0.59$ \\
 $500$ & $-0.0022$ & $0.0501$ & $1.12$ & $-0.08$ & $+0.38$ & $0.52$ \\
 $2000$ & $+0.0009$ & $0.0225$ & $1.01$ & $-0.20$ & $-0.20$ & $0.32$ \\
 \bottomrule
-\end{tabular}
-\caption{Distribution of the maximum-likelihood estimate of $A$ in $300$ pseudo-datasets of $N$ candidates (six-parameter model of Sec.~\ref{sec:bayes_minimal}).}
+\end{tabular}}
+\caption{Distribution of the maximum-likelihood estimate of $A$ in $300$ toy-MC datasets of $N$ candidates (six-parameter model of Sec.~\ref{sec:bayes_minimal}).}
 \label{tab:checks_scaling}
 \end{table}
 
@@ -179,13 +179,13 @@ The systematic study counts a variant that changes the sample only if its shift 
 
 \subsection{Neyman Construction and Dependence on the Momentum}
 \label{sec:checks_belt}
-\emph{In short: inverting the test of $A_{\mathrm{true}}$ with pseudo-experiments gives the same interval as the likelihood ratio, and $\Araw$ does not depend on the momentum of the $B$.}
-The confidence interval is, by definition, the set of $A_{\mathrm{true}}$ not rejected by the data. It was constructed directly (Fig.~\ref{fig:checks_belt}): for $11$ values of $A_{\mathrm{true}}$ between $-0.1$ and $0$, $300$ pseudo-experiments give the central $68\%$ and $95\%$ ranges of $\hat A$ (the belt), and the interval is the set of $A_{\mathrm{true}}$ whose $68\%$ range contains the observed $\hat A=-0.0441$: $[-0.0528,-0.0351]$, against $[-0.0526,-0.0356]$ from the profile likelihood (Minos), which is the content of Wilks' theorem for this problem.
+\emph{In short: inverting the test of $A_{\mathrm{true}}$ with toy-MC experiments gives the same interval as the likelihood ratio, and $\Araw$ does not depend on the momentum of the $B$.}
+The confidence interval is, by definition, the set of $A_{\mathrm{true}}$ not rejected by the data. It was constructed directly (Fig.~\ref{fig:checks_belt}): for $11$ values of $A_{\mathrm{true}}$ between $-0.1$ and $0$, $300$ toy-MC experiments give the central $68\%$ and $95\%$ ranges of $\hat A$ (the belt), and the interval is the set of $A_{\mathrm{true}}$ whose $68\%$ range contains the observed $\hat A=-0.0441$: $[-0.0528,-0.0351]$, against $[-0.0526,-0.0356]$ from the profile likelihood (Minos), which is the content of Wilks' theorem for this problem.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/validation_neyman_belt.pdf}
-\caption{Confidence belt of $\hat A$ from pseudo-experiments (central $68\%$ and $95\%$ ranges) as a function of $A_{\mathrm{true}}$; the vertical line is the observed $\hat A$ and the dashed lines the resulting $68\%$ interval.}
+\caption{Confidence belt of $\hat A$ from toy-MC experiments (central $68\%$ and $95\%$ ranges) as a function of $A_{\mathrm{true}}$; the vertical line is the observed $\hat A$ and the dashed lines the resulting $68\%$ interval.}
 \label{fig:checks_belt}
 \end{figure}
 
@@ -218,12 +218,12 @@ The profile likelihood of $A$ is given in Table~\ref{tab:checks_qa}, together wi
 
 \begin{table}[h]
 \centering
-\begin{tabular}{r|ccccccccc}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{r|ccccccccc}
 \toprule
 $A$ & $-0.08$ & $-0.07$ & $-0.06$ & $-0.05$ & $-0.04$ & $-0.03$ & $-0.02$ & $-0.01$ & $+0.00$ \\
 $q(A)$ & $17.9$ & $9.3$ & $3.5$ & $0.5$ & $0.2$ & $2.8$ & $8.1$ & $16.1$ & $27.0$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Profile likelihood ratio $q(A)=-2\Delta\ln L$ of the nominal fit (other parameters profiled); minimum at $-0.0441$, Minos intervals $[-0.0526,-0.0356]$ ($68\%$) and $[-0.0607,-0.0275]$ ($95\%$).}
 \label{tab:checks_qa}
 \end{table}
