@@ -223,7 +223,7 @@ The two measures of the relevance of a feature available here -- the Random Fore
 \subsection{Regularization, Bias-Variance, and Calibration}
 \label{sec:ml_regcal}
 \emph{In short: the linear model does not overfit, gradient boosting overfits beyond $\sim$150 stages without losing test AUC, and class weights bias the probabilities, which an isotonic recalibration corrects (Brier score $0.122\to0.062$) without changing the ranking.}
-A scan of the regularization strength of the logistic regression ($30$ log-spaced values of $C=1/\alpha$, cross-validated) gives the same optimal AUC for the $L1$ and $L2$ penalties ($0.7686$, at $C_{L1}=0.12$ and $C_{L2}=9.2$), and the optimal $L1$ penalty sets no coefficient to zero: the linear model does not overfit, and its limitation is the linear decision boundary, not the variance.
+A scan of the regularization strength of the logistic regression (penalties and loss functions are defined in Appendix~\ref{app:theory}) ($30$ log-spaced values of $C=1/\alpha$, cross-validated) gives the same optimal AUC for the $L1$ and $L2$ penalties ($0.7686$, at $C_{L1}=0.12$ and $C_{L2}=9.2$), and the optimal $L1$ penalty sets no coefficient to zero: the linear model does not overfit, and its limitation is the linear decision boundary, not the variance.
 
 \begin{figure*}[t]
 \centering

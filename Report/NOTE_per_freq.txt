@@ -45,3 +45,11 @@ G. AGGIORNAMENTO (2026-10-10, sera): nuova Sec. VII "Validation of the Estimator
    Nei tuoi punti 5-6: il chi2 160/88 (p = 4.8e-6) e' corretto e ora e' riprodotto da lf.gof_joint(bins=50) in freq_validation.py (modo "gof").
 H. Con i toy: coverage al valore adattato 0.70 +- 0.01 (68%) e 0.95 +- 0.01 (95%), bias -0.0001 +- 0.0003, sd(Â)/Hesse = 0.97.
    Il tuo bootstrap (68.4 +- 1.5%) e' coerente.
+
+I. TEORIA (2026-10-11): nel corpo (sottosezione "Profile Likelihood and Confidence Interval") il paragrafo
+   "By Wilks' theorem, q(A) follows a chi2 with one degree of freedom ... intervals q<=1 and q<=3.84 (MINOS)" e' dentro righe commentate (%).
+   Va scommentato: senza di esso il lettore non vede perche' gli intervalli sono q(A)<=1 e <=3.84. La teoria di dettaglio (Fisher/Hesse,
+   Neyman-Pearson, Wilks, Z = sqrt(q), Savage-Dickey) e' nell'Appendix C, e le altre definizioni (estesa, MCMC, regolarizzazione, CWoLa...)
+   nella nuova Appendix D "Statistical and Machine-Learning Background"; la tua sottosezione puo' rimandare ad esse.
+   Vocabolario: nel resto del report ora si dice "toy-MC experiments"; nella tua parte restano "toys"/"replicas" (bootstrap): va bene
+   "replicas" solo per il ricampionamento dai dati, "toy MC" per le simulazioni dal modello.
