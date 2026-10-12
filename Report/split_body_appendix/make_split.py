@@ -43,7 +43,7 @@ for f,(title,lab,subs,floats) in SPEC.items():
     if f=='dalitz':
         m_=re.search(r'\n(Two null tests check the procedure itself.*?)\n\n',body,re.S)
         if m_:
-            _L='\\emph{In short: permuting the charges gives $\\chi^2=31.4\\pm8.1$, as expected, and never reaches the observed $80.8$; the phase-space simulation is consistent with no asymmetry, with slightly optimistic $\\chi^2$ $p$-values.}'
+            _L='\\emph{In short: permuting the charges gives $\\chi^2=31.5\\pm8.4$, as expected, and never reaches the observed $80.8$; the phase-space simulation is consistent with no asymmetry, with slightly optimistic $\\chi^2$ $p$-values.}'
             moved.append('\\subsection{Null Tests of the Local-Asymmetry Procedure}\n\\label{sec:dalitz_null}\n'+_L+'\n'+m_.group(1)+'\n'); leads.append(('Null Tests of the Local-Asymmetry Procedure',_L))
             body=body.replace(m_.group(1)+'\n','')
     if f=='ml':

@@ -14,7 +14,7 @@ The priors are uniform, with independent ranges except for the ordering of the b
 \pi(\theta)\propto\mathbf{1}\left[\theta\in\Theta\right],
 \label{eq:prior}
 \end{equation}
-and inside it the posterior is proportional to the likelihood. A flat prior is not invariant under reparametrization, but with $\sim$$2\times10^4$ events the posterior is dominated by the likelihood, as the prior-sensitivity check of Appendix~\ref{sec:bayes_checks} confirms for $A$. The evidence $p(D)$ is a constant: the MCMC samples $\mathcal{L}\,\pi$ without it, and the Savage-Dickey ratio of Sec.~\ref{sec:bayes_factor} avoids it as well; the marginal posterior of $A$ is the histogram of the $A$ component of the chain.
+and inside it the posterior is proportional to the likelihood. With $\sim$$2\times10^4$ events the posterior is dominated by the likelihood, as the prior-sensitivity check of Appendix~\ref{sec:bayes_checks} confirms for $A$. The evidence $p(D)$ is a constant: the MCMC samples $\mathcal{L}\,\pi$ without it, and the Savage-Dickey ratio of Sec.~\ref{sec:bayes_factor} avoids it as well; the marginal posterior of $A$ is the histogram of the $A$ component of the chain.
 
 \subsection{MCMC Sampling and Convergence Diagnostics}
 \label{sec:bayes_mcmc}
@@ -38,12 +38,12 @@ The posterior was sampled with the affine-invariant ensemble sampler of Goodman 
 \label{fig:bayes_corner}
 \end{figure*}
 
-The marginal posterior on the raw asymmetry gives (median and equal-tailed credible intervals, CI)
+Figure~\ref{fig:bayes_fit} compares the nominal model with the data of the two charges: it follows the spectrum over two orders of magnitude, and the pulls show signal tails heavier than a Gaussian, whose effect on $\Araw$ is negligible (Appendix~\ref{sec:bayes_gof}). The marginal posterior on the raw asymmetry gives (median and equal-tailed credible intervals, CI)
 \begin{gather*}
 \Araw = -0.0443, \\
 68\%~\text{CI}~[-0.0528,-0.0358], \\ 95\%~\text{CI}~[-0.0608,-0.0276].
 \end{gather*}
-The posterior is very close to Gaussian (standard deviation $0.0085$), so equal-tailed and highest-posterior-density intervals coincide; with uniform priors its mode, $-0.0441$, is the maximum-likelihood estimate and the result can be compared directly with the frequentist fit (Sec.~\ref{sec:frequentist}, Appendix~\ref{sec:appendix_freq}). The other physics parameters are $N_s=15{,}328\pm133$, $N_b=4404\pm82$, $A_b=-0.040\pm0.018$, $\mu=5284.39\pm0.16\,\MeV$ and $\sigma=18.00\pm0.14\,\MeV$ (Fig.~\ref{fig:bayes_corner}). $A$ is almost uncorrelated with them; its largest correlation, $-0.17$, is with $A_b$: conditioning on $A_b=0$ moves $A$ to $-0.0475$, as the fit with a charge-symmetric background does ($-0.0471$, Sec.~\ref{sec:syst}). The fitted model is compared with the data of the two charges in Fig.~\ref{fig:bayes_fit}: the pulls show the heavier signal tails of the data, whose effect on $\Araw$ is negligible (Appendix~\ref{sec:bayes_gof}).
+The posterior is very close to Gaussian (standard deviation $0.0085$), so equal-tailed and highest-posterior-density intervals coincide; with uniform priors its mode, $-0.0441$, is the maximum-likelihood estimate and the result can be compared directly with the frequentist fit (Sec.~\ref{sec:frequentist}, Appendix~\ref{sec:appendix_freq}). The other physics parameters (Fig.~\ref{fig:bayes_corner}) are $N_s=15{,}328\pm133$, $N_b=4404\pm82$, $A_b=-0.040\pm0.018$, $\mu=5284.39\pm0.16\,\MeV$ and $\sigma=18.00\pm0.14\,\MeV$. $A$ is almost uncorrelated with them, which is why profiling (frequentist) and marginalizing (Bayesian) the nuisance parameters give the same result; the largest correlation, $-0.17$, is with $A_b$: conditioning on $A_b=0$ moves $A$ to $-0.0475$, as the fit with a charge-symmetric background does ($-0.0471$, Sec.~\ref{sec:syst}).
 
 
 
@@ -66,6 +66,6 @@ $A=0$ lies $5.2$ posterior standard deviations from the median, where the chain 
 \end{figure}
 
 
-The same test on the background asymmetry shows the Ockham factor at work: $A_b=-0.040\pm0.018$ is $2.3$ standard deviations from zero, yet $BF_{01}(A_b=0)\approx3.5$, because the likelihood gain does not compensate for spreading the prior over $(-1,1)$. A negative $A_b$ is plausible given the misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $\pi^\pm K^+K^-$ decays; $A_b$ is kept free in the nominal model and fixing it to zero is one of the systematic variants (Sec.~\ref{sec:syst}).
+The same test on the background asymmetry shows the Ockham factor at work: $A_b=-0.040\pm0.018$ is $2.3$ standard deviations from zero, yet $BF_{01}(A_b=0)\approx3.5$, because the likelihood gain does not compensate for spreading the prior over $(-1,1)$; unlike for $A$, the preference changes sign with the prior width (Fig.~\ref{fig:checks_bf}, crossing at $W\approx0.3$). A negative $A_b$ is plausible given the misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $\pi^\pm K^+K^-$ decays; $A_b$ is kept free in the nominal model and fixing it to zero is one of the systematic variants (Sec.~\ref{sec:syst}).
 
 \paragraph*{Further material} is in Appendix~\ref{app:ext_bayes}. \emph{Model Adequacy: Goodness of Fit and Posterior Predictive Check}: the model does not reach $\chi^2/\mathrm{ndof}\approx1$ ($164.1/88$), mainly because the signal tails are heavier than a Gaussian, but $\Araw$ changes by only $-0.0002$ with a Crystal Ball signal.

@@ -91,7 +91,57 @@ def section(title, labels, lead_txt, blocks):
     return s + '\n' + '\n'.join(blocks) + '\n\\FloatBarrier\n'
 
 
-D = lambda prefix, title: take('details', prefix, title)
+
+LEADS = {
+ 'Data: description': "the record holds $8{,}556{,}118$ candidates of $B^\\pm\\to h^\\pm h^+h^-$ collected in 2011, in two files by magnet polarity, plus a detector-free phase-space simulation of $B^\\pm\\to K^\\pm K^+K^-$ used only to test the local-asymmetry procedure.",
+ 'Data: branches': "the analysis reads momentum, particle-identification likelihoods, muon flag and charge of each track; the common preselection keeps $23{,}895$ candidates ($0.28\\%$), mostly through the kaon-identification requirement.",
+ 'Data: candidates sharing': "only $42$ candidates of the fit window ($0.2\\%$) share a track with another candidate, a negligible effect, and all are kept.",
+ 'Data: charge combinations': "$H1$ is always the kaon of charge opposite to the $B$ and $H2$, $H3$ the same-sign pair, so the Dalitz variables are the two opposite-sign invariant masses.",
+ 'Data: invariant mass': "the mass is computed with the kaon hypothesis on all tracks; the fit window $[5100,5600]\\,\\MeV$ holds $19{,}731$ candidates and includes the start of the rise of the background below $\\sim5150\\,\\MeV$.",
+ 'Extended likelihood versus': "the extended form differs from a mixture with fixed total only by the Poisson term of the total yield, which carries no information on $A$; the purity of the signal window is about $96\\%$.",
+ 'Model: label switching': "the mixture is invariant under the exchange of the two exponentials, which would give two identical modes; the ordering $\\lambda_1>\\lambda_2$ removes the symmetry.",
+ 'Priors: flat priors': "a flat prior is not invariant under reparametrization, but with $\\sim2\\times10^4$ events the posterior is dominated by the likelihood; the evidence is a constant that neither the MCMC nor the Savage-Dickey ratio needs.",
+ 'MCMC sampling': "$32$ walkers for $25{,}000$ steps give $N/\\tau\\geq113$ autocorrelation times for every parameter, and runs started over the whole prior box converge to the same single mode.",
+ 'Posterior of the raw': "$\\Araw=-0.0443$ with $68\\%$ and $95\\%$ intervals $[-0.0528,-0.0358]$ and $[-0.0608,-0.0276]$; the posterior is Gaussian, so equal-tailed and highest-density intervals coincide and its mode is the maximum-likelihood estimate.",
+ 'Bayes factor of A=0': "the Savage-Dickey ratio with the Gaussian approximation of the posterior gives $BF_{01}\\approx1.1\\times10^{-4}$ ($BF_{10}\\approx9\\times10^3$), decisive evidence against $A=0$ that scales with the prior width.",
+ 'Bayes factor of the background': "$A_b=-0.040\\pm0.018$ is $2.3$ standard deviations from zero, yet $BF_{01}\\approx3.5$ favors $A_b=0$ (Ockham factor); $A_b$ is kept free in the nominal model.",
+ 'Systematic study: list': "thirteen variants of the nominal choices, in four groups (window, background, signal, preselection), fitted by both methods on exactly the same candidates.",
+ 'Combination rule': "a variant that changes the sample counts only if its shift exceeds $\\sigma_B$; variants rejected by the data are excluded, the largest shift of each group is its uncertainty, and the groups are added in quadrature.",
+ 'Systematic study: results': "the total systematic uncertainties are $0.0070$ (Bayesian) and $0.0072$ (frequentist), dominated by the preselection through the single variant $\\texttt{ProbK}>0.6$ ($+0.0058$, $1.2\\,\\sigma_B$).",
+ 'Systematic study: scan': "on the tight side the shift scatters around zero within $1.3\\,\\sigma_B$ and the pion requirement is flat; loosening $\\texttt{ProbK}$ moves $\\Araw$ monotonically, which supports the nominal requirement.",
+ 'Sensitivity of sigma': "$\\sigma_B$ is the difference of two nearly equal uncertainties and is sensitive to small differences between the methods; a variant at the threshold can be classified differently without changing the result.",
+ 'Stability scans': "the largest shifts are $0.0048$ over the grid of window edges and $0.0126$ over the grid of the two PID cuts, whose samples are smaller (mean uncertainty $0.0112$); the signal region moves $\\Araw$ by $6\\times10^{-5}$.",
+ 'Validation: generation': "toy experiments are generated from the fitted model (Poisson yields, masses by the transformation method) and fitted with the nominal procedure: $1000$ at the fitted value and $300$ at each of four other values of $A$.",
+ 'Validation: bias': "the bias is at most $0.0008$, the spread equals the Hesse uncertainty within $6\\%$, and the coverage at the fitted value is $0.696\\pm0.015$ and $0.954\\pm0.007$.",
+ 'Dalitz plane: local': "two bins have $|S_i|>3$ ($-3.7$ and $-3.0$) and the global homogeneity test gives $\\chi^2=80.8$ for $31$ degrees of freedom ($p=3\\times10^{-6}$), also in the signal window alone.",
+ 'Dalitz plane: robustness': "the homogeneity test holds in the signal window, with the charm vetoes and for other grids, and the structure is the same in the two magnet polarities ($\\chi^2=23.0$ for $29$ bins).",
+ 'Dalitz plane: the region': "the $\\phi(1020)$ band has no asymmetry ($-0.004\\pm0.023$); the fit of the $2146$ candidates of the published region gives $-0.234\\pm0.025$ (Bayesian) and $-0.237\\pm0.025$ (frequentist), against $-0.239\\pm0.020$.",
+ 'Comparison: meaning': "the credible interval is a probability on $A$ given the data and the prior, the confidence interval a property of the procedure, which the bootstrap and the toy experiments verified.",
+ 'Comparison: hypothesis': "the exact binomial test on all candidates gives $6.1\\sigma$, the test of the fit $p=2\\times10^{-7}$ ($5.2\\sigma$) and the Bayes factor $BF_{10}\\approx9\\times10^3$; they answer different questions.",
+ 'Comparison: goodness': "the same fit has $p=0.03$ in $2.5\\,\\MeV$ bins and $p\\approx5\\times10^{-6}$ in $10\\,\\MeV$ bins: the $p$-value of the binned $\\chi^2$ is a property of the binning as much as of the model.",
+ 'Comparison: nuisance': "the frequentist analysis profiles the eleven nuisance parameters and the Bayesian one marginalizes them; the results coincide because $A$ is almost uncorrelated with them.",
+ 'Comparison with the published analysis: samples': "the published analysis has $22{,}119\\pm164$ signal candidates, a Cruijff signal and misidentified and partially reconstructed backgrounds; with the same $D^0$ veto the Bayesian fit gives $-0.0496\\pm0.0088$.",
+ 'Comparison with the published analysis: raw': "$\\ACP\\approx\\Araw-A_P-A_D$; the corrections move the published result from $-0.060$ to $-0.043\\pm0.009\\pm0.003\\pm0.007$ and cannot be assumed for a different selection.",
+ 'Comparison: machine-learning': "a cut at $0.5$ on the classifier score keeps $92\\%$ of the signal and $36\\%$ of the background and gives $-0.0451\\pm0.0087$ (Bayesian) and $-0.0447\\pm0.0086$ (frequentist).",
+ 'Introduction: scope': "the aim is a methodological comparison of the two frameworks on the same data, not a measurement of $\\ACP$, which this record cannot give for lack of the control channel; the other three channels are not analysed.",
+ 'Conclusions: headline': "$\\Araw=-0.0441\\pm0.0085\\pm0.0072$ (frequentist) and $-0.0443\\pm0.0085\\pm0.0070$ (Bayesian), $5.2$ standard deviations from zero, stable under the thirteen variants; it is a raw asymmetry, not a significance of CP violation.",
+ 'Conclusions: lessons of each method (complete)': "the frequentist fit gives intervals with nominal coverage and an unbiased estimator; the Bayesian one the same interval with flat priors plus diagnostics to check, a Bayes factor that depends on the prior and a predictive check; the ML selection leaves $\\Araw$ unchanged.",
+ 'Conclusions: systematic study and dependence': "the particle-identification requirement dominates, and several statistics depend on choices: the binned $\\chi^2$ on the binning, the Bayes factor on the prior, the coverage on how the toy experiments are generated.",
+}
+
+
+def _with_lead(prefix, block):
+    txt = LEADS.get(prefix)
+    if not txt or '\\emph{In short' in block[:600]:
+        return block
+    lines = block.split('\n')
+    i = 1
+    while i < len(lines) and lines[i].startswith('\\label'):
+        i += 1
+    lines.insert(i, '\\emph{In short: %s}' % txt)
+    return '\n'.join(lines)
+
+D = lambda prefix, title: _with_lead(prefix, take('details', prefix, title))
 K = lambda prefix, title=None: take('checks', prefix, title)
 T = lambda prefix, title=None: take('theory', prefix, title)
 

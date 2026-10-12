@@ -3,7 +3,7 @@
 \emph{In short: the frequentist and Bayesian analyses give the same value, uncertainty and coverage for $\Araw$ because they use the same likelihood and the data constrain it well; they differ in what the numbers mean and in the hypothesis tests, and a machine-learning selection (Appendix~\ref{sec:ml}) confirms the result without improving it.}
 
 \label{sec:comparison_summary}
-Table~\ref{tab:comparison} puts the two approaches side by side.
+Table~\ref{tab:comparison} puts the two approaches side by side, from the question each one asks to how it was validated; the subsections below explain the rows where the numbers coincide but the statements do not.
 \begin{table*}[t]
 \centering
 \small
@@ -39,7 +39,7 @@ Computing time & one joint fit with Minos $\simeq19\,$s; $1000$ bootstrap fits $
 \label{fig:checks_profile}
 \end{figure*}
 
-\emph{Hypothesis test.} The exact binomial test of $N^-=N^+$ on all candidates gives $6.1\sigma$ ($A_{\mathrm{count}}=-0.0432\pm0.0071$); it sees signal and background together and does not use the mass. The frequentist test of the fit gives $p=2\times10^{-7}$ ($Z=\sqrt{q(0)}=5.2\sigma$ in the two-sided convention, $5.06\sigma$ one-sided, Appendix~\ref{sec:appendix_freq}), independent of the prior and not the probability of $A=0$; its size and power were verified with toy MC (Appendix~\ref{sec:validation_power}). The $5.2\sigma$ refers to a raw asymmetry, not to CP violation (Sec.~\ref{sec:comparison_published}). The Bayes factor, $BF_{10}\approx9\times10^3$, depends on the prior width (Sec.~\ref{sec:bayes_factor}). For $A$ the two give the same conclusion; for the background asymmetry, $A_b=-0.040\pm0.018$, a frequentist test would call $2.3\sigma$ a hint while $BF_{01}\approx3.5$ mildly favors $A_b=0$ (Sec.~\ref{sec:bayes_factor}): they answer different questions.
+\emph{Hypothesis test.} Three tests of $A=0$ are available. The exact binomial test of $N^-=N^+$ on all candidates gives $6.1\sigma$ ($A_{\mathrm{count}}=-0.0432\pm0.0071$); it sees signal and background together and does not use the mass. The frequentist test of the fit gives $p=2\times10^{-7}$ ($Z=\sqrt{q(0)}=5.2\sigma$ in the two-sided convention, $5.06\sigma$ one-sided, Appendix~\ref{sec:appendix_freq}), independent of the prior and not the probability of $A=0$; its size and power were verified with toy MC (Appendix~\ref{sec:validation_power}). The Bayes factor, $BF_{10}\approx9\times10^3$, depends on the prior width (Sec.~\ref{sec:bayes_factor}). For $A$ the frequentist and Bayesian tests give the same conclusion; for the background asymmetry, $A_b=-0.040\pm0.018$, a frequentist test would call $2.3\sigma$ a hint while $BF_{01}\approx3.5$ mildly favors $A_b=0$: the $p$-value asks how improbable the data are under $A_b=0$, the Bayes factor which hypothesis the data prefer after the prior volume is accounted for.
 
 \subsection{Comparison with the Published Analysis}
 \label{sec:comparison_published}
@@ -51,6 +51,6 @@ The raw asymmetry is not the CP asymmetry: $\ACP\approx\Araw-A_P-A_D$ (Eq.~\eqre
 \subsection{Machine-Learning Cross-Check}
 \label{sec:comparison_mlcheck}
 \emph{In short: a classifier trained on weak labels from the mass spectrum selects candidates without changing $\Araw$ beyond its statistical spread; it does not improve the precision and cannot remove the misidentified decays under the signal (Appendix~\ref{sec:ml}).}
-A cut at $0.5$ on the classifier score keeps $92\%$ of the fitted signal and $36\%$ of the background and gives $\Araw=-0.0451\pm0.0087$ (Bayesian) and $-0.0447\pm0.0086$ (frequentist), against $-0.0443$ and $-0.0441$ for the full window; the classifier and the $K$-means partition of the Dalitz plane are in Appendix~\ref{sec:ml}.
+A cut at $0.5$ on the classifier score keeps $92\%$ of the fitted signal and $36\%$ of the background and gives $\Araw=-0.0451\pm0.0087$ (Bayesian) and $-0.0447\pm0.0086$ (frequentist), against $-0.0443$ and $-0.0441$ for the full window: both shifts are within the statistical spread expected for a subsample (Appendix~\ref{sec:ml_stability}, Fig.~\ref{fig:ml_three}). The precision does not improve because the nominal sample has little background to remove; the classifier is described in Appendix~\ref{sec:ml}.
 
 \paragraph*{Further material} is in Appendix~\ref{app:ext_comp}.
