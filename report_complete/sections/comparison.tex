@@ -1,0 +1,58 @@
+\section{Comparison and Discussion}
+\label{sec:comparison}
+\emph{In short: the frequentist and Bayesian analyses give the same value, uncertainty and coverage for $\Araw$ because they use the same likelihood and the data constrain it well; they differ in what the numbers mean and in the hypothesis tests, and a machine-learning selection (Appendix~\ref{sec:ml}) confirms the result without improving it.}
+
+\label{sec:comparison_summary}
+The frequentist and Bayesian analyses agree on every number and differ in what each number means. Table~\ref{tab:comparison} puts the two approaches side by side, from the question each one asks to how it was validated; the subsections explain the rows where the numbers coincide but the statements do not.
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{p{2.6cm}p{6.6cm}p{6.6cm}}
+\toprule
+ & Frequentist (Sec.~\ref{sec:frequentist}) & Bayesian (Sec.~\ref{sec:bayesian}) \\
+\midrule
+Question & Which value of $A$ makes the data most probable, and which values are not rejected? & What is the distribution of $A$ given the data and the prior? \\
+Estimate & Maximum likelihood, $-0.0441$ & Posterior median, $-0.0443$ (mode $-0.0441$) \\
+Interval (68\%) & $[-0.0526,-0.0356]$ (profile likelihood, Minos) & $[-0.0528,-0.0358]$ (credible, equal-tailed) \\
+Nuisance parameters (11) & profiled: re-minimized at each fixed $A$ & marginalized: integrated over the prior \\
+Test of $A=0$ & $q(0)\simeq27$, $p=2.05\times10^{-7}$, $5.2\sigma$ & $BF_{01}\approx1.1\times10^{-4}$ (Savage-Dickey) \\
+Validation of the interval & $1000$ bootstrap replicas: $68.4\pm1.5\%$; $985$ toys: $70\pm1\%$ ($68\%$), $95\pm1\%$ ($95\%$) & $200$ toys: $0.65\pm0.03$ ($68\%$), $0.93\pm0.02$ ($95\%$) \\
+Goodness of fit & $\chi^2/\mathrm{ndof}\approx160/88$ ($10\,\MeV$ bins); $441.7/388$, $p=0.031$ ($2.5\,\MeV$ bins) & $164.1/88$ ($p=1.6\times10^{-6}$); posterior predictive check \\
+Computing time & one joint fit with Minos $\simeq19\,$s; $1000$ bootstrap fits $\simeq49\,$min & one chain ($25{,}000$ steps, 32 walkers) $\simeq8\,$min; $200$ toys of $12{,}000$ steps \\
+\bottomrule
+\end{tabular}
+\caption{Frequentist and Bayesian analyses compared on the same candidates ($\Araw$, statistical uncertainties only). Computing times are indicative, on one laptop.}
+\label{tab:comparison}
+\end{table*}
+
+
+
+\subsection{Where the Approaches Differ}
+\label{sec:comparison_differ}
+\emph{In short: the numbers coincide but the statements differ: the meaning of the interval, the test of $A=0$, the goodness of fit, the treatment of the nuisance parameters and what has been validated, as summarized in Table~\ref{tab:comparison}.}
+\emph{Meaning of the interval.} The credible interval states that, given the data and the prior, $A$ lies in $[-0.0528,-0.0358]$ with $68\%$ probability; the confidence interval $[-0.0526,-0.0356]$ is the set of values that the data do not reject at the $32\%$ level, and the $68\%$ is the fraction of repeated experiments in which such an interval contains the true value, a property of the procedure that the bootstrap and toy checks verified. Figure~\ref{fig:checks_profile} shows the two for $A$: the profile likelihood and the marginal posterior coincide (a), and the profile curves of the two magnet polarities add up to that of the joint fit (b).
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/validation_profile_polarity.pdf}
+\caption{(a) Frequentist profile likelihood, $\exp[-q(A)/2]$ normalized, and Bayesian marginal posterior of $A$. (b) Profile curves $q(A)$ of the two magnet polarities (parabolic fits to the points), their sum and the joint fit.}
+\label{fig:checks_profile}
+\end{figure*}
+
+\emph{Hypothesis test.} Three tests of $A=0$ are available. The exact binomial test of $N^-=N^+$ on all candidates gives $6.1\sigma$ ($A_{\mathrm{count}}=-0.0432\pm0.0071$); it sees signal and background together and does not use the mass. The frequentist test of the fit gives $p=2\times10^{-7}$ ($Z=\sqrt{q(0)}=5.2\sigma$ in the two-sided convention, $5.06\sigma$ one-sided, Appendix~\ref{sec:appendix_freq}), independent of the prior and not the probability of $A=0$; its size and power were verified with toy MC (Appendix~\ref{sec:validation_power}).
+
+The Bayes factor, $BF_{10}\approx9\times10^3$, depends on the prior width (Sec.~\ref{sec:bayes_factor}). For $A$ the frequentist and Bayesian tests give the same conclusion; for the background asymmetry, $A_b=-0.040\pm0.018$, a frequentist test would call $2.3\sigma$ a hint while $BF_{01}\approx3.5$ mildly favors $A_b=0$: the $p$-value asks how improbable the data are under $A_b=0$, the Bayes factor which hypothesis the data prefer after the prior volume is accounted for.
+
+\subsection{Comparison with the Published Analysis}
+\label{sec:comparison_published}
+\emph{In short: the published value ($-0.060\pm0.007$) differs from this one ($-0.0441\pm0.0085$) by the sample and the model; with the same $D^0$ veto the Bayesian fit gives $-0.0496\pm0.0088$, and $\Araw$ is not $\ACP$.}
+The published analysis~\cite{lhcb_cpv_2013} finds $\Araw=-0.060\pm0.007$ with $22{,}119\pm164$ signal candidates, against $-0.0441\pm0.0085$ and $15{,}328\pm133$ here: the Open Data record is a preselected subset and the published model has a Cruijff signal, partially reconstructed four-body decays and a misidentified peaking background from simulation. With the same $D^0$ veto the Bayesian fit gives $-0.0496\pm0.0088$, within $0.93\sigma$ of the published value.
+
+The raw asymmetry is not the CP asymmetry: $\ACP\approx\Araw-A_P-A_D$ (Eq.~\eqref{eq:acp}), and in the published analysis the corrections move the result from $-0.060$ to $-0.043\pm0.009\pm0.003\pm0.007$ ($3.7\sigma$)~\cite{lhcb_cpv_2013}, by $+0.017$, about two statistical uncertainties of this work. Such a correction cannot be assumed for a different selection, and the $5.2\sigma$ here is the significance of a nonzero raw asymmetry, not of CP violation. A later measurement on a larger data set gives $\ACP=-0.037\pm0.002\pm0.002\pm0.003$ ($8.5\sigma$)~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}; our result is consistent with these in sign and size.
+
+\subsection{Machine-Learning Cross-Check}
+\label{sec:comparison_mlcheck}
+\emph{In short: a classifier trained on weak labels from the mass spectrum selects candidates without changing $\Araw$ beyond its statistical spread; it does not improve the precision and cannot remove the misidentified decays under the signal (Appendix~\ref{sec:ml}).}
+A cut at $0.5$ on the classifier score keeps $92\%$ of the fitted signal and $36\%$ of the background and gives $\Araw=-0.0451\pm0.0087$ (Bayesian) and $-0.0447\pm0.0086$ (frequentist), against $-0.0443$ and $-0.0441$ for the full window: both shifts are within the statistical spread expected for a subsample (Appendix~\ref{sec:ml_stability}, Fig.~\ref{fig:ml_three}). The precision does not improve because the nominal sample has little background to remove; the classifier is described in Appendix~\ref{sec:ml}.
+
+\paragraph*{Further material} is in Appendix~\ref{app:ext_comp}.

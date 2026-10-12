@@ -1,7 +1,7 @@
 # Frequentist, Bayesian and machine-learning analysis of the raw asymmetry in B± → K± K+ K−
 
 Final project for the *Statistics and Data Analysis* course (Università di Milano-Bicocca, A.Y. 2025–2026),
-Giacomo Moretti and Marco Belotti. The report is `Report/main.pdf`.
+Giacomo Moretti and Marco Belotti. The report is `report_complete/main.pdf`.
 
 ## Data
 
@@ -48,14 +48,14 @@ Bayesian notebook has to be run first.
 
 ## Report and figures
 
-`Report/main.tex` (compile with `tectonic main.tex`) only sets the document up: packages and macros are in `Report/preamble.tex`, and each section is a separate file in `Report/sections/` (`introduction.tex`, `data.tex`, `frequentist.tex`, `bayesian.tex`, `systematics.tex`, `ml.tex`, `comparison.tex`, `limitations.tex`, `conclusions.tex`, `contributions.tex`, `code.tex`, `appendix.tex`, `abstract.tex`), included with `\input`. The figures are rebuilt from the saved results, without
+`report_complete/main.tex` (compile with `tectonic main.tex`) only sets the document up: packages and macros are in `report_complete/preamble.tex`, and each section is a separate file in `report_complete/sections/` (`introduction.tex`, `data.tex`, `frequentist.tex`, `bayesian.tex`, `systematics.tex`, `ml.tex`, `comparison.tex`, `limitations.tex`, `conclusions.tex`, `contributions.tex`, `code.tex`, `appendix.tex`, `abstract.tex`), included with `\input`. The figures are rebuilt from the saved results, without
 rerunning any fit:
 
 | Script | Figures |
 |---|---|
-| `Report/figures/regen_mass_spectrum.py` | `mass_spectrum.pdf` (Data section) |
-| `Report/figures/regen_figures_nominal.py` | `bayes_nominal_*.pdf` (Bayesian section) |
-| `Report/figures/regen_figures_ml_nominal.py` | `ml_nominal_*.pdf` (machine-learning section) |
+| `report_complete/figures/regen_mass_spectrum.py` | `mass_spectrum.pdf` (Data section) |
+| `report_complete/figures/regen_figures_nominal.py` | `bayes_nominal_*.pdf` (Bayesian section) |
+| `report_complete/figures/regen_figures_ml_nominal.py` | `ml_nominal_*.pdf` (machine-learning section) |
 
 `plot_style.py` holds the common style. By default the scripts read the results from the `bayes` and `mach_lear`
 git branches; set `REGEN_NOMINAL_DIR` / `REGEN_ML_DIR` to a local `results/nominal` directory to read local files.
