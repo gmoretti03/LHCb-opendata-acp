@@ -14,6 +14,7 @@ Table~\ref{tab:comparison} puts the two approaches side by side.
 Question & Which value of $A$ makes the data most probable, and which values are not rejected? & What is the distribution of $A$ given the data and the prior? \\
 Estimate & Maximum likelihood, $-0.0441$ & Posterior median, $-0.0443$ (mode $-0.0441$) \\
 Interval (68\%) & $[-0.0526,-0.0356]$ (profile likelihood, Minos) & $[-0.0528,-0.0358]$ (credible, equal-tailed) \\
+Nuisance parameters (11) & profiled: re-minimized at each fixed $A$ & marginalized: integrated over the prior \\
 Test of $A=0$ & $q(0)\simeq27$, $p=2.05\times10^{-7}$, $5.2\sigma$ & $BF_{01}\approx1.1\times10^{-4}$ (Savage-Dickey) \\
 Validation of the interval & $1000$ bootstrap replicas: $68.4\pm1.5\%$; $985$ toys: $70\pm1\%$ ($68\%$), $95\pm1\%$ ($95\%$) & $200$ toys: $0.65\pm0.03$ ($68\%$), $0.93\pm0.02$ ($95\%$) \\
 Goodness of fit & $\chi^2/\mathrm{ndof}\approx160/88$ ($10\,\MeV$ bins); $441.7/388$, $p=0.031$ ($2.5\,\MeV$ bins) & $164.1/88$ ($p=1.6\times10^{-6}$); posterior predictive check \\

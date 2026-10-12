@@ -137,3 +137,4 @@ for fn in os.listdir(DST):
         t=re.sub(r'Secs?\.~\\ref\{%s\}'%re.escape(l),lambda _m,l=l:'Appendix~\\ref{'+l+'}',t)
     if t!=t0: open(f'{DST}/{fn}','w').write(t)
 print('ok',[f for f,_ in ext])
+exec(open(HERE+'/make_appendix.py').read())
