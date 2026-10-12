@@ -12,15 +12,14 @@ SRC=HERE+'/sections_full'; DST=os.path.abspath(HERE+'/../sections')
 # file -> (appendix title, label, moved subsection prefixes, moved float labels)
 SPEC = {
  'data':       ('Dataset and Selection Details','app:ext_data',[],['tab:cutflow']),
- 'bayesian':   ('Extended Bayesian Analysis','app:ext_bayes',['Model Adequacy','Robustness Checks','Toy-MC Coverage'],[]),
+ 'bayesian':   ('Extended Bayesian Analysis','app:ext_bayes',['Model Adequacy','Robustness Checks','Toy-MC Coverage'],['fig:bayes_sd']),
  'validation': ('Extended Validation of the Estimator','app:ext_valid',['Size and Power','Goodness of Fit'],['fig:validation_injection','fig:validation_null']),
  'dalitz':     ('Extended Dalitz-Plane Analysis','app:ext_dalitz',[],[]),
- 'ml':         ('Extended Machine Learning Module','app:ext_ml',['Model Comparison','Regularization','Uncertainty Quantification','K-means','Hyperparameter'],['fig:ml_features','fig:ml_threshold','fig:ml_mass_cut','fig:ml_high_bkg']),
- 'comparison': ('Extended Comparison','app:ext_comp',['Numerical Agreement','Machine Learning and the Fits','Bayesian and Frequentist Intervals at Low'],[]),
+  'comparison': ('Extended Comparison','app:ext_comp',['Numerical Agreement','Bayesian and Frequentist Intervals at Low'],['tab:comparison']),
 }
 exec(open(B+'/overrides.py').read()) if os.path.exists(B+'/overrides.py') else None
-KEEPL=('',)
-WHOLE=('limitations','code')
+KEEPL=('Model Adequacy',)
+WHOLE=('ml','limitations','code')
 FL=re.compile(r'\\begin\{(figure\*?|table\*?)\}.*?\\end\{\1\}\n?',re.S)
 # frequentist.tex is Marco's and lives only in ../sections: never overwritten here
 for n in os.listdir(SRC):
@@ -63,10 +62,11 @@ for f,(title,lab,subs,floats) in SPEC.items():
         body=re.sub(r'((?:Figs?|Tables?)\.?~\\ref\{%s\})'%re.escape(l), r'\1 of Appendix~\\ref{%s}'%lab, body)
     if not (moved or fb): continue
     ptr='\n\\paragraph*{Further material} is in Appendix~\\ref{%s}.'%lab
-    items=[]
+    items=[]; _titles=[]
     for ti,le in leads:
         le=re.sub(r'^\\emph\{In short:\s*','',le); le=re.sub(r'\}\s*$','',le)
-        if ti.startswith(KEEPL): items.append(f' \\emph{{{ti}.}} {le}')
+        if ti.startswith(KEEPL): items.append(f' \\emph{{{ti}}}: {le}')
+        else: _titles.append(ti)
     body=body.rstrip('\n')+'\n'+ptr+''.join(items)+'\n'
     open(f'{DST}/{f}.tex','w').write(body)
     # floats cited by a moved block go right after that block's citing paragraph
@@ -88,7 +88,7 @@ for f,(title,lab,subs,floats) in SPEC.items():
         refs=', '.join(('Fig.' if l.startswith('fig') else 'Table')+'~\\ref{%s}'%l for l in fl_cited)
         tail+='\\clearpage\n\\subsection{Float%s Cited in the Main Text}\nThe main text cites %s; %s placed here to keep the main text within its page limit.\n\n'%('s' if len(fb)>1 else '',refs,'they are' if len(fb)>1 else 'it is')+'\n'.join(fb)+'\n'
     e+='\n'.join(moved)+tail+'\n\\FloatBarrier\n'; ext.append((f,e))
-order=['data','bayesian','validation','dalitz','ml','comparison']
+order=['data','bayesian','validation','dalitz','comparison']
 open(DST+'/appendix_ext.tex','w').write('\n\n'.join(e for k in order for (f,e) in ext if f==k))
 m=open(DST+'/../main.tex').read()
 for n in WHOLE: m=m.replace('\\input{sections/%s}\n'%n,'')
@@ -120,9 +120,20 @@ for sec in re.split(r'(?m)^(?=\\section\{)',extt):
     ml=re.search(r'\\label\{(app:[^}]+)\}',sec)
     if ml:
         for l in re.findall(r'\\label\{((?:fig|tab):[^}]+)\}',sec): lab2app[l]=ml.group(1)
-for fn in ['introduction','data','model','bayesian','systematics','dalitz','ml','comparison','conclusions','abstract']:
+for fn in ['introduction','data','model','bayesian','systematics','dalitz','ml','comparison','conclusions','abstract','details']:
     t=open(f'{DST}/{fn}.tex').read(); t0=t
     for l,ap in lab2app.items():
-        t=re.sub(r'((?:Figs?\.|Figure|Tables?)~\\ref\{%s\})(?! of Appendix)'%re.escape(l),r'\1 of Appendix~\\ref{%s}'%ap,t)
+        t=re.sub(r'((?:Figs?\.|Figure|Tables?)~\\ref\{%s\})(?![a-z]? of Appendix)'%re.escape(l),r'\1 of Appendix~\\ref{%s}'%ap,t)
     if t!=t0: open(f'{DST}/{fn}.tex','w').write(t)
+
+_ext=open(DST+'/appendix_ext.tex').read()
+_applab=set(re.findall(r'\\label\{(sec:[^}]+)\}',_ext))|set(re.findall(r'\\label\{(sec:[^}]+)\}',open(DST+'/ml.tex').read()))
+_applab-={'sec:ml'}
+for fn in os.listdir(DST):
+    if not fn.endswith('.tex') or fn in ('frequentist.tex','appendix_ext.tex','ml.tex','theory.tex','appendix_checks.tex','appendix.tex','details.tex','limitations.tex','code.tex','notation.tex'): continue
+    t=open(f'{DST}/{fn}').read(); t0=t
+    t=re.sub(r'(\\ref\{[^}]+\}) of Appendix~\\ref\{([^}]+)\}([a-z])\b',r'\1\3 of Appendix~\\ref{\2}',t)
+    for l in _applab:
+        t=re.sub(r'Secs?\.~\\ref\{%s\}'%re.escape(l),lambda _m,l=l:'Appendix~\\ref{'+l+'}',t)
+    if t!=t0: open(f'{DST}/{fn}','w').write(t)
 print('ok',[f for f,_ in ext])

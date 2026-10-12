@@ -26,7 +26,7 @@ When the classes are weighted, with weight $w_c$ for class $c$, the minimized lo
 
 \subsection{Classification Without Labels}
 \emph{In short: the classifier that is optimal between two mixtures of the same signal and background is monotonic in the signal-to-background ratio, so labels derived from the mass are sufficient.}
-Let two samples be mixtures of the same signal and background densities $s(x)$ and $b(x)$, with signal fractions $f_1\neq f_2$. The ratio of their feature densities, $p_1(x)/p_2(x)=[f_1\,s+(1-f_1)\,b]/[f_2\,s+(1-f_2)\,b]$, is a monotonic function of $s(x)/b(x)$, so that the classifier that is optimal between the two mixtures is, up to a monotonic transformation, the one that is optimal between signal and background~\cite{cwola}. The proof requires that $s$ and $b$ be the same in the two samples, which is the condition discussed in Sec.~\ref{sec:ml_labels}.
+Let two samples be mixtures of the same signal and background densities $s(x)$ and $b(x)$, with signal fractions $f_1\neq f_2$. The ratio of their feature densities, $p_1(x)/p_2(x)=[f_1\,s+(1-f_1)\,b]/[f_2\,s+(1-f_2)\,b]$, is a monotonic function of $s(x)/b(x)$, so that the classifier that is optimal between the two mixtures is, up to a monotonic transformation, the one that is optimal between signal and background~\cite{cwola}. The proof requires that $s$ and $b$ be the same in the two samples, which is the condition discussed in Appendix~\ref{sec:ml_labels}.
 
 \subsection{Clustering and Uncertainty Estimators}
 \emph{In short: $K$-means converges to a local minimum of the inertia, the adjusted Rand index measures the stability of a partition, and the spread of an ensemble estimates the epistemic uncertainty.}

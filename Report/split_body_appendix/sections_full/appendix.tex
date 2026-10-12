@@ -45,36 +45,7 @@ $D^0$, $J/\psi$, $\chi_{c0}$ vetoes & $16367$ & $-0.0423$ & $[-0.0516,-0.0329]$ 
 \label{fig:bayes_trace}
 \end{figure*}
 
-\begin{table*}[t]
-\centering
-\begin{tabular}{lp{7cm}lc}
-\toprule
-Model & Grid & Best configuration & CV AUC / Test AUC (default) \\
-\midrule
-Random Forest & \texttt{n\_estimators} $200$--$1200$, \texttt{max\_depth} $6$--$12$ or none, \texttt{min\_samples\_leaf} $5$--$40$ & $400$, $12$, $5$ & $0.8706$ / $0.8656$ ($0.8604$) \\
-Gradient Boosting & \texttt{n\_estimators} $100$--$500$, \texttt{max\_depth} $1$--$5$, \texttt{learning\_rate} $0.01$--$0.1$ & $300$, $2$, $0.1$ & $0.8684$ / $0.8650$ ($0.8643$) \\
-\bottomrule
-\end{tabular}
-\caption{Hyperparameter search for the tree ensembles ($120$ and $100$ configurations, 5-fold cross-validation repeated 10 times, balanced class weights). The test AUC of the best configuration is compared with that of the default of Table~\ref{tab:ml_models} (in parentheses); the bootstrap uncertainty of each test AUC is $0.012$.}
-\label{tab:ml_hyperparams}
-\end{table*}
 
-\begin{table*}[t]
-\centering
-\begin{tabular}{llccc}
-\toprule
-Architecture & Layers & Dropout & Learning rate & CV AUC \\
-\midrule
-\texttt{deep\_3layer} (best) & $[64,32,16]$ & $0.2$ & $0.003$ & $0.8585\pm0.0174$ \\
-\texttt{wide\_2layer}        & $[64,32]$    & $0.3$ & $0.003$ & $0.8582\pm0.0175$ \\
-\texttt{deep\_3layer}        & $[64,32,16]$ & $0.3$ & $0.003$ & $0.8580\pm0.0187$ \\
-\texttt{wide\_2layer}        & $[64,32]$    & $0.3$ & $0.005$ & $0.8579\pm0.0184$ \\
-\texttt{wide\_2layer}        & $[64,32]$    & $0.4$ & $0.005$ & $0.8579\pm0.0187$ \\
-\bottomrule
-\end{tabular}
-\caption{Top five of the $168$ FFNN configurations ($7$ architectures from one hidden layer of 8 units to five layers $[128,64,32,16,8]$, dropout $0.1$--$0.4$, learning rates $0.0002$--$0.005$; 5-fold cross-validation repeated twice). The five are within $0.0007$ of each other, far below the fold-to-fold spread: the optimum is a plateau. The best configuration has test AUC $0.8606$, against $0.8568$ for the default architecture ($\pm0.005$ over initializations).}
-\label{tab:ml_ffnn_search}
-\end{table*}
 
 \section{Minimal Model as a Cross-Check}
 \label{sec:bayes_minimal}
@@ -104,5 +75,6 @@ BF_{01}=\frac{P(D\mid H_0)}{P(D\mid H_1)}=\frac{p(A=0\mid D)}{\pi(A=0)},
 the density of the posterior at $A=0$ divided by that of the prior: how much the data have lowered the probability density of the null value. No integral over the twelve parameters is needed, only the marginal posterior of $A$ from the chain.
 
 \input{sections/theory}
+\input{sections/details}
 \input{sections/appendix_checks}
 \input{sections/notation}

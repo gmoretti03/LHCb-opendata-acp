@@ -7,12 +7,6 @@ This appendix collects the checks that complete the analysis of Secs.~\ref{sec:f
 \emph{In short: profiling and marginalizing the nuisance parameters give the same distribution of $A$; the two magnet polarities agree with each other, and combining their likelihoods reproduces the joint fit.}
 The frequentist way of eliminating the nuisance parameters is to profile them, $q(A)=-2\Delta\ln L$ with the other parameters re-maximized at each $A$, the Bayesian one is to marginalize them; Fig.~\ref{fig:checks_profile}a shows that $\exp[-q(A)/2]$, normalized, and the marginal posterior coincide, as expected for a near-Gaussian likelihood and flat priors. The two polarities were fitted separately and their profile curves added, which is the combination of likelihoods of two independent measurements of the same parameter (Fig.~\ref{fig:checks_profile}b): magnet down gives $-0.0492\pm0.0111$, magnet up $-0.0374\pm0.0131$, their sum $-0.0443\pm0.0084$, against $-0.0441\pm0.0085$ of the joint fit (the nuisance parameters are shared in the joint fit, separate in the sum). The Bayesian counterpart is sequential: the posterior of magnet down used as the prior of magnet up gives $-0.0446\pm0.0086$ (Table~\ref{tab:checks_polarity}).
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/validation_profile_polarity.pdf}
-\caption{(a) Frequentist profile likelihood, $\exp[-q(A)/2]$ normalized, and Bayesian marginal posterior of $A$. (b) Profile curves $q(A)$ of the two magnet polarities (parabolic fits to the points), their sum and the joint fit.}
-\label{fig:checks_profile}
-\end{figure*}
 
 \begin{table}[h]
 \centering
@@ -67,12 +61,6 @@ Flat in $(N_s^\pm)$ and $(N_b^\pm)$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $19993$ 
 
 The Bayes factor $BF_{01}=p(A=0\mid D)/\pi(0)$ is proportional to the density of the prior at zero, $\pi(0)=1/(2W)$ for a uniform prior on $(-W,W)$ (Fig.~\ref{fig:checks_bf}): for $A$ it stays below $10^{-2}$ for every width up to $W=1$ (decisive evidence for $A\neq0$ whatever the prior), while for $A_b$ it crosses $1$ at $W\simeq0.3$, which is the content of the Lindley paradox. The same evidence was computed by direct numerical integration over $A$ on a grid, $Z_1=\int L\,\pi\,dA$ with the nuisance parameters fixed at the maximum of the posterior, the method that is not feasible for twelve parameters: it gives $K_{01}=7.0e-05$, against $1.3e-04$ with the profile likelihood and $1.1e-04$ for the Savage-Dickey ratio, which marginalizes the nuisance parameters; the three values are of the same order and the conclusion is the same.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/validation_bf_prior_width.pdf}
-\caption{$BF_{01}$ of $A=0$ and of $A_b=0$ as a function of the half-width $W$ of the uniform prior $(-W,W)$ (Gaussian approximation of the posterior, Savage-Dickey). The vertical line marks the nominal prior.}
-\label{fig:checks_bf}
-\end{figure}
 
 The Savage-Dickey ratio also tests the equality of the background shapes of the two charges, one parameter at a time, with the difference $\delta=\theta^+-\theta^-$: $BF_{01}=3.1$ for the steep slope $\lambda_1$ (difference at $0.8\sigma$), $2.2$ for $\lambda_2$ ($2.4\sigma$) and $1.1$ for the fraction $f$ ($2.0\sigma$). The data are not able to distinguish the shapes, with a weak preference for equal ones: this is why the variant with a shared shape moves $A$ by $-0.0037$ and is part of the systematic uncertainty, without being preferred.
 

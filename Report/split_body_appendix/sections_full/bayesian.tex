@@ -14,19 +14,26 @@ The priors are uniform, with independent ranges except for the ordering of the b
 \pi(\theta)\propto\mathbf{1}\left[\theta\in\Theta\right],
 \label{eq:prior}
 \end{equation}
-and inside it the posterior is proportional to the likelihood. A flat prior is not uninformative in an absolute sense, since it is not invariant under reparametrization (a prior uniform in $\lambda$ is not uniform in $1/\lambda$); with $\sim$$2\times10^4$ events, however, the posterior is dominated by the likelihood, as the prior-sensitivity check of Sec.~\ref{sec:bayes_checks} confirms for $A$. The evidence $p(D)$ is a constant normalization: the MCMC samples $\mathcal{L}\,\pi$ without computing it, and the Savage-Dickey ratio of Sec.~\ref{sec:bayes_factor} avoids computing it as well. The marginal posterior of the asymmetry, $p(A\mid D)=\int p(\theta\mid D)\,d\theta_{\neq A}$, is the histogram of the $A$ component of the chain.
+and inside it the posterior is proportional to the likelihood. A flat prior is not invariant under reparametrization, but with $\sim$$2\times10^4$ events the posterior is dominated by the likelihood, as the prior-sensitivity check of Sec.~\ref{sec:bayes_checks} confirms for $A$. The evidence $p(D)$ is a constant: the MCMC samples $\mathcal{L}\,\pi$ without it, and the Savage-Dickey ratio of Sec.~\ref{sec:bayes_factor} avoids it as well; the marginal posterior of $A$ is the histogram of the $A$ component of the chain.
 
 \subsection{MCMC Sampling and Convergence Diagnostics}
 \label{sec:bayes_mcmc}
 \emph{In short: 32 walkers for $25{,}000$ steps; the chain is at least $113$ autocorrelation times long for every parameter and independent runs from dispersed starting points agree.}
-The posterior was sampled with the affine-invariant ensemble sampler of Goodman and Weare~\cite{goodman_weare} as implemented in \texttt{emcee}~\cite{emcee} (the stretch move, the autocorrelation time and the effective sample size are described in Appendix~\ref{app:theory}). The maximum of the posterior was first located numerically (Nelder-Mead), and 32 walkers were initialized in a narrow ball around it and run for $25{,}000$ steps, with the first $4166$ ($1/6$) discarded as burn-in, leaving $6.7\times10^5$ samples; the mean acceptance fraction is $0.38$. Convergence was checked through the integrated autocorrelation time of each parameter, $\tau=1+2\sum_{t\geq1}\rho(t)$, with $\rho(t)$ the autocorrelation of the chain at lag $t$. We find $\tau\in[147,183]$ steps, the longest for the background-shape parameters: the post-burn-in chain is $N/\tau\geq113$ autocorrelation times long for every parameter, above the threshold of $50$ recommended for a reliable estimate of $\tau$~\cite{emcee}, and corresponds to $\gtrsim3600$ effectively independent samples per parameter. To check that the chain is not trapped near its starting point, the fit was repeated twice with the walkers initialized uniformly over the whole prior box and the first half of the chain discarded: both runs converge to the same single mode, with $\Araw=-0.0446$ and $-0.0442$, the same intervals and the same values of all other parameters as the nominal fit. The trace plot of such a run (Fig.~\ref{fig:bayes_trace}, Appendix~\ref{sec:appendix}) shows all walkers reaching the bulk of the posterior within $\sim$2000 steps, the background fraction $f_+$ last, well inside the discarded half of the chain.
+The posterior was sampled with the affine-invariant ensemble sampler of Goodman and Weare~\cite{goodman_weare} as implemented in \texttt{emcee}~\cite{emcee} (Appendix~\ref{app:theory}): 32 walkers started around the maximum of the posterior, $25{,}000$ steps with the first $1/6$ discarded as burn-in ($6.7\times10^5$ samples, acceptance $0.38$). The integrated autocorrelation time is $\tau\in[147,183]$ steps, so the chain is $N/\tau\geq113$ autocorrelation times long for every parameter, above the threshold of $50$~\cite{emcee} ($\gtrsim3600$ effectively independent samples). Two runs started uniformly over the whole prior box converge to the same single mode ($\Araw=-0.0446$ and $-0.0442$; trace plot in Fig.~\ref{fig:bayes_trace}, Appendix~\ref{sec:appendix}).
 
 \subsection{Posterior Results and Credible Intervals}
 \label{sec:bayes_posterior}
 \emph{In short: $\Araw=-0.0443$, 68\% credible interval $[-0.0528,-0.0358]$ and 95\% $[-0.0608,-0.0276]$; the posterior is Gaussian.}
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/bayes_nominal_mass_fit.pdf}
+\caption{Mass distributions of (a) $B^+$ and (b) $B^-$ candidates with the nominal model (posterior medians, logarithmic scale): total, signal and background components. Bottom: pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$.}
+\label{fig:bayes_fit}
+\end{figure*}
+
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/bayes_nominal_corner.pdf}
+\includegraphics[width=0.55\textwidth]{figures/bayes_nominal_corner.pdf}
 \caption{Posterior of the six physics parameters of the nominal fit (the six background-shape parameters are marginalized). Diagonal: marginal posteriors with the 16th, 50th and 84th percentiles (dashed lines and titles). Off-diagonal: 2D marginals, contours enclosing the regions of the $1\sigma$ and $2\sigma$ levels of a 2D Gaussian ($39\%$ and $86\%$).}
 \label{fig:bayes_corner}
 \end{figure*}
@@ -36,7 +43,8 @@ The marginal posterior on the raw asymmetry gives (median and equal-tailed credi
 \Araw = -0.0443, \\
 68\%~\text{CI}~[-0.0528,-0.0358], \\ 95\%~\text{CI}~[-0.0608,-0.0276].
 \end{gather*}
-The posterior is very close to Gaussian, with standard deviation $0.0085$; its 68\% interval is symmetric about the median to within $2\times10^{-5}$, so the equal-tailed intervals coincide with the highest-posterior-density ones at the quoted precision. Since the priors are uniform, the posterior mode (the maximum a posteriori, MAP, estimate, $-0.0441$) coincides with the maximum-likelihood estimate, so this result can be compared directly with the frequentist fit of the same model (Sec.~\ref{sec:frequentist}; the quantities it uses are summarized in Appendix~\ref{sec:appendix_freq}). The published analysis of the same 2011 data, with its own selection (which includes a $D^0$ veto) and a mass model with partially reconstructed and misidentified backgrounds, finds $\Araw=-0.060\pm0.007$~\cite{lhcb_cpv_2013}; with the $D^0$ veto our fit gives $-0.0496\pm0.0088$ (Sec.~\ref{sec:bayes_checks}), compatible within the statistical uncertainties, although the two selections overlap and differ. After the corrections of Eq.~\eqref{eq:acp}, the published asymmetry is $\ACP=-0.043\pm0.009\pm0.003\pm0.007$~\cite{lhcb_cpv_2013}, and the most precise later measurement, on a larger data set, is $\ACP=-0.037\pm0.002\pm0.002\pm0.003$~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}. The other physics parameters are $N_s=15{,}328\pm133$, $N_b=4404\pm82$, $A_b=-0.040\pm0.018$, $\mu=5284.39\pm0.16\,\MeV$ and $\sigma=18.00\pm0.14\,\MeV$ (Fig.~\ref{fig:bayes_corner}). $A$ is almost uncorrelated with the other parameters: its largest correlation, $-0.17$, is with $A_b$: conditioning on $A_b=0$ shifts $A$ by $\rho\,\sigma_A/\sigma_{A_b}\,(0-\bar A_b)=-0.0033$, to $-0.0475$, which is what the fit with a charge-symmetric background gives ($-0.0471$, Sec.~\ref{sec:syst}).
+The posterior is very close to Gaussian (standard deviation $0.0085$), so equal-tailed and highest-posterior-density intervals coincide; with uniform priors its mode, $-0.0441$, is the maximum-likelihood estimate and the result can be compared directly with the frequentist fit (Sec.~\ref{sec:frequentist}, Appendix~\ref{sec:appendix_freq}). The other physics parameters are $N_s=15{,}328\pm133$, $N_b=4404\pm82$, $A_b=-0.040\pm0.018$, $\mu=5284.39\pm0.16\,\MeV$ and $\sigma=18.00\pm0.14\,\MeV$ (Fig.~\ref{fig:bayes_corner}). $A$ is almost uncorrelated with them; its largest correlation, $-0.17$, is with $A_b$: conditioning on $A_b=0$ moves $A$ to $-0.0475$, as the fit with a charge-symmetric background does ($-0.0471$, Sec.~\ref{sec:syst}). The fitted model is compared with the data of the two charges in Fig.~\ref{fig:bayes_fit}: the pulls show the heavier signal tails of the data, whose effect on $\Araw$ is negligible (Appendix~\ref{sec:bayes_gof}).
+
 
 
 
@@ -44,11 +52,18 @@ The posterior is very close to Gaussian, with standard deviation $0.0085$; its 6
 \label{sec:bayes_factor}
 \emph{In short: decisive evidence against $A=0$ (Bayes factor $BF_{10}\approx9\times10^3$); the evidence for a background asymmetry is not significant, and depends on the prior width.}
 
-The Bayes factor compares two hypotheses through their evidences (marginal likelihoods), $BF_{10}=P(D\mid H_1)/P(D\mid H_0)$ with $P(D\mid H_i)=\int\mathcal{L}(D\mid\theta,H_i)\,\pi(\theta\mid H_i)\,d\theta$: it is the factor by which the data update the prior odds of the two hypotheses, and it requires proper priors. Computing the evidence of each hypothesis by direct numerical integration is impractical for a 12-parameter posterior. When the null hypothesis fixes one parameter, $H_0$: $A=0$, nested in $H_1$ ($A$ free), and the priors on the other parameters are shared, the Bayes factor reduces to the Savage-Dickey density ratio~\cite{dickey1971} (Appendix~\ref{sec:appendix_freq}),
+The Bayes factor compares two hypotheses through their evidences, $BF_{10}=P(D\mid H_1)/P(D\mid H_0)$, and requires proper priors. For the nested hypothesis $H_0$: $A=0$ against $H_1$: $A$ free, with shared priors on the other parameters, it reduces to the Savage-Dickey ratio~\cite{dickey1971} (Appendix~\ref{sec:appendix_freq}),
 \[
 BF_{01} = \frac{p(A=0\mid D)}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
 \]
-With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the posterior odds of $H_0$ against $H_1$. $A=0$ lies $5.2$ posterior standard deviations from the median, in a tail where the chain contains essentially no samples, so a kernel density estimate of $p(A=0\mid D)$ would only reflect the kernel tails of the few most extreme samples. We therefore use the Gaussian approximation of the marginal posterior (Sec.~\ref{sec:bayes_posterior}), with the mean and standard deviation of the chain, which gives $BF_{01}\approx1.1\times10^{-4}$ ($BF_{10}\approx9\times10^{3}$, $\ln BF_{10}\approx9.1$): decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys} ($BF_{10}>100$). As for any Bayes factor of a point null against a free parameter, the value scales with the prior width -- the Ockham factor built into the Bayes factor, which penalizes a free parameter in proportion to the prior volume it is allowed to explore, and the mechanism behind Lindley's paradox: with the narrower prior $A\in(-0.3,0.3)$ of Sec.~\ref{sec:bayes_checks}, $\pi(A=0)$ grows to $1/0.6$ and $BF_{01}$ drops by a factor $3.3$, which leaves the conclusion unchanged. Figure~\ref{fig:bayes_sd} shows the two densities of the ratio; the dependence on the prior width, the evidence computed by direct integration and the equality of the background shapes of the two charges are in Appendix~\ref{sec:appendix_checks}.
+$A=0$ lies $5.2$ posterior standard deviations from the median, where the chain has essentially no samples, so $p(A=0\mid D)$ was taken from the Gaussian approximation of the marginal posterior: $BF_{01}\approx1.1\times10^{-4}$ ($BF_{10}\approx9\times10^{3}$), decisive evidence against $A=0$ on Jeffreys' scale~\cite{jeffreys}. The value scales with the prior width (Ockham factor): with $A\in(-0.3,0.3)$, $BF_{01}$ drops by a factor $3.3$ and the conclusion is unchanged (Fig.~\ref{fig:checks_bf}; the Savage-Dickey densities are in Fig.~\ref{fig:bayes_sd}, further checks in Appendix~\ref{sec:appendix_checks}).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{figures/validation_bf_prior_width.pdf}
+\caption{$BF_{01}$ of $A=0$ and of $A_b=0$ as a function of the half-width $W$ of the uniform prior $(-W,W)$ (Gaussian approximation of the posterior, Savage-Dickey). The vertical line marks the nominal prior.}
+\label{fig:checks_bf}
+\end{figure}
 
 \begin{figure*}[!t]
 \centering
@@ -57,7 +72,7 @@ With equal prior probabilities for the two hypotheses, $BF_{01}$ is also the pos
 \label{fig:bayes_sd}
 \end{figure*}
 
-The same test on the background asymmetry shows the Ockham factor at work. $A_b=-0.040\pm0.018$ lies $2.3$ standard deviations from zero, yet the Savage-Dickey ratio gives $BF_{01}(A_b=0)\approx3.5$: the data mildly \emph{favor} a charge-symmetric background, because the gain in likelihood does not compensate for spreading the prior of $A_b$ over $(-1,1)$. A negative background asymmetry is plausible: besides combinatorial background, the sample contains misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $B^\pm\to\pi^\pm K^+K^-$ decays, with $\ACP$ values of their own, whose contribution grows when the kaon identification is loosened (Sec.~\ref{sec:syst}). $A_b$ is nevertheless kept free in the nominal model, which avoids imposing an assumption on the background that the frequentist analysis does not make; fixing $A_b=0$ is one of the variants of the systematic study (Sec.~\ref{sec:syst}).
+The same test on the background asymmetry shows the Ockham factor at work: $A_b=-0.040\pm0.018$ is $2.3$ standard deviations from zero, yet $BF_{01}(A_b=0)\approx3.5$, because the likelihood gain does not compensate for spreading the prior over $(-1,1)$. A negative $A_b$ is plausible given the misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $\pi^\pm K^+K^-$ decays; $A_b$ is kept free in the nominal model and fixing it to zero is one of the systematic variants (Sec.~\ref{sec:syst}).
 
 
 
@@ -82,12 +97,6 @@ Single exponential & $-0.0480$ & $297.7/92$ & $2\times10^{-23}$ \\
 \label{tab:gof}
 \end{table}
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_mass_fit.pdf}
-\caption{Mass distributions of (a) $B^+$ and (b) $B^-$ candidates with the nominal model (posterior medians, logarithmic scale): total, signal and background components. Bottom: pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$.}
-\label{fig:bayes_fit}
-\end{figure*}
 
 A binned comparison of data and posterior-median model ($\chi^2=\sum(\text{obs}-\text{exp})^2/\text{exp}$ over 50 bins of $10\,\MeV$ per charge, $100-12=88$ degrees of freedom) gives $\chi^2=164.1/88$ ($p=1.6\times10^{-6}$), with $95.4$ for $B^+$ and $68.7$ for $B^-$. The largest pulls, in the $B^+$ sample, sit on the two flanks of the peak, about $\pm3\sigma$ from $\mu$ (Fig.~\ref{fig:bayes_fit}): the observed signal shape has heavier tails than a Gaussian. Replacing the Gaussian by a Crystal Ball shape~\cite{skwarnicki}, a Gaussian core with a power-law low-mass tail,
 \begin{equation}
