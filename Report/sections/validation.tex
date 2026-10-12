@@ -6,7 +6,7 @@ The asymptotic properties of the maximum-likelihood estimator and of the profile
 
 \subsection{Bias, Efficiency and Coverage}
 \label{sec:validation_estimator}
-\emph{In short: no bias larger than $0.0008$, an estimator spread equal to the Hesse uncertainty within $6\%$, and coverage of $0.70\pm0.01$ and $0.95\pm0.01$ at the fitted value.}
+\emph{In short: no bias larger than $0.0008$, an estimator spread equal to the Hesse uncertainty within $6\%$, and coverage of $0.70\pm0.01$ and $0.95\pm0.01$ at the fitted value; the test of $A=0$ has size $0.051\pm0.013$ and power $0.68$ at $A=-0.02$.}
 Table~\ref{tab:validation_toys} summarizes the estimator over the five injected values: the bias of $\hat A$ is at most $0.0008$ ($1.6$ standard errors), its spread equals the mean Hesse uncertainty within $6\%$ and the pulls have width $0.94$--$1.05$, so the estimator is unbiased and reaches the minimum variance bound. At the fitted value the coverage of $t(A_{\mathrm{true}})\leq1$ is $0.696\pm0.015$ ($68.3\%$ level) and $0.954\pm0.007$ ($95.4\%$ level); at $A_{\mathrm{true}}=+0.05$ the $68\%$ coverage is $0.614\pm0.028$, $2.5$ standard deviations low, not unexpected among five values.
 
 \begin{table}[h]
@@ -25,5 +25,14 @@ $+0.05$ & $293$ & $-0.0004\pm0.0005$ & $1.05$ & $0.61$ & $0.96$ \\
 \caption{Toy-MC experiments at five injected values of the asymmetry: number of valid fits, bias of $\hat A$ with its standard error, spread of the estimates relative to the mean Hesse uncertainty ($0.0085$), and coverage of the intervals $t(A_{\mathrm{true}})\leq1$ and $\leq3.84$.}
 \label{tab:validation_toys}
 \end{table}
+
+\emph{Size and power.} Under $A_{\mathrm{true}}=0$ the test $q(0)>3.84$ rejects in $0.051\pm0.013$ of the toy experiments, the nominal size, and $q(0)$ is compatible with $\chi^2_1$ (Kolmogorov-Smirnov $p=0.79$). Figure~\ref{fig:validation_power} gives the power: $1.00$ at the fitted value and $0.68$ ($0.27$ at $3\sigma$) at $A_{\mathrm{true}}=-0.02$, so with $19{,}731$ candidates an asymmetry below $\sim0.02$ is not resolved. The $5.2\sigma$ of the data is an extrapolation of the $\chi^2_1$ tail verified up to $3\sigma$ (Appendix~\ref{sec:validation_power}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/validation_power.pdf}
+\caption{Probability to reject $A=0$ as a function of the injected asymmetry, with the test $q(0)>3.84$ (size $5\%$, dotted line) and $q(0)>9$ ($3\sigma$); $1000$ toy experiments at $-0.0441$, about $300$ at each other value.}
+\label{fig:validation_power}
+\end{figure}
 
 \paragraph*{Further material} is in Appendix~\ref{app:ext_valid}.

@@ -1,9 +1,9 @@
 \section{Data}
 \label{sec:data}
 
-\subsection{Dataset and Preselection}
+\subsection{Dataset, Preselection and Mass}
 \label{sec:data_presel}
-\emph{In short: $8{,}556{,}118$ candidates are reduced to $23{,}895$ by a kaon-identification and muon-veto requirement, common to the analyses.}
+\emph{In short: $8{,}556{,}118$ candidates are reduced to $23{,}895$ by a kaon-identification and muon-veto requirement common to the analyses; the fit window $[5100,5600]\,\MeV$ contains $19{,}731$ candidates ($10{,}292$ $B^+$, $9439$ $B^-$).}
 The dataset is the CERN Open Data record 4900~\cite{opendata_record}: $B^{\pm}\to h^{\pm}h^{+}h^{-}$ candidates collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, already through trigger and offline selection, distributed as ROOT \texttt{TTree}s with the most relevant branches and split by magnet polarity, for $8{,}556{,}118$ candidates. The record also contains a phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ ($50{,}000$ decays, no asymmetry), used only to test the local-asymmetry procedure (Sec.~\ref{sec:dalitz}).
 
 \begin{table}[h]
@@ -27,14 +27,12 @@ For each of the three final-state tracks ($H1$, $H2$, $H3$) the analysis reads t
 \[
 \texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
 \]
-and retains $23{,}895$ of the $8{,}556{,}118$ candidates ($0.28\%$), the PID requirement being the dominant reduction (Table~\ref{tab:cutflow}). The files have no event identifier; only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate, a negligible effect, and all are kept.
+and retains $23{,}895$ of the $8{,}556{,}118$ candidates ($0.28\%$), the PID requirement being the dominant reduction (Table~\ref{tab:cutflow}).
 
 $H1$ is always the kaon of charge opposite to the $B$ and $H2$, $H3$ the interchangeable same-sign pair, so the Dalitz variables are $m^2(H1,H2)$ and $m^2(H1,H3)$.
 
-\subsection{Invariant Mass Reconstruction}
 \label{sec:data_mass}
-\emph{In short: the mass is computed with the kaon hypothesis; the fit window $[5100,5600]\,\MeV$ contains $19{,}731$ candidates ($10{,}292$ $B^+$, $9439$ $B^-$).}
-The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K=493.677\,\MeV$) regardless of their PID likelihoods, and their four-momenta are summed to reconstruct the $B$ candidate, $m(KKK)=\sqrt{(\sum_i E_i)^2-|\sum_i \vec{p}_i|^2}$. The nominal fit window, common to the frequentist and Bayesian analyses, is $[5100,5600]\,\MeV$. Below $\sim$5150\,\MeV\ the background rises, consistent with a partially reconstructed contribution that a single exponential cannot describe; the window includes the start of this rise, which is described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}). This leaves $19{,}731$ preselected candidates in the fit window: $10{,}292$ with $B$-charge $+1$ and $9439$ with $B$-charge $-1$, split $11{,}636$ (magnet down) / $8095$ (magnet up). The machine-learning selection of Appendix~\ref{sec:ml} uses the same window, with the region below $5150\,\MeV$ excluded from its background-like training sample (Appendix~\ref{sec:ml_labels}).
+The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K=493.677\,\MeV$) regardless of their PID likelihoods, and their four-momenta are summed to reconstruct the $B$ candidate, $m(KKK)=\sqrt{(\sum_i E_i)^2-|\sum_i \vec{p}_i|^2}$. The nominal fit window, common to the frequentist and Bayesian analyses, is $[5100,5600]\,\MeV$ and contains $19{,}731$ candidates ($10{,}292$ $B^+$, $9439$ $B^-$; $11{,}636$ magnet down, $8095$ magnet up). Below $\sim$5150\,\MeV\ the background rises, consistent with a partially reconstructed contribution that a single exponential cannot describe; the window includes the start of this rise, which is described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}). The machine-learning selection (Appendix~\ref{sec:ml}) uses the same window.
 
 \subsection{Data Exploration}
 \label{sec:data_exploration}

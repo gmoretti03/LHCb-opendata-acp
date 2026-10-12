@@ -171,6 +171,13 @@ if len(toys) > 200:
     a.errorbar(keys, pw3, yerr=[se(p, len(byA[k])) for p, k in zip(pw3, keys)], fmt="s--", color=C["count"], label=r"$q(0)>9$ ($3\sigma$)")
     a.set_xlabel(r"Injected $A_{\mathrm{true}}$"); a.set_ylabel("Probability to reject $A=0$"); a.legend(fontsize=10)
     plt.tight_layout(); save(fig, "validation_injection_power.pdf")
+    # (1b) power of the test of A = 0 alone, single column (main text)
+    fig, a = plt.subplots(figsize=(ps.SINGLE, 4.2))
+    a.errorbar(keys, pw, yerr=[se(p, len(byA[k])) for p, k in zip(pw, keys)], fmt="o-", color=C["freq"], label=r"$q(0)>3.84$ (size 5%)")
+    a.errorbar(keys, pw3, yerr=[se(p, len(byA[k])) for p, k in zip(pw3, keys)], fmt="s--", color=C["count"], label=r"$q(0)>9$ ($3\sigma$)")
+    a.axhline(0.05, color="k", ls=":", lw=0.8)
+    a.set_xlabel(r"Injected $A_{\mathrm{true}}$"); a.set_ylabel("Probability to reject $A=0$"); a.legend(fontsize=10, loc="center left")
+    plt.tight_layout(); save(fig, "validation_power.pdf")
 
     # (2) null distribution and uniformity of the p-value, coverage statistic at the injected value
     fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.2))

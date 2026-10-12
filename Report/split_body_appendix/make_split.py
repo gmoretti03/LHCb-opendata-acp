@@ -15,7 +15,7 @@ SPEC = {
  'bayesian':   ('Extended Bayesian Analysis','app:ext_bayes',['Model Adequacy','Robustness Checks','Toy-MC Coverage'],['fig:bayes_sd']),
  'validation': ('Extended Validation of the Estimator','app:ext_valid',['Size and Power','Goodness of Fit'],['fig:validation_injection','fig:validation_null']),
  'dalitz':     ('Extended Dalitz-Plane Analysis','app:ext_dalitz',[],[]),
-  'comparison': ('Extended Comparison','app:ext_comp',['Numerical Agreement','Bayesian and Frequentist Intervals at Low'],['tab:comparison']),
+  'comparison': ('Extended Comparison','app:ext_comp',['Numerical Agreement','Bayesian and Frequentist Intervals at Low'],[]),
 }
 exec(open(B+'/overrides.py').read()) if os.path.exists(B+'/overrides.py') else None
 KEEPL=('Model Adequacy',)

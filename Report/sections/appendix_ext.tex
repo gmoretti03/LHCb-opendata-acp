@@ -185,29 +185,5 @@ With $\sim$$2\times10^4$ candidates the posterior is Gaussian and, with flat pri
 \end{figure*}
 
 The two methods agree at every size (Fig.~\ref{fig:bayes_lowstat}). The coverages of the three intervals are compatible with nominal and with each other, the posterior median and the maximum-likelihood estimate differ on average by $5\%$ of the statistical uncertainty at $N=50$ and by less above, and the credible intervals stay symmetric (at $N=50$ the shortest chain is only $\approx10$ autocorrelation times long, so the Monte Carlo error on the interval endpoints is larger there). The asymmetry is a ratio of Poisson yields, whose likelihood is close to Gaussian already with a few tens of signal events: in this problem flat-prior credible intervals and profile-likelihood confidence intervals give the same answer, and Wilks' theorem holds, down to $N=50$. The two approaches differ in what the interval means and in hypothesis testing (Sec.~\ref{sec:bayes_factor}), not in the numbers. At $N=2000$ all three intervals over-cover slightly ($0.98$--$0.99$ for the 95\% interval); since the effect is the same for the three methods, it is a feature of this set of replicas rather than of either inference.
-\clearpage
-\subsection{Float Cited in the Main Text}
-The main text cites Table~\ref{tab:comparison}; it is placed here to keep the main text within its page limit.
-
-\begin{table*}[t]
-\centering
-\small
-\begin{tabular}{p{2.6cm}p{6.6cm}p{6.6cm}}
-\toprule
- & Frequentist (Sec.~\ref{sec:frequentist}) & Bayesian (Sec.~\ref{sec:bayesian}) \\
-\midrule
-Question & Which value of $A$ makes the data most probable, and which values are not rejected? & What is the distribution of $A$ given the data and the prior? \\
-Estimate & Maximum likelihood, $-0.0441$ & Posterior median, $-0.0443$ (mode $-0.0441$) \\
-Interval (68\%) & $[-0.0526,-0.0356]$ (profile likelihood, Minos) & $[-0.0528,-0.0358]$ (credible, equal-tailed) \\
-Test of $A=0$ & $q(0)\simeq27$, $p=2.05\times10^{-7}$, $5.2\sigma$ & $BF_{01}\approx1.1\times10^{-4}$ (Savage-Dickey) \\
-Validation of the interval & $1000$ bootstrap replicas: $68.4\pm1.5\%$; $985$ toys: $70\pm1\%$ ($68\%$), $95\pm1\%$ ($95\%$) & $200$ toys: $0.65\pm0.03$ ($68\%$), $0.93\pm0.02$ ($95\%$) \\
-Goodness of fit & $\chi^2/\mathrm{ndof}\approx160/88$ ($10\,\MeV$ bins); $441.7/388$, $p=0.031$ ($2.5\,\MeV$ bins) & $164.1/88$ ($p=1.6\times10^{-6}$); posterior predictive check \\
-Computing time & one joint fit with Minos $\simeq19\,$s; $1000$ bootstrap fits $\simeq49\,$min & one chain ($25{,}000$ steps, 32 walkers) $\simeq8\,$min; $200$ toys of $12{,}000$ steps \\
-\bottomrule
-\end{tabular}
-\caption{Frequentist and Bayesian analyses compared on the same candidates ($\Araw$, statistical uncertainties only). Computing times are indicative, on one laptop.}
-\label{tab:comparison}
-\end{table*}
-
 
 \FloatBarrier
