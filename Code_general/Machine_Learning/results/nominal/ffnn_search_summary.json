@@ -1,0 +1,83 @@
+{
+ "n_configs": 168,
+ "top5": [
+  {
+   "arch": "deep_3layer",
+   "layers": [
+    64,
+    32,
+    16
+   ],
+   "dropout": 0.2,
+   "lr": 0.003,
+   "cv_auc_mean": 0.8585050463676452,
+   "cv_auc_std": 0.01735789980978991,
+   "seconds": 16.7
+  },
+  {
+   "arch": "wide_2layer",
+   "layers": [
+    64,
+    32
+   ],
+   "dropout": 0.3,
+   "lr": 0.003,
+   "cv_auc_mean": 0.8582312583923339,
+   "cv_auc_std": 0.017471580196747053,
+   "seconds": 17.5
+  },
+  {
+   "arch": "deep_3layer",
+   "layers": [
+    64,
+    32,
+    16
+   ],
+   "dropout": 0.3,
+   "lr": 0.003,
+   "cv_auc_mean": 0.8580277621746063,
+   "cv_auc_std": 0.01873267501808194,
+   "seconds": 18.2
+  },
+  {
+   "arch": "wide_2layer",
+   "layers": [
+    64,
+    32
+   ],
+   "dropout": 0.3,
+   "lr": 0.005,
+   "cv_auc_mean": 0.8579055964946747,
+   "cv_auc_std": 0.018385542735059147,
+   "seconds": 14.2
+  },
+  {
+   "arch": "wide_2layer",
+   "layers": [
+    64,
+    32
+   ],
+   "dropout": 0.4,
+   "lr": 0.005,
+   "cv_auc_mean": 0.857885479927063,
+   "cv_auc_std": 0.018715987833014036,
+   "seconds": 15.6
+  }
+ ],
+ "best": {
+  "arch": "deep_3layer",
+  "layers": [
+   64,
+   32,
+   16
+  ],
+  "dropout": 0.2,
+  "lr": 0.003,
+  "cv_auc_mean": 0.8585050463676452,
+  "cv_auc_std": 0.01735789980978991,
+  "seconds": 16.7
+ },
+ "best_test_auc": 0.8606271420881569,
+ "default_test_auc": 0.856796935153072,
+ "default_seed_spread_auc_sd": 0.005321983348159775
+}

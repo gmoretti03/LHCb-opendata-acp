@@ -1,0 +1,26 @@
+{
+ "mu": 5284.387271951045,
+ "sigma": 18.000058898668883,
+ "n_window": 19731,
+ "n_signal_like": 15130,
+ "n_background_like": 1940,
+ "n_train": 10242,
+ "n_val": 3414,
+ "n_test": 3414,
+ "n_test_background": 388,
+ "class_weights": {
+  "0": 4.399484536082475,
+  "1": 0.5641110376734964
+ },
+ "exploration": {
+  "B_FlightDistance": {
+   "ks_p": 8.274393696315928e-144,
+   "max_abs_spearman_vs_track_features": 0.5251895774772006
+  },
+  "B_VertexChi2": {
+   "ks_p": 2.294552235101204e-67,
+   "max_abs_spearman_vs_track_features": 0.04819978488058673
+  },
+  "pca_n_components_90pct": 15
+ }
+}

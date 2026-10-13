@@ -1,0 +1,51 @@
+\section{Data}
+\label{sec:data}
+
+\subsection{Dataset and Preselection}
+\label{sec:data_presel}
+\emph{In short: $8{,}556{,}118$ candidates are reduced to $23{,}895$ by a kaon-identification and muon-veto requirement, common to the three analyses.}
+The dataset is the CERN Open Data record 4900, ``Matter Antimatter Differences -- B meson decays to three hadrons''~\cite{opendata_record}: candidates for $B^{\pm}\to h^{\pm}h^{+}h^{-}$ decays collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, reconstructed with the LHCb software and already passed through trigger and offline selection. The data are distributed as ROOT \texttt{TTree}s (\texttt{DecayTree}) containing only the most relevant reconstructed branches, split across two files by magnet polarity (magnet up/down), for a combined $8{,}556{,}118$ candidates. The same record also includes a simplified, detector-response-free phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ ($50{,}000$ decays, half of each charge); it is used only as a sample without asymmetry to test the local-asymmetry procedure (Sec.~\ref{sec:bayes_dalitz}).
+
+\begin{table}[h]
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lrrrr}
+\toprule
+Requirement & alone & cumulative & down & up \\
+\midrule
+All candidates & -- & $8{,}556{,}118$ & $5{,}135{,}823$ & $3{,}420{,}295$ \\
+$\lnot\texttt{isMuon}$, three tracks & $6{,}311{,}517$ & $6{,}311{,}517$ & $3{,}806{,}297$ & $2{,}505{,}220$ \\
+$\texttt{ProbPi}<0.5$, three tracks & $975{,}724$ & $481{,}101$ & $288{,}908$ & $192{,}193$ \\
+$\texttt{ProbK}>0.5$, three tracks & $28{,}812$ & $23{,}895$ & $14{,}178$ & $9717$ \\
+Mass window $[5100,5600]\,\MeV$ & -- & $19{,}731$ & $11{,}636$ & $8095$ \\
+\bottomrule
+\end{tabular}}
+\caption{Number of candidates passing each requirement alone and after the cumulative selection, in the order of the table, and by magnet polarity. The kaon-identification requirement on the three tracks is by far the most selective.}
+\label{tab:cutflow}
+\end{table}
+
+For each of the three final-state tracks ($H1$, $H2$, $H3$) the analysis reads momentum components (\texttt{PX}, \texttt{PY}, \texttt{PZ}), particle-identification (PID) likelihoods (\texttt{ProbK}, \texttt{ProbPi}), a muon flag (\texttt{isMuon}), and the track charge. The same preselection is used in all three analyses: a kaon-PID requirement and a muon veto on every track,
+\[
+\texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
+\]
+which retains $23{,}895$ of the $8{,}556{,}118$ candidates ($0.28\%$), the PID requirement being by far the dominant reduction (Table~\ref{tab:cutflow}). The files contain no event identifier; as a proxy for multiple candidates from the same collision, only $42$ of the candidates in the fit window ($0.2\%$) share an identical track with another candidate, a negligible effect on the statistical uncertainties, and all are kept.
+
+In this dataset only the charge combinations $(+1,-1,-1)$ and $(-1,+1,+1)$ occur for $(H1,H2,H3)$: $H1$ is always the kaon of charge opposite to the $B$, and $H2$, $H3$ are the interchangeable same-sign pair. The Dalitz-plot variables are therefore the invariant masses of the two opposite-sign pairs, $m^2(H1,H2)$ and $m^2(H1,H3)$.
+
+\subsection{Invariant Mass Reconstruction}
+\label{sec:data_mass}
+\emph{In short: the mass is computed with the kaon hypothesis; the fit window $[5100,5600]\,\MeV$ contains $19{,}731$ candidates ($10{,}292$ $B^+$, $9439$ $B^-$).}
+The three final-state tracks are assigned the charged-kaon mass hypothesis ($M_K=493.677\,\MeV$) regardless of their PID likelihoods, and their four-momenta are summed to reconstruct the $B$ candidate, $m(KKK)=\sqrt{(\sum_i E_i)^2-|\sum_i \vec{p}_i|^2}$. The nominal fit window, common to the frequentist and Bayesian analyses, is $[5100,5600]\,\MeV$. Below $\sim$5150\,\MeV\ the background rises, consistent with a partially reconstructed contribution that a single exponential cannot describe; the window includes the start of this rise, which is described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}). This leaves $19{,}731$ preselected candidates in the fit window: $10{,}292$ with $B$-charge $+1$ and $9439$ with $B$-charge $-1$, split $11{,}636$ (magnet down) / $8095$ (magnet up). The machine-learning selection of Appendix~\ref{sec:ml} uses the same window, with the region below $5150\,\MeV$ excluded from its background-like training sample (Appendix~\ref{sec:ml_labels}).
+
+\subsection{Data Exploration}
+\label{sec:data_exploration}
+\emph{In short: the spectrum peaks at $5284\,\MeV$ with a similar shape for the two charges and the two magnet polarities, and the counting asymmetry of all candidates is $-0.043\pm0.007$.}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/mass_spectrum.pdf}
+\caption{Reconstructed $B\to KKK$ invariant mass in the nominal fit window $[5100,5600]\,\MeV$, split by (a) $B$ charge and (b) magnet polarity. Both splits show a consistent peak at $m\approx5284\,\MeV$ over a falling combinatorial background, which rises below $\sim$5150\,\MeV.}
+\label{fig:mass_spectrum}
+\end{figure*}
+
+Figure~\ref{fig:mass_spectrum} shows the reconstructed mass spectrum in the fit window, split by $B$ charge (left) and by magnet polarity (right). The spectrum peaks at $m\approx5284\,\MeV$ over a falling combinatorial background, with a similar shape for the two charges and the two magnet polarities. The charge-counting asymmetry of all candidates in the fit window, signal and background together, is $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.043\pm0.007$ (binomial uncertainty).
+
+

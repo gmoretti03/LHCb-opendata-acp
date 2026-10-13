@@ -1,0 +1,432 @@
+{
+ "nominal": {
+  "A_CP": -0.044129214862583255,
+  "A_CP_err": 0.008499045991967324,
+  "chi2": 441.716011076376,
+  "n_events": 19731
+ },
+ "variations": [
+  {
+   "label": "nominal",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19731,
+   "A_CP": -0.044129214862583255,
+   "A_CP_err": 0.008499045991967324,
+   "N_sig": 15327.953877179396,
+   "mu": 5284.3781247813495,
+   "sigma": 18.001775210346295,
+   "chi2": 441.716011076376,
+   "fval": -123351.19740512449,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "window_lo5050",
+   "left": 5050.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 21164,
+   "A_CP": -0.04450317559022887,
+   "A_CP_err": 0.008512115366115347,
+   "N_sig": 15304.34182197967,
+   "mu": 5284.449694252309,
+   "sigma": 17.953486124525735,
+   "chi2": 519.2554518881052,
+   "fval": -128068.68217360697,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "window_lo5150",
+   "left": 5150.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": false,
+   "n_events": 18566,
+   "A_CP": -0.0445902146836652,
+   "A_CP_err": 0.004305855300381911,
+   "N_sig": 15298.821190969931,
+   "mu": 5284.374310053164,
+   "sigma": 17.96465626474244,
+   "chi2": 455.377176900233,
+   "fval": -119942.59833461387,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "window_hi5450",
+   "left": 5100.0,
+   "right": 5450.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19004,
+   "A_CP": -0.04422170941000603,
+   "A_CP_err": 0.008492265367865015,
+   "N_sig": 15319.551854057696,
+   "mu": 5284.397689987596,
+   "sigma": 17.990573543768363,
+   "chi2": 482.73391698757024,
+   "fval": -123514.50755976982,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "window_hi5700",
+   "left": 5100.0,
+   "right": 5700.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 20191,
+   "A_CP": -0.0455372996456368,
+   "A_CP_err": 0.008500143710212904,
+   "N_sig": 15384.83630919399,
+   "mu": 5284.356965165369,
+   "sigma": 18.08592770040957,
+   "chi2": 473.80249239866185,
+   "fval": -123181.49502823016,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "bkg_single_exp",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19731,
+   "A_CP": -0.04806048298243104,
+   "A_CP_err": 0.008470944717051565,
+   "N_sig": 15083.261468995124,
+   "mu": 5284.48910621074,
+   "sigma": 17.639253096941182,
+   "chi2": 576.2645244641624,
+   "fval": -123210.97579967708,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "bkg_shared_shape",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19731,
+   "A_CP": -0.04814323652972197,
+   "A_CP_err": 0.008341846899577565,
+   "N_sig": 15323.754207865306,
+   "mu": 5284.375222429596,
+   "sigma": 17.99843120254593,
+   "chi2": 451.06373077421824,
+   "fval": -123342.84854320672,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "bkg_symmetric",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19731,
+   "A_CP": -0.047237666383654564,
+   "A_CP_err": 0.008386858281682452,
+   "N_sig": 15327.892633853933,
+   "mu": 5284.37610941599,
+   "sigma": 18.00380274974583,
+   "chi2": 448.43367596215137,
+   "fval": -123346.00616157585,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "signal_crystal_ball",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19731,
+   "A_CP": -0.04472867921438439,
+   "A_CP_err": 0.008477280805754661,
+   "N_sig": 15494.379454012864,
+   "mu": 5284.631187916504,
+   "sigma": 17.727244041948282,
+   "chi2": 406.79459624379547,
+   "fval": -123386.12894574105,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "signal_per_charge",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 19731,
+   "A_CP": -0.044244598288394,
+   "A_CP_err": 0.008668201398378983,
+   "N_sig": 15328.399676910876,
+   "mu": 5284.381002456131,
+   "sigma": 18.00221030883685,
+   "chi2": 441.4644685691765,
+   "fval": -123351.49234043158,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "presel_probk_0.4",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 26553,
+   "A_CP": -0.047306476816906584,
+   "A_CP_err": 0.0076398546269256795,
+   "N_sig": 19415.275277114833,
+   "mu": 5284.390649607072,
+   "sigma": 18.12698696042905,
+   "chi2": 444.5210146470099,
+   "fval": -175260.83857921523,
+   "prob_k_min": 0.4,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "presel_probk_0.6",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 13981,
+   "A_CP": -0.038367764795594894,
+   "A_CP_err": 0.00985508057331197,
+   "N_sig": 11240.225177918795,
+   "mu": 5284.309429178473,
+   "sigma": 17.819574156110715,
+   "chi2": 411.10753561765443,
+   "fval": -80067.11252122253,
+   "prob_k_min": 0.6,
+   "prob_pi_max": 0.5
+  },
+  {
+   "label": "presel_probpi_0.4",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 17984,
+   "A_CP": -0.042084537946296074,
+   "A_CP_err": 0.00880197477975847,
+   "N_sig": 14167.113861728463,
+   "mu": 5284.386833856507,
+   "sigma": 17.89947796501362,
+   "chi2": 420.56592253966403,
+   "fval": -110316.64029835194,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.4
+  },
+  {
+   "label": "presel_probpi_0.6",
+   "left": 5100.0,
+   "right": 5600.0,
+   "sig_lo": 5200.0,
+   "sig_hi": 5350.0,
+   "valid": true,
+   "accurate": true,
+   "n_events": 20953,
+   "A_CP": -0.04476118159499598,
+   "A_CP_err": 0.00832507308288244,
+   "N_sig": 16060.372758106296,
+   "mu": 5284.45616016696,
+   "sigma": 18.048923237535703,
+   "chi2": 435.80008346882505,
+   "fval": -132280.68278242688,
+   "prob_k_min": 0.5,
+   "prob_pi_max": 0.6
+  }
+ ],
+ "systematics": {
+  "A_nominal": -0.044129214862583255,
+  "sigma_stat": 0.008499045991967324,
+  "variations": {
+   "window_lo5050": {
+    "shift": -0.00037396072764561694,
+    "sigma_barlow": 0.0004715137670112755,
+    "rejected_by_data": false,
+    "counts": false,
+    "sigma_from_n_events": false
+   },
+   "window_lo5150": {
+    "shift": -0.00046099982108194215,
+    "sigma_barlow": 0.0021289917034453664,
+    "rejected_by_data": false,
+    "counts": false,
+    "sigma_from_n_events": true
+   },
+   "window_hi5450": {
+    "shift": -9.24945474227723e-05,
+    "sigma_barlow": 0.00033942848338982656,
+    "rejected_by_data": false,
+    "counts": false,
+    "sigma_from_n_events": false
+   },
+   "window_hi5700": {
+    "shift": -0.0014080847830535426,
+    "sigma_barlow": 0.00013660278436456328,
+    "rejected_by_data": false,
+    "counts": true,
+    "sigma_from_n_events": false
+   },
+   "bkg_single_exp": {
+    "shift": -0.003931268119847786,
+    "sigma_barlow": null,
+    "rejected_by_data": true,
+    "counts": false,
+    "sigma_from_n_events": false
+   },
+   "bkg_shared_shape": {
+    "shift": -0.004014021667138712,
+    "sigma_barlow": null,
+    "rejected_by_data": false,
+    "counts": true,
+    "sigma_from_n_events": false
+   },
+   "bkg_symmetric": {
+    "shift": -0.0031084515210713093,
+    "sigma_barlow": null,
+    "rejected_by_data": false,
+    "counts": true,
+    "sigma_from_n_events": false
+   },
+   "signal_crystal_ball": {
+    "shift": -0.0005994643518011378,
+    "sigma_barlow": null,
+    "rejected_by_data": false,
+    "counts": true,
+    "sigma_from_n_events": false
+   },
+   "signal_per_charge": {
+    "shift": -0.00011538342581074446,
+    "sigma_barlow": null,
+    "rejected_by_data": false,
+    "counts": true,
+    "sigma_from_n_events": false
+   },
+   "presel_probk_0.4": {
+    "shift": -0.0031772619543233294,
+    "sigma_barlow": 0.0037237620832993785,
+    "rejected_by_data": false,
+    "counts": false,
+    "sigma_from_n_events": false
+   },
+   "presel_probk_0.6": {
+    "shift": 0.005761450066988361,
+    "sigma_barlow": 0.004988870647039783,
+    "rejected_by_data": false,
+    "counts": true,
+    "sigma_from_n_events": false
+   },
+   "presel_probpi_0.4": {
+    "shift": 0.0020446769162871803,
+    "sigma_barlow": 0.0022893180753072147,
+    "rejected_by_data": false,
+    "counts": false,
+    "sigma_from_n_events": false
+   },
+   "presel_probpi_0.6": {
+    "shift": -0.0006319667324127254,
+    "sigma_barlow": 0.001710830482029743,
+    "rejected_by_data": false,
+    "counts": false,
+    "sigma_from_n_events": false
+   }
+  },
+  "groups": {
+   "window": 0.0014080847830535426,
+   "background": 0.004014021667138712,
+   "signal": 0.0005994643518011378,
+   "preselection": 0.005761450066988361
+  },
+  "total": 0.007186705579332336,
+  "rule": "Barlow for sample-changing variants; exclude dchi2>25; max per group; groups in quadrature"
+ },
+ "charm_vetoes": {
+  "veto_D0": {
+   "n": 18744,
+   "A_CP": -0.049284589048888994,
+   "A_CP_err": 0.008683336821680765,
+   "shift": -0.005155374186305739,
+   "valid": true,
+   "accurate": true
+  },
+  "veto_D0_Jpsi_chic0": {
+   "n": 16367,
+   "A_CP": -0.0420758058476558,
+   "A_CP_err": 0.00935626383197824,
+   "shift": 0.002053409014927454,
+   "valid": true,
+   "accurate": true
+  }
+ },
+ "groups": {
+  "window": [
+   "window_lo5050",
+   "window_lo5150",
+   "window_hi5450",
+   "window_hi5700"
+  ],
+  "background": [
+   "bkg_single_exp",
+   "bkg_shared_shape",
+   "bkg_symmetric"
+  ],
+  "signal": [
+   "signal_crystal_ball",
+   "signal_per_charge"
+  ],
+  "preselection": [
+   "presel_probk_0.4",
+   "presel_probk_0.6",
+   "presel_probpi_0.4",
+   "presel_probpi_0.6"
+  ]
+ },
+ "sample_changing": [
+  "window_lo5050",
+  "window_lo5150",
+  "window_hi5450",
+  "window_hi5700",
+  "presel_probk_0.4",
+  "presel_probk_0.6",
+  "presel_probpi_0.4",
+  "presel_probpi_0.6"
+ ]
+}

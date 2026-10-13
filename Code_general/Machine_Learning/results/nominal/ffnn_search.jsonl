@@ -1,0 +1,168 @@
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.7654841661453247, "cv_auc_std": 0.03134111853429405, "seconds": 26.2}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.8113621890544891, "cv_auc_std": 0.021543175295052838, "seconds": 26.2}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.829681932926178, "cv_auc_std": 0.020481739359064152, "seconds": 26.0}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.8357994079589843, "cv_auc_std": 0.019651447844507043, "seconds": 24.5}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8375541150569916, "cv_auc_std": 0.01855263197202172, "seconds": 21.9}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.83895902633667, "cv_auc_std": 0.018323919836884812, "seconds": 18.3}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.7624721944332122, "cv_auc_std": 0.03218370321941718, "seconds": 26.1}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.8066409468650818, "cv_auc_std": 0.020994018148977067, "seconds": 26.5}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.825700831413269, "cv_auc_std": 0.02100039304457063, "seconds": 26.0}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8323807060718537, "cv_auc_std": 0.020315768519391052, "seconds": 24.5}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8347378730773926, "cv_auc_std": 0.019335722992022672, "seconds": 23.2}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.8365613937377929, "cv_auc_std": 0.01952966510876, "seconds": 20.1}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.7578261137008667, "cv_auc_std": 0.03380162636139414, "seconds": 25.9}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.8013680040836334, "cv_auc_std": 0.02079692607535792, "seconds": 26.9}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8209011316299438, "cv_auc_std": 0.020874761698268865, "seconds": 26.1}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.8274143099784851, "cv_auc_std": 0.021523581625091975, "seconds": 23.7}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8297841012477875, "cv_auc_std": 0.020527742812654445, "seconds": 21.1}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8340505421161651, "cv_auc_std": 0.02058429886512302, "seconds": 20.2}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.7525568842887879, "cv_auc_std": 0.035703009426904034, "seconds": 26.0}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.796542900800705, "cv_auc_std": 0.0207394612875655, "seconds": 26.1}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8159787237644196, "cv_auc_std": 0.020720569208271814, "seconds": 25.9}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.8248311519622803, "cv_auc_std": 0.023339365854935498, "seconds": 24.5}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8257281959056855, "cv_auc_std": 0.021468357175645745, "seconds": 20.6}
+{"arch": "tiny_1layer", "layers": [8], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.8272279381752015, "cv_auc_std": 0.022503883319684535, "seconds": 17.0}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.8004885613918304, "cv_auc_std": 0.02438989019680252, "seconds": 25.9}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.8325470864772797, "cv_auc_std": 0.02114504160280394, "seconds": 25.9}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.8436948239803315, "cv_auc_std": 0.020987300030901004, "seconds": 26.3}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.8470512092113495, "cv_auc_std": 0.02107118269840519, "seconds": 22.4}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8472480773925781, "cv_auc_std": 0.02053912497544754, "seconds": 18.0}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.84672309756279, "cv_auc_std": 0.020792915880944743, "seconds": 14.7}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.79670050740242, "cv_auc_std": 0.025021749931439765, "seconds": 25.7}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.8288204371929169, "cv_auc_std": 0.02164633637640868, "seconds": 25.9}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.841745239496231, "cv_auc_std": 0.021402423334606457, "seconds": 27.1}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8463356614112854, "cv_auc_std": 0.021998933871325323, "seconds": 23.2}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8470153093338013, "cv_auc_std": 0.02099458806714134, "seconds": 19.6}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.847117018699646, "cv_auc_std": 0.021255436224053913, "seconds": 14.3}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.7928780913352966, "cv_auc_std": 0.025583158716249364, "seconds": 25.7}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.8247335612773895, "cv_auc_std": 0.022117144394125845, "seconds": 25.7}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8387828290462493, "cv_auc_std": 0.021836239756714847, "seconds": 26.9}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.8442682087421417, "cv_auc_std": 0.021940046919325537, "seconds": 24.1}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8451227426528931, "cv_auc_std": 0.020200600900900735, "seconds": 21.2}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8447348594665527, "cv_auc_std": 0.02056562768271596, "seconds": 14.7}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.7883938014507293, "cv_auc_std": 0.026204271075973673, "seconds": 26.1}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.8198919236660004, "cv_auc_std": 0.021960235332805014, "seconds": 25.8}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8348087191581726, "cv_auc_std": 0.021555139606389127, "seconds": 26.0}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.8420246362686157, "cv_auc_std": 0.02169442946558595, "seconds": 23.9}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8431813895702363, "cv_auc_std": 0.020716143179688225, "seconds": 22.1}
+{"arch": "small_1layer", "layers": [16], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.8427253603935242, "cv_auc_std": 0.020076267139207498, "seconds": 15.8}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.8237083435058594, "cv_auc_std": 0.023434365596526223, "seconds": 28.4}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.8457959175109864, "cv_auc_std": 0.019299735059161587, "seconds": 28.6}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.8510336101055145, "cv_auc_std": 0.018839356185183915, "seconds": 24.5}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.8519972443580628, "cv_auc_std": 0.01935241086993255, "seconds": 18.5}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8525911867618561, "cv_auc_std": 0.018516692920527048, "seconds": 15.8}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.8540918171405792, "cv_auc_std": 0.017609721811192462, "seconds": 15.0}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.8144764423370361, "cv_auc_std": 0.02370009419181267, "seconds": 30.9}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.8432854115962982, "cv_auc_std": 0.02054866774083336, "seconds": 28.6}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.8509092509746552, "cv_auc_std": 0.02052230035064912, "seconds": 27.0}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8538418233394622, "cv_auc_std": 0.02017621760521815, "seconds": 22.0}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8543112099170684, "cv_auc_std": 0.021206669210041808, "seconds": 18.3}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.8564242482185364, "cv_auc_std": 0.020244707736127056, "seconds": 15.5}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.8037782311439514, "cv_auc_std": 0.02361027897016974, "seconds": 28.1}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.8381004571914673, "cv_auc_std": 0.02083488893895895, "seconds": 28.1}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8502123951911926, "cv_auc_std": 0.020347414275121538, "seconds": 30.2}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.8538635313510895, "cv_auc_std": 0.020944167264632857, "seconds": 22.2}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8548401355743408, "cv_auc_std": 0.021634102121773913, "seconds": 18.4}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8561405003070831, "cv_auc_std": 0.02098812056310801, "seconds": 16.2}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.7924303472042084, "cv_auc_std": 0.023814680403286295, "seconds": 28.5}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.8306325793266296, "cv_auc_std": 0.02117162026552566, "seconds": 28.4}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8478076100349426, "cv_auc_std": 0.021299493866204857, "seconds": 27.6}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.8533640623092651, "cv_auc_std": 0.022054879796215333, "seconds": 25.0}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8546307563781739, "cv_auc_std": 0.02195761864951414, "seconds": 20.3}
+{"arch": "baseline_2layer", "layers": [32, 16], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.8545494019985199, "cv_auc_std": 0.020620394158474633, "seconds": 16.5}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.844984519481659, "cv_auc_std": 0.02175975318831634, "seconds": 32.4}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.851405280828476, "cv_auc_std": 0.02098302763225786, "seconds": 27.4}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.8523725688457489, "cv_auc_std": 0.020275351226819657, "seconds": 19.5}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.853020989894867, "cv_auc_std": 0.01984282648082539, "seconds": 14.9}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8541816115379334, "cv_auc_std": 0.019769142703016107, "seconds": 13.6}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.8548045873641967, "cv_auc_std": 0.019938655870257727, "seconds": 12.5}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.8406864881515503, "cv_auc_std": 0.022210360588579323, "seconds": 30.1}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.8524485468864441, "cv_auc_std": 0.021267507818198278, "seconds": 28.2}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.8542196214199066, "cv_auc_std": 0.02073434798559456, "seconds": 21.0}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8553194105625153, "cv_auc_std": 0.01852007241228452, "seconds": 16.8}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8562241494655609, "cv_auc_std": 0.017955491911321154, "seconds": 15.0}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.8574481666088104, "cv_auc_std": 0.01740747146163764, "seconds": 14.2}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.8337058782577514, "cv_auc_std": 0.022742532291474406, "seconds": 33.5}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.8524365246295929, "cv_auc_std": 0.02243972755326063, "seconds": 29.9}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8559104561805725, "cv_auc_std": 0.019362472394642342, "seconds": 24.9}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.8575933754444123, "cv_auc_std": 0.017680572698020734, "seconds": 19.7}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8582312583923339, "cv_auc_std": 0.017471580196747053, "seconds": 17.5}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8579055964946747, "cv_auc_std": 0.018385542735059147, "seconds": 14.2}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.8244962096214294, "cv_auc_std": 0.0221903973808581, "seconds": 29.7}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.8487911105155945, "cv_auc_std": 0.02237965949204077, "seconds": 29.6}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8542815923690796, "cv_auc_std": 0.019598475697464358, "seconds": 25.6}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.8566850841045379, "cv_auc_std": 0.01914245044895984, "seconds": 20.9}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8565625786781311, "cv_auc_std": 0.019990858652173305, "seconds": 17.6}
+{"arch": "wide_2layer", "layers": [64, 32], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.857885479927063, "cv_auc_std": 0.018715987833014036, "seconds": 15.6}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.8469484329223633, "cv_auc_std": 0.019845481170036303, "seconds": 31.7}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.8523271143436432, "cv_auc_std": 0.018203285136064607, "seconds": 29.1}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.8539299428462982, "cv_auc_std": 0.017046367786941855, "seconds": 20.6}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.8552747070789337, "cv_auc_std": 0.017208185469233632, "seconds": 16.3}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8557057857513428, "cv_auc_std": 0.016575391654414448, "seconds": 15.0}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.8538772106170655, "cv_auc_std": 0.01940192672887976, "seconds": 13.2}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.8424990892410278, "cv_auc_std": 0.020365963102356735, "seconds": 32.0}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.8542743563652039, "cv_auc_std": 0.018650387071520006, "seconds": 29.3}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.8562024176120758, "cv_auc_std": 0.019029258503219904, "seconds": 23.4}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8575214564800262, "cv_auc_std": 0.017756456317215768, "seconds": 17.5}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8585050463676452, "cv_auc_std": 0.01735789980978991, "seconds": 16.7}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.8576555371284484, "cv_auc_std": 0.018932254121672803, "seconds": 14.8}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.8318310618400574, "cv_auc_std": 0.02092589641672149, "seconds": 31.7}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.852406358718872, "cv_auc_std": 0.019451616038274944, "seconds": 30.8}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8557280898094177, "cv_auc_std": 0.01836515981634461, "seconds": 29.5}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.8572687268257141, "cv_auc_std": 0.018852621179078956, "seconds": 21.2}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8580277621746063, "cv_auc_std": 0.01873267501808194, "seconds": 18.2}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8575367510318757, "cv_auc_std": 0.016089545245344353, "seconds": 16.7}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.8159670054912567, "cv_auc_std": 0.022122993745306553, "seconds": 32.0}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.8466656923294067, "cv_auc_std": 0.020306689482281152, "seconds": 32.1}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8525905907154083, "cv_auc_std": 0.020444331468904925, "seconds": 27.1}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.8574428558349609, "cv_auc_std": 0.017733924376667667, "seconds": 23.0}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8570539653301239, "cv_auc_std": 0.01893323432119659, "seconds": 18.7}
+{"arch": "deep_3layer", "layers": [64, 32, 16], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.8563578009605408, "cv_auc_std": 0.01881473027138123, "seconds": 16.8}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.8510852754116058, "cv_auc_std": 0.018770935598620295, "seconds": 33.7}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.8527087569236755, "cv_auc_std": 0.01878784614813613, "seconds": 22.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.8523107290267944, "cv_auc_std": 0.019406293184159866, "seconds": 19.1}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.8522689163684845, "cv_auc_std": 0.018926028815741094, "seconds": 15.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8517509460449219, "cv_auc_std": 0.01808735365107226, "seconds": 15.2}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.8533827006816864, "cv_auc_std": 0.018643118323731486, "seconds": 20.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.8512778759002686, "cv_auc_std": 0.019455351638855384, "seconds": 38.3}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.8537385642528534, "cv_auc_std": 0.01882675036028453, "seconds": 26.6}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.8547114193439483, "cv_auc_std": 0.01890156854152546, "seconds": 21.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8548811614513397, "cv_auc_std": 0.018223477495666336, "seconds": 17.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8540879428386688, "cv_auc_std": 0.01868337068377008, "seconds": 17.0}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.8536794304847717, "cv_auc_std": 0.018692936624087463, "seconds": 15.7}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.8474534511566162, "cv_auc_std": 0.0203192983162914, "seconds": 38.2}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.8538998782634735, "cv_auc_std": 0.0203299722597883, "seconds": 30.8}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8556310594081878, "cv_auc_std": 0.02044272582454422, "seconds": 25.1}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.855701071023941, "cv_auc_std": 0.02057926315070286, "seconds": 19.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8559026598930359, "cv_auc_std": 0.01888297429738995, "seconds": 18.7}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8556321799755097, "cv_auc_std": 0.019388516393050663, "seconds": 16.6}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.8369571149349213, "cv_auc_std": 0.021611878155990968, "seconds": 38.8}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.8523276448249817, "cv_auc_std": 0.019962990751020978, "seconds": 35.2}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8549036145210266, "cv_auc_std": 0.021364272704486157, "seconds": 28.9}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.8549837648868561, "cv_auc_std": 0.02084094727552109, "seconds": 30.2}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8565820813179016, "cv_auc_std": 0.020309043581562207, "seconds": 20.6}
+{"arch": "deep_4layer", "layers": [128, 64, 32, 16], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.8561115860939026, "cv_auc_std": 0.01992869449537543, "seconds": 18.3}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.1, "lr": 0.0002, "cv_auc_mean": 0.848111230134964, "cv_auc_std": 0.02074956452476391, "seconds": 32.1}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.1, "lr": 0.0005, "cv_auc_mean": 0.8496066689491272, "cv_auc_std": 0.020287284303309946, "seconds": 23.4}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.1, "lr": 0.001, "cv_auc_mean": 0.8499050796031952, "cv_auc_std": 0.020866832997402614, "seconds": 19.8}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.1, "lr": 0.002, "cv_auc_mean": 0.8514235496520997, "cv_auc_std": 0.02149451522523782, "seconds": 18.5}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.1, "lr": 0.003, "cv_auc_mean": 0.8501885592937469, "cv_auc_std": 0.02154961805094708, "seconds": 17.7}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.1, "lr": 0.005, "cv_auc_mean": 0.8533200979232788, "cv_auc_std": 0.018820838714805218, "seconds": 17.6}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.2, "lr": 0.0002, "cv_auc_mean": 0.8480103135108947, "cv_auc_std": 0.021858585635083357, "seconds": 39.3}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.2, "lr": 0.0005, "cv_auc_mean": 0.849983936548233, "cv_auc_std": 0.022231721097788107, "seconds": 27.1}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.2, "lr": 0.001, "cv_auc_mean": 0.8504165768623352, "cv_auc_std": 0.020457413305312595, "seconds": 22.2}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.2, "lr": 0.002, "cv_auc_mean": 0.8523529410362244, "cv_auc_std": 0.02037670340470997, "seconds": 19.6}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.2, "lr": 0.003, "cv_auc_mean": 0.8523287534713745, "cv_auc_std": 0.020618333989503836, "seconds": 18.4}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.2, "lr": 0.005, "cv_auc_mean": 0.8534388065338134, "cv_auc_std": 0.02139626843213299, "seconds": 18.2}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.3, "lr": 0.0002, "cv_auc_mean": 0.8420881807804108, "cv_auc_std": 0.021622692046830972, "seconds": 40.8}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.3, "lr": 0.0005, "cv_auc_mean": 0.850004357099533, "cv_auc_std": 0.022641124436039765, "seconds": 34.3}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.3, "lr": 0.001, "cv_auc_mean": 0.8508978307247161, "cv_auc_std": 0.02359387482746046, "seconds": 35.0}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.3, "lr": 0.002, "cv_auc_mean": 0.8537384927272796, "cv_auc_std": 0.020578083344284067, "seconds": 23.0}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.3, "lr": 0.003, "cv_auc_mean": 0.8519233524799347, "cv_auc_std": 0.022466104108376576, "seconds": 20.8}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.3, "lr": 0.005, "cv_auc_mean": 0.8539143979549408, "cv_auc_std": 0.021345704249611366, "seconds": 20.5}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.4, "lr": 0.0002, "cv_auc_mean": 0.8048817694187165, "cv_auc_std": 0.05481417457778946, "seconds": 38.1}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.4, "lr": 0.0005, "cv_auc_mean": 0.847585266828537, "cv_auc_std": 0.021870858446558446, "seconds": 39.4}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.4, "lr": 0.001, "cv_auc_mean": 0.8510385572910308, "cv_auc_std": 0.02317529130440972, "seconds": 30.2}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.4, "lr": 0.002, "cv_auc_mean": 0.850557541847229, "cv_auc_std": 0.021413246047453528, "seconds": 23.5}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.4, "lr": 0.003, "cv_auc_mean": 0.8538834571838378, "cv_auc_std": 0.020895450221061186, "seconds": 22.9}
+{"arch": "deep_5layer", "layers": [128, 64, 32, 16, 8], "dropout": 0.4, "lr": 0.005, "cv_auc_mean": 0.8510033071041108, "cv_auc_std": 0.021829550392734307, "seconds": 20.3}
