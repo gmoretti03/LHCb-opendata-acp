@@ -1,7 +1,9 @@
 opendata-project/
 lhc_anomaly_detection/
-report_cut
-report_complete
+report_cut/
+report_complete/
+Docs/
+backup_sections_full_precondense/
 
 # large regeneratable cached artifacts (rerun the notebook to recreate)
 Code_general/*/results/*.npz
