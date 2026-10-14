@@ -8,6 +8,8 @@ Nothing is edited by hand: run make_cut.py first, then this script, then  cd rep
 usage: python3 report_extended/split_body_appendix/make_short.py
 """
 import os, re, shutil, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from float_place import place_floats, never_cited, FLOAT as _FLOAT
 
 BUILD = os.path.dirname(os.path.abspath(__file__))                       # report_extended/split_body_appendix
 CUT = os.path.abspath(os.path.join(BUILD, '..', '..', 'report_cut'))
@@ -28,11 +30,10 @@ inputs = re.findall(r'\\input\{sections/([^}]+)\}', main)
 R = [
  ('abstract', ', described in Appendix~\\ref{sec:ml}, leaves', ' leaves'),
  ('introduction', ' (Appendix~\\ref{sec:limitations})', ''),
- ('introduction', 'the comparison; a machine-learning selection is in Appendix~\\ref{sec:ml}.',
-  'the comparison, which includes a machine-learning selection\\appref{sec:ml}.'),
+ 
  ('introduction', '\\ref{sec:bayes_checks} \\\\', '\\apponly{sec:bayes_checks} \\\\'),
- ('introduction', 'App.~\\ref{sec:ml_stability} \\\\\nFrequentist fit, ML', '\\secorapp{sec:comparison}{sec:ml_stability} \\\\\nFrequentist fit, ML'),
- ('introduction', 'App.~\\ref{sec:ml_stability} \\\\\nBayesian fit, Dalitz', '\\secorapp{sec:comparison}{sec:ml_stability} \\\\\nBayesian fit, Dalitz'),
+ ('introduction', 'App.~\\ref{sec:ml_stability} \\\\\nFrequentist fit, ML', '\\ref{sec:ml_stability} \\\\\nFrequentist fit, ML'),
+ ('introduction', 'App.~\\ref{sec:ml_stability} \\\\\nBayesian fit, Dalitz', '\\ref{sec:ml_stability} \\\\\nBayesian fit, Dalitz'),
  ('data', '; the cut flow is in Table~\\ref{tab:cutflow} of Appendix~\\ref{app:ext_data}.', '.'),
  ('model', ', hence the Poisson term, Appendix~\\ref{app:model})', ', hence the Poisson term)'),
  ('frequentist', '(Sec.~\\ref{sec:bayes_toymc}, $65.0', '($65.0'),
@@ -95,6 +96,11 @@ text = {n: open(f'{CUT}/sections/{n}.tex').read() for n in inputs}
 for n in os.listdir(OVR):
     if n.endswith('.tex'):
         text[n[:-4]] = open(f'{OVR}/{n}').read()
+_FL = r'\\begin\{(figure\*?|table\*?)\}.*?\\end\{\1\}'
+for _m in set(re.findall(r'%%FIG:([^%]+)%%', text.get('ml', ''))):
+    _blk = [m_.group(0) for m_ in re.finditer(_FL, app, re.S) if '\\label{' + _m + '}' in m_.group(0)][0]
+    _blk = _blk.replace('Appendix~\\ref', 'Sec.~\\ref').replace('App.~\\ref', 'Sec.~\\ref')
+    text['ml'] = text['ml'].replace(f'%%FIG:{_m}%%', _blk)
 
 bad = 0
 R = [r for r in R if r[0] not in ('comparison', 'conclusions', 'abstract', 'frequentist', 'validation')]     # replaced by short_overrides/*.tex
@@ -127,7 +133,6 @@ for n, old, new in R:
 # ---- structural edits (after the rewrites above, which act on the original strings)
 sd = float_block(app, 'fig:bayes_sd')
 MOVED = {'sec:bayes_gof': float_block(text['bayesian'], 'fig:bayes_fit'),                          # figures of the old body that go to the appendix
-         'sec:checks_hpd': float_block(text['bayesian'], 'fig:bayes_corner'),
          'app:dalitz_phi': float_block(text['dalitz'], 'fig:dalitz_region'),
          'sec:freq_stab_numbers': float_block(text['systematics'], 'fig:freq_stability')}
 text['bayesian'] = text['bayesian'].replace(float_block(text['bayesian'], 'fig:checks_bf'), sd)   # BF vs prior width -> Savage-Dickey
@@ -138,6 +143,10 @@ for old, new in (('$BF_{10}\\approx9\\times10^{3}$), decisive', '$BF_{10}\\appro
     assert text['bayesian'].count(old) == 1, old
     text['bayesian'] = text['bayesian'].replace(old, new)
 _fstab = float_block(text['systematics'], 'fig:freq_stability')
+text['dalitz'] = re.sub(r'Three caveats limit the interpretation:.*?carries it\.',
+                        lambda m: 'The asymmetries are counts without background subtraction, and part of the local variation can be instrumental' +
+                                  ('\\appref{sec:limitations}' if 'appref{sec:limitations}' in m.group(0) else '') + '.',
+                        text['dalitz'], count=1, flags=re.S)
 text['dalitz'] = drop_float(text['dalitz'], 'fig:dalitz_region')                                  # ordered Dalitz plot: not in the short
 for old, new in (('The ordered Dalitz plot (Fig.~\\ref{fig:dalitz_region}a) shows the', 'The Dalitz plane shows the'),
                  (' (spectra of the two charges in Fig.~\\ref{fig:dalitz_region}b, where the $B^-$ peak is visibly smaller)', '')):
@@ -158,19 +167,29 @@ text['data'] = text['data'].replace(_ms, r"""\begin{figure}[t]
 \caption{(a) Reconstructed $B\to KKK$ invariant mass in the nominal fit window $[5100,5600]\,\MeV$ for $B^+$ and $B^-$, logarithmic scale; the signal region $[5200,5350]\,\MeV$ is shaded. (b) Counting asymmetry in $25\,\MeV$ bins of the mass for the two magnet polarities, and for all candidates (dashed); the two polarities agree within their uncertainties and the asymmetry is similar in the peak and in the sidebands.}
 \label{fig:mass_spectrum}
 \end{figure}""")
-text['bayesian'] = re.sub(r'\n ?\\emph\{Model Adequacy: Goodness of Fit and Posterior Predictive Check\}:[^\n]*\n', '\n', text['bayesian'])
-text['bayesian'] = drop_float(text['bayesian'], 'fig:bayes_corner')                          # corner plot: not in the short
-text['bayesian'] = text['bayesian'].replace('The other physics parameters (Fig.~\\ref{fig:bayes_corner})', 'The other physics parameters')
+text['bayesian'] = re.sub(r'\n?(?:\\paragraph\*\{Further material\} is in Appendix~\\ref\{[^}]+\}\.)? ?\\emph\{Model Adequacy: Goodness of Fit and Posterior Predictive Check\}:[^\n]*(?:\n|$)', '\n', text['bayesian'])
+_cb = float_block(text['bayesian'], 'fig:bayes_corner')                                          # corner plot redrawn for the short
+text['bayesian'] = text['bayesian'].replace(_cb, r"""\begin{figure*}[t]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/short_corner.pdf}
+\caption{Marginal posteriors and correlations of the six physics parameters of the nominal fit (the six background-shape parameters are marginalized). Diagonal: posterior with its median (line) and $68\%$ interval (band), quoted above as median $\pm$ half-width; below the diagonal: two-dimensional posteriors with the correlation coefficient.}
+\label{fig:bayes_corner}
+\end{figure*}""")
 text['bayesian'] = drop_float(text['bayesian'], 'fig:bayes_fit')                               # same fit as the frequentist figure
 _pat = (r'Figure~\\ref\{fig:bayes_fit\} compares the nominal model with the data of the two charges: it follows the spectrum over two orders of '
         r'magnitude, and the pulls show signal tails heavier than a Gaussian, whose effect on \$\\Araw\$ is negligible((?:\\apprefs?\{[^}]*\}(?:\{[^}]*\})?)*)\.')
 assert len(re.findall(_pat, text['bayesian'])) == 1
-text['bayesian'] = re.sub(_pat, lambda m: 'The nominal model with the posterior medians coincides with the fit of Fig.~\\ref{fig:freq_jointfit}: it follows the spectrum '
-    'over two orders of magnitude, and the pulls show signal tails heavier than a Gaussian, whose effect on $\\Araw$ is negligible' + m.group(1) + '.', text['bayesian'])
+text['bayesian'] = re.sub(_pat, lambda m: 'The nominal model with the posterior medians coincides with the fit of Fig.~\\ref{fig:freq_jointfit}, which it follows over two orders of magnitude' + m.group(1) + '.', text['bayesian'])
 # ---- figures added to the short: shifts of all variants, goodness of fit with toys, phi band, three methods with ML, profile vs posterior
 _cmp = open(CUT + '/sections/comparison.tex').read()
 _sv = float_block(app, 'fig:syst_pid_scan'); _gof = float_block(app, 'fig:validation_gof'); _phi = float_block(app, 'fig:dalitz_phi')
 _ml3 = float_block(app, 'fig:ml_three'); _prof = float_block(_cmp, 'fig:checks_profile')
+_prof = r"""\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/short_profile_polarity.pdf}
+\caption{(a) Frequentist profile likelihood, $\exp[-q(A)/2]$ normalized, and Bayesian marginal posterior of $A$: the two coincide. (b) Profile likelihood $q(A)$ of the two magnet polarities (parabolic fits to the points), their sum and the joint fit: the likelihoods of the two polarities combine into that of the full sample.}
+\label{fig:checks_profile}
+\end{figure*}"""
 # ---- lighter table of the 13 variants: one column per method, "shift ($\sigma_B$)", no bold, no sample size
 _tab = float_block(text['systematics'], 'tab:syst')
 _rows = []
@@ -206,6 +225,7 @@ Group & Variant & Bayesian & Frequentist \\
 \label{tab:syst}
 \end{table}"""
 text['systematics'] = text['systematics'].replace(_tab, _new_tab)
+MOVED['sec:syst_tables'] = _new_tab
 _sv = float_block(app, 'fig:syst_pid_scan')
 text['systematics'] = text['systematics'].replace('\\label{tab:syst}\n\\end{table}', '\\label{tab:syst}\n\\end{table}\n\nFigure~\\ref{fig:syst_pid_scan} shows the scan of each particle-identification cut, with the expected spread $\\sigma_B$.\n\n' + _sv, 1)
 _i = text['systematics'].index('\\subsection{Stability Checks of the Frequentist Fit}')          # numbers go to the additional results
@@ -263,9 +283,7 @@ for sec in re.split(r'(?m)^(?=\\section\{)', app):
 # ---- hand-condensed "Additional Results": the same checks and numbers as the appendix, in one paragraph per section
 ADD = {
  'data': [
-  ("Branches and cut flow", r"""The analysis reads momentum, particle-identification likelihoods, muon flag and charge of each track; the kaon-identification requirement on the three tracks is by far the most selective."""),
-  ("Charge combinations", r"""$H1$ is always the kaon of charge opposite to the $B$ and $H2$, $H3$ the same-sign pair, so the Dalitz variables are the two opposite-sign invariant masses."""),
-  ("Shared tracks and window", r"""Only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate and all are kept; the mass is computed with the kaon hypothesis on all tracks, and the window includes the start of the rise of the background below $\sim5150\,\MeV$.""")],
+  ("Selection", r"""The kaon-identification requirement on the three tracks is by far the most selective step of the preselection, and only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate; all are kept.""")],
  'model': [
   ("Minimal model", r"""A six-parameter model on a narrower window gives $\Araw=-0.0497$ ($68\%$ CI $[-0.058,-0.041]$), compatible with the nominal result within its uncertainty; it is the model of the low-statistics comparison.""")],
  'frequentist': [
@@ -279,8 +297,7 @@ ADD = {
   ("Model adequacy", r"""The model does not reach $\chi^2/\mathrm{ndof}\approx1$ ($164.1/88$), because the signal tails are heavier than a Gaussian, but $\Araw$ changes by $-0.0002$ with a Crystal Ball signal; the posterior predictive check reproduces the asymmetry in slices of the mass ($p_B=0.67$) and puts the difference of the $\chi^2$ of the two charges at the edge of the replicas ($p_B=0.08$)."""),
   ("Robustness and coverage", r"""$\Araw$ agrees between the magnet polarities ($0.7\sigma$) and the $D^0$ veto moves it by $2.3$ times the expected spread; $200$ toy-MC experiments give coverage $0.65\pm0.03$ ($68\%$) and $0.93\pm0.02$ ($95\%$) with pulls of width $1.04$.""")],
  'systematics': [
-  ("The $\sigma_B$ rule", r"""$\sigma_B$ is the difference of two nearly equal uncertainties, so a variant at the threshold can be classified differently by the two methods without changing the result; the rule is verified by bootstrap (the spread of the shift between a sample and its tighter subsample is $\sigma_B$)."""),
-  ("Stability scans", r"""The frequentist grid scans shift $\Araw$ by at most $0.0048$ over the window edges ($55$ of $80$ fits valid), $6\times10^{-5}$ over the signal region and $0.0126$ over the grid of the two PID cuts, whose samples are smaller (mean uncertainty $0.0112$).""")],
+  ("Checks", r"""The $\sigma_B$ rule is verified by bootstrap (the spread of the shift between a sample and its tighter subsample is $\sigma_B$), and the grid scans of the Frequentist fit move $\Araw$ by at most $0.0126$ (PID cuts, smaller samples), $0.0048$ (window edges) and $6\times10^{-5}$ (signal region).""")],
  'validation': [
   ("Asymptotic behavior", r"""With the number of candidates the bias tends to zero, the spread scales as $N^{-1/2}$ and the distribution of $\hat A$ becomes Gaussian."""),
   ("Goodness of fit and binning", r"""The binned $\chi^2$ of toy experiments follows its asymptotic distribution, so its $p$-values are accurate: the misfit of the data is $5.4$ standard deviations in $10\,\MeV$ bins and $2.0$ in $2.5\,\MeV$ bins, because it lives on the scale of the flanks of the peak.""")],
@@ -292,13 +309,11 @@ ADD = {
   ("Tests and goodness of fit", r"""The exact binomial test on all candidates gives $6.1\sigma$. The same fit has $p=0.03$ in $2.5\,\MeV$ bins and $p\approx5\times10^{-6}$ in $10\,\MeV$ bins: the $p$-value of the binned $\chi^2$ depends on the binning as much as on the model."""),
   ("Low statistics", r"""Credible and confidence intervals coincide in value and coverage from $\sim2\times10^4$ down to $50$ candidates."""),
   ("Published analysis", r"""It has $22{,}119\pm164$ signal candidates, a Cruijff signal and misidentified and partially reconstructed backgrounds; its corrections move $-0.060$ to $-0.043\pm0.009\pm0.003\pm0.007$ and cannot be assumed for another selection."""),
-  ("Machine learning: labels and models", r"""A classifier separates the signal-enriched window from the sidebands ($15{,}130$ and $1940$ candidates, $20$ features, $60/20/20$ split) and, by the Neyman-Pearson argument of CWoLa, is also the signal/background classifier; the tree ensembles and the neural network reach test AUC $0.857$--$0.864$, $0.09$ above the linear models and indistinguishable within $0.012$, with gradient boosting as reference."""),
-  ("Machine learning: regularization and uncertainty", r"""The linear model does not overfit, gradient boosting overfits beyond $\sim150$ stages without losing test AUC, and class weights bias the probabilities, corrected by isotonic recalibration (Brier score $0.122\to0.062$); the mean per-candidate uncertainties are $0.178$ (Random Forest), $0.095$ (MC dropout) and $0.050$ (deep ensemble)."""),
-  ("Machine learning: Dalitz plane and selection", r"""K-means with $K=8$ finds two clusters beyond $3\sigma$ ($\chi^2=46.4$ for $7$ degrees of freedom), the pattern of the fixed binning ($80.8/31$): negative at low $m^2_{\mathrm{lo}}$, positive at high $m^2_{\mathrm{hi}}$. A cut at $0.5$ on the score keeps $92\%$ of the signal and $36\%$ of the background and gives $-0.0451\pm0.0087$ (Bayesian) and $-0.0447\pm0.0086$ (frequentist), within the spread of a subsample, with counting too; the hyperparameter search gains at most $0.005$ in AUC (winner's curse), and the selection cannot remove the misidentified background.""")],
+  ("Machine learning: hyperparameters and features", r"""The hyperparameter search gains at most $0.005$ in AUC, less than its uncertainty, and the cross-validated maximum overestimates the test AUC (winner's curse); the Random Forest importance and the Lasso coefficients of the features agree only partly (Spearman correlation $0.42$) and both rank the two vertex variables of the $B$ among the top five.""")],
 }
 
 ADD_REFS = {
- ('data', 'Branches and cut flow'): ['app:cutflow'], ('data', 'Charge combinations'): ['app:ext_data'], ('data', 'Shared tracks and window'): ['app:ext_data'],
+ ('data', 'Selection'): ['app:cutflow', 'app:ext_data'],
  ('model', 'Minimal model'): ['sec:bayes_minimal'],
  ('frequentist', 'Neyman construction and momentum'): ['sec:checks_belt'], ('frequentist', 'Uncertainties of the twelve parameters'): ['sec:checks_covariance'],
  ('frequentist', 'Starting values'): ['sec:checks_multistart'],
@@ -306,20 +321,19 @@ ADD_REFS = {
  ('bayesian', 'Background asymmetry'): ['app:sd_densities'], ('bayesian', 'Priors'): ['sec:checks_prior'],
  ('bayesian', 'Model adequacy'): ['sec:bayes_gof', 'sec:checks_ppc'], ('bayesian', 'Robustness and coverage'): ['sec:bayes_checks', 'sec:bayes_toymc'],
  ('systematics', 'Variants'): ['sec:syst_tables', 'app:syst_variants'], ('systematics', 'PID scan'): ['app:syst'],
- ('systematics', 'The $\\sigma_B$ rule'): ['sec:checks_barlow'], ('systematics', 'Stability scans'): ['sec:freq_stab_numbers'],
+ ('systematics', 'Checks'): ['sec:checks_barlow', 'sec:freq_stab_numbers'],
  ('validation', 'Asymptotic behavior'): ['sec:checks_scaling'], ('validation', 'Goodness of fit and binning'): ['sec:validation_gof'],
  ('dalitz', 'Local deviations'): ['app:ext_dalitz'], ('dalitz', 'Null tests'): ['sec:dalitz_null', 'app:dalitz_perm'],
  ('dalitz', 'The $\\phi(1020)$ band'): ['app:dalitz_phi'],
  ('conclusions', 'Numerical agreement'): ['sec:comparison_numbers'], ('conclusions', 'Profile, posterior and polarities'): ['sec:checks_profile', 'sec:checks_region'],
  ('conclusions', 'Tests and goodness of fit'): ['app:ext_comp'], ('conclusions', 'Low statistics'): ['sec:bayes_lowstat'],
  ('conclusions', 'Published analysis'): ['app:ext_comp'],
- ('conclusions', 'Machine learning: labels and models'): ['sec:ml_labels', 'sec:ml_models'],
- ('conclusions', 'Machine learning: regularization and uncertainty'): ['sec:ml_regcal', 'sec:ml_uncertainty'],
- ('conclusions', 'Machine learning: Dalitz plane and selection'): ['sec:ml_kmeans', 'sec:ml_stability'],
+ ('conclusions', 'Machine learning: hyperparameters and features'): ['sec:ml_hyper', 'sec:ml_models'],
 }
 def _ptr(labs):
     return '' if not labs else ('\\appref{%s}' % labs[0] if len(labs) == 1 else '\\apprefs{%s}{%s}' % tuple(labs[:2]))
 extra = {k: ['\n\n'.join('\\emph{%s.} %s' % (t, (lambda y, q: (y[:-1] + q + '.') if y.endswith('.') else y + q)(x.rstrip(), _ptr(ADD_REFS.get((k, t), [])))) for t, x in v) + '\n'] for k, v in ADD.items()}
+text['systematics'] = open(os.path.join(BUILD, 'short_late', 'systematics.tex')).read()      # compact result and systematics
 for n, items in extra.items():
     head = '\\subsection{Additional Results}\n' if n != 'ml' else '\\section{Machine-Learning Analysis}\n\\label{sec:ml_short}\n'
     body = head + '\n'.join(items)
@@ -344,7 +358,7 @@ def _clean(t):
 for n in extra:
     text[n] = _clean(text[n])
 _q = text['conclusions'].index('\n\n', text['conclusions'].index('The numbers coincide'))
-text['conclusions'] = text['conclusions'][:_q] + ' Figure~\\ref{fig:checks_profile} shows the profile likelihood and the marginal posterior of $A$ on the same axis.\n\n' + _prof + text['conclusions'][_q:]
+text['conclusions'] = text['conclusions'][:_q] + ' Figure~\\ref{fig:checks_profile} shows the profile likelihood and the marginal posterior of $A$ on the same axis, and the likelihoods of the two magnet polarities.\n\n' + _prof + text['conclusions'][_q:]
 # the "In short" summaries only at the level of the sections, not of the subsections
 def _drop_subsection_summaries(t):
     out, pos = [], 0
@@ -379,7 +393,7 @@ GUIDE = {
  'systematics': r"thirteen variants in four groups, fitted by both methods on the same candidates, give $0.0070$ (Bayesian) and $0.0072$ (frequentist), dominated by the particle-identification requirement.",
  'validation': r"toy-MC experiments show an unbiased estimator at the minimum variance bound, intervals with nominal coverage and a test of $A=0$ with the nominal size.",
  'dalitz': r"the asymmetry is not uniform over the Dalitz plane ($\chi^2=80.8$ for $31$ degrees of freedom) and is concentrated outside the $\phi(1020)$, in the region of the published analysis: $-0.234\pm0.025$ against $-0.239\pm0.020$.",
- 'ml': r"a classifier trained on weak labels from the mass spectrum selects candidates without changing $\Araw$ beyond its statistical spread.",
+ 'ml': r"classifiers trained on weak labels from the mass spectrum reach a test AUC of $0.86$; a cut on their score leaves $\Araw$ unchanged, and an adaptive partition of the Dalitz plane shows the pattern of the fixed binning.",
  'conclusions': r"the frequentist and Bayesian analyses give the same $\Araw=-0.044\pm0.009\,(\text{stat})\pm0.007\,(\text{syst})$, $5.2$ standard deviations from zero, with validated intervals; they differ in the meaning of the numbers and of the tests, not in their values.",
 }
 def _set_guide(t, g):
@@ -408,7 +422,7 @@ _labels = set(l for t in text.values() for l in re.findall(r'\\label\{([^}]+)\}'
 for n in text:
     text[n] = _clean(text[n])
 SHORT_FIG = {'bayes_nominal_dalitz_maps': 'short_dalitz_maps', 'bayes_nominal_savage_dickey': 'short_savage_dickey', 'syst_pid_scan': 'short_pid_scan',
-             'validation_injection_power': 'short_injection_power', 'validation_profile_polarity': 'short_profile_polarity'}
+             'validation_injection_power': 'short_injection_power', 'ml_nominal_three_methods': 'short_ml_three', 'ml_weak_labels': 'short_ml_labels', 'ml_nominal_kmeans': 'short_ml_kmeans', 'validation_profile_polarity': 'short_profile_polarity'}
 for n in text:
     for a, b in SHORT_FIG.items():
         text[n] = text[n].replace(f'figures/{a}.pdf', f'figures/{b}.pdf')
@@ -419,6 +433,80 @@ def _cap(t):
     return ''.join(p if _PROT.fullmatch(p) else re.sub(r'\bfrequentist\b', 'Frequentist', p) for p in parts)
 for n in text:
     text[n] = _cap(text[n])
+# the machine-learning section of the body has its own labels, distinct from those of the appendix (the pointers \appref use the latter)
+text['ml'] = re.sub(r'\\label\{(sec:ml(?:_[a-z]+)?)\}', r'\\label{\1_body}', text['ml'])
+for n in text:
+    text[n] = re.sub(r'(?<!app)\\ref\{(sec:ml(?:_[a-z]+)?)\}', r'\\ref{\1_body}', text[n])
+
+# ---- readability: a few key results in bold and the terms being defined in italics (the same body for the short and the cut)
+EMPH = {
+ 'abstract': [
+  (r"$\Araw=-0.0441\pm0.0085\,(\text{stat})\pm0.0072\,(\text{syst})$ (Frequentist) and $-0.0443\pm0.0085\pm0.0070$ (Bayesian), $5.2$ standard deviations from zero",
+   r"\bnum{\Araw=-0.0441\pm0.0085\,(\text{stat})\pm0.0072\,(\text{syst})} (Frequentist) and \bnum{-0.0443\pm0.0085\pm0.0070} (Bayesian), \textbf{5.2 standard deviations} from zero"),
+  (r"the dominant systematic uncertainty is the particle-identification requirement", r"the dominant systematic uncertainty is the \emph{particle-identification requirement}"),
+  (r"we find $-0.234\pm0.025$", r"we find \bnum{-0.234\pm0.025}"),
+ ],
+ 'introduction': [(r"so $\Araw$ is not a measurement of $\ACP$;", r"so $\Araw$ is \emph{not} a measurement of $\ACP$;")],
+ 'data': [
+  (r"The nominal fit window, common to the two analyses, is $[5100,5600]\,\MeV$", r"The \textbf{nominal fit window}, common to the two analyses, is $[5100,5600]\,\MeV$"),
+  (r"The counting asymmetry of all candidates", r"The \emph{counting asymmetry} of all candidates"),
+ ],
+ 'model': [
+  (r"the parameter of interest (POI,", r"the \emph{parameter of interest} (POI,"),
+  (r"The likelihood is extended (the yields", r"The likelihood is \emph{extended} (the yields"),
+  (r"can only come from the inference.", r"can only come from \emph{the inference}."),
+ ],
+ 'frequentist': [
+  (r"is the nominal one.", r"is the \textbf{nominal} one."),
+  (r"The maximum-likelihood estimate is $\hat A=-0.0441$", r"The maximum-likelihood estimate is \bnum{\hat A=-0.0441}"),
+  (r"The profile likelihood ratio $q(A)", r"The \emph{profile likelihood ratio} $q(A)"),
+  (r"$5.20\sigma$", r"\bnum{5.20\sigma}"),
+  (r"The fraction is $68.4\pm1.5\%$ against", r"The fraction is \bnum{68.4\pm1.5\%} against"),
+ ],
+  'bayesian': [
+  (r"[width=0.95\textwidth]{figures/short_savage_dickey.pdf}", r"[width=0.78\textwidth]{figures/short_savage_dickey.pdf}"),
+  (r"$BF_{01}\approx1.1\times10^{-4}$", r"\bnum{BF_{01}\approx1.1\times10^{-4}}"),
+  (r"decisive evidence against $A=0$", r"\textbf{decisive evidence} against $A=0$"),
+  (r"Of the Bayesian results only the Bayes factor depends on the prior;", r"Of the Bayesian results \emph{only the Bayes factor} depends on the prior;"),
+ ],
+ 'validation': [
+  (r"the estimator is unbiased and reaches the minimum variance bound.", r"the estimator is \textbf{unbiased} and reaches the \textbf{minimum variance bound}."),
+  (r"rejects in $0.051\pm0.013$ of the experiments, the nominal size,", r"rejects in $0.051\pm0.013$ of the experiments, the \textbf{nominal size},"),
+  (r"an asymmetry below $\sim0.02$ is not resolved", r"an asymmetry below $\sim0.02$ is \emph{not} resolved"),
+ ],
+ 'ml': [
+  (r"derived from the mass spectrum, following", r"derived from the mass spectrum (\emph{weak labels}), following"),
+  (r"The raw asymmetry is stable (", r"The raw asymmetry is \textbf{stable} ("),
+  (r"an unsupervised partition", r"an \emph{unsupervised} partition"),
+ ],
+ 'dalitz': [
+  (r"confirms that the local asymmetry is not uniform;", r"confirms that the local asymmetry is \textbf{not uniform};"),
+  (r"The negative asymmetry is not produced by the $\phi(1020)$", r"The negative asymmetry is \emph{not} produced by the $\phi(1020)$"),
+  (r"gives $\Araw=-0.234\pm0.025$ (Bayesian)", r"gives $\Araw=\bnum{-0.234\pm0.025}$ (Bayesian)"),
+ ],
+ 'systematics': [
+  (r"The preselection dominates,", r"The \textbf{preselection} dominates,"),
+  (r"shows to be a fluctuation:", r"shows to be a \emph{fluctuation}:"),
+ ],
+ 'conclusions': [
+  (r"The numbers coincide, the statements do not.", r"\textbf{The numbers coincide, the statements do not.}"),
+  (r"The credible interval states", r"The \emph{credible interval} states"),
+  (r"the confidence interval $[-0.0526,-0.0356]$ is", r"the \emph{confidence interval} $[-0.0526,-0.0356]$ is"),
+ ],
+}
+for n_, pairs_ in EMPH.items():
+    if n_ not in text:
+        continue
+    for old_, new_ in pairs_:
+        if text[n_].count(old_) != 1:
+            print('EMPH: not found once in', n_, ':', old_[:60], text[n_].count(old_))
+            continue
+        text[n_] = text[n_].replace(old_, new_, 1)
+for n in text:
+    text[n] = place_floats(text[n])
+_nc = never_cited(text)
+if _nc:
+    print('floats not cited in the text:', _nc)
 for n, t in text.items():
     open(f'{OUT}/sections/{n}.tex', 'w').write(t)
 alltex = ''.join(text.values())
@@ -435,13 +523,15 @@ print('report_short built:', len(used), 'figures,', len(inputs), 'body files')
 
 # ---- macros of the pointers to the appendix, in the short (nothing) and in the cut (Appendix~\ref)
 MAC_SHORT = ('\\usepackage{xspace}\\newcommand{\\appref}[1]{}\\newcommand{\\apprefs}[2]{}\\newcommand{\\secorapp}[2]{\\ref{#1}}'
-             '\\newcommand{\\apponly}[1]{--}\n')
+             '\\newcommand{\\apponly}[1]{--}\\newcommand{\\bnum}[1]{\\textbf{\\boldmath$#1$}}\n')
 MAC_CUT = ('\\usepackage{xspace}\\newcommand{\\appref}[1]{\\unskip~(Appendix~\\ref{#1})\\xspace}\\newcommand{\\apprefs}[2]{\\unskip~(Appendices~\\ref{#1} and~\\ref{#2})\\xspace}'
-           '\\newcommand{\\secorapp}[2]{App.~\\ref{#2}}\\newcommand{\\apponly}[1]{App.~\\ref{#1}}\n')
+           '\\newcommand{\\secorapp}[2]{App.~\\ref{#2}}\\newcommand{\\apponly}[1]{App.~\\ref{#1}}\\newcommand{\\bnum}[1]{\\textbf{\\boldmath$#1$}}\n')
+_ORDER = ['introduction', 'data', 'model', 'frequentist', 'bayesian', 'validation', 'ml', 'dalitz', 'systematics', 'conclusions']
 main = open(OUT + '/main.tex').read()
+main = re.sub(r'\\input\{sections/introduction\}.*?\\input\{sections/conclusions\}\n', lambda m_: ''.join(f'\\input{{sections/{n_}}}\n' for n_ in _ORDER), main, flags=re.S)
 open(OUT + '/main.tex', 'w').write(main.replace('\\input{preamble}\n', '\\input{preamble}\n' + MAC_SHORT, 1))
 # the cut: the same body, with the pointers, followed by the appendix built by make_cut.py (summaries, figures and tables)
-if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex'):
+if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex') and not os.environ.get('SHORT_ONLY'):
     cmain = main.replace('\\input{preamble}\n', '\\input{preamble}\n' + MAC_CUT, 1)
     cmain = cmain.replace('\\bibliography{biblio}', '\\input{sections/appendix}\n\n\\bibliography{biblio}', 1)
     open(CUT + '/main.tex', 'w').write(cmain)
@@ -461,7 +551,7 @@ if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex'):
     for a_, b_ in SHORT_FIG.items():
         ap = ap.replace(f'figures/{a_}.pdf', f'figures/{b_}.pdf')
     # every float of the appendix is cited where it is presented
-    _alltxt = '\n'.join(text.values()) + '\n' + ap
+    _alltxt = _FLOAT.sub('', '\n'.join(text.values()) + '\n' + ap)
     _refs = set(re.findall(r'\\(?:ref|eqref|autoref)\{([^}]+)\}', _alltxt))
     for _m in re.finditer(r'\\(?:appref|apponly)\{([^}]+)\}|\\apprefs\{([^}]+)\}\{([^}]+)\}', _alltxt):
         _refs.update(g for g in _m.groups() if g)
@@ -483,7 +573,7 @@ if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex'):
         k_ = m_.end() + (k_.start() if k_ else len(ap) - m_.end())
         ap = ap[:k_].rstrip('\n') + '\n\n' + blk + '\n' + ap[k_:]
     # every float of the appendix is cited where it is presented
-    _alltxt = '\n'.join(text.values()) + '\n' + ap
+    _alltxt = _FLOAT.sub('', '\n'.join(text.values()) + '\n' + ap)
     _refs = set(re.findall(r'\\(?:ref|eqref|autoref)\{([^}]+)\}', _alltxt))
     for _m in re.finditer(r'\\(?:appref|apponly)\{([^}]+)\}|\\apprefs\{([^}]+)\}\{([^}]+)\}', _alltxt):
         _refs.update(g for g in _m.groups() if g)

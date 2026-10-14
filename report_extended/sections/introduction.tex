@@ -1,7 +1,6 @@
 \section{Introduction}
 \label{sec:intro}
 Charge-parity (CP) violation -- the small observed asymmetry between the behavior of matter and antimatter -- is one of the necessary ingredients for the matter-dominated universe we observe, yet the CP violation built into the Standard Model is far too small to account for it. Studying CP violation in the decays of $B$ mesons, where it is comparatively large and experimentally accessible, is one of the main ways to test the Standard Model's Cabibbo-Kobayashi-Maskawa (CKM) description of the effect and search for physics beyond it. Charmless three-body decays such as $B^{\pm}\to h^{\pm}h^{+}h^{-}$ ($h=K,\pi$) are especially interesting in this respect: unlike a two-body decay, the three-body phase space (the Dalitz plot) allows the asymmetry to be studied not only as a single global number, but also \emph{locally}, since interference between intermediate resonances can concentrate CP-violating effects in specific kinematic regions rather than spreading them uniformly~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}.
-
 The quantity measured in this work is the raw asymmetry between the signal yields of the two charges,
 \begin{equation}
 \Araw=\frac{N(B^-)-N(B^+)}{N(B^-)+N(B^+)} .
@@ -13,7 +12,6 @@ It differs from the physical asymmetry $\ACP$ by the production asymmetry $A_P$ 
 \label{eq:acp}
 \end{equation}
 where $A_D$ arises mainly from the different interaction cross sections of $K^+$ and $K^-$ with the detector material and depends on the kaon momenta~\cite{lhcb_cpv_prd2023}. Neither correction is applied here, so $\Araw$ is not a measurement of $\ACP$. The corrections applied in the published analysis are discussed in Sec.~\ref{sec:comparison_published}.
-
 In this work we use the LHCb Open Data record for $B^{\pm}\to K^{\pm}K^{+}K^{-}$~\cite{opendata_record,opendata_notebook}, a subset of the 2011 data on which the first evidence of an inclusive $CP$ asymmetry in this decay was published~\cite{lhcb_cpv_2013}, to ask: \emph{to what extent do Frequentist likelihood fits and Bayesian inference produce consistent, well-controlled estimates of the raw asymmetry $\Araw$?} The aim is a methodological comparison of the two frameworks on the same data and, by construction, on the same likelihood, so that any difference between the two results comes from the inference and not from the model; it is not a competitive measurement of $\ACP$, which cannot be obtained from this record because it lacks the control channel for $A_P$ and $A_D$ (Sec.~\ref{sec:limitations}); the other three channels of the record need a different selection and a model of peaking backgrounds and are not analysed. Secs.~\ref{sec:data}--\ref{sec:model} describe the data and the common model, Secs.~\ref{sec:frequentist}--\ref{sec:bayesian} the two fits, and Secs.~\ref{sec:syst}--\ref{sec:comparison} the systematic study, the validation, the Dalitz plane and the comparison; a machine-learning selection is in Sec.~\ref{sec:ml}. The main results are in Table~\ref{tab:summary}.
 
 \begin{table*}[t]
@@ -36,3 +34,4 @@ Published analysis (same data)~\cite{lhcb_cpv_2013} & different selection and mo
 \caption{Summary of the raw asymmetry $\Araw$ (not corrected for production and detection asymmetries). The Bayesian value is the posterior median and its standard deviation; the systematic uncertainty is given only for the nominal fits (Sec.~\ref{sec:syst}). The published $\Araw$ comes from a different selection and a model with additional background components, so it is not directly comparable with the first rows.}
 \label{tab:summary}
 \end{table*}
+

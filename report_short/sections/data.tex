@@ -1,6 +1,5 @@
 \section{Data}
 \label{sec:data}
-
 \emph{In short: the record, the common preselection ($23{,}895$ candidates) and the fit window ($19{,}731$ candidates); the spectrum peaks at $5284\,\MeV$ for both charges and both polarities, and the counting asymmetry is $-0.043\pm0.007$.}
 \subsection{Dataset, Preselection and Mass}
 \label{sec:data_presel}
@@ -9,12 +8,13 @@ The dataset is the CERN Open Data record 4900~\cite{opendata_record}: $B^{\pm}\t
 \texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
 \]
 for each of the three tracks, and retains $23{,}895$ candidates ($0.28\%$)\appref{app:ext_data}. $H1$ is always the kaon of charge opposite to the $B$, so the Dalitz variables are $m^2(H1,H2)$ and $m^2(H1,H3)$.
-
 \label{sec:data_mass}
-The three tracks are assigned the charged-kaon mass and their four-momenta are summed to reconstruct $m(KKK)$. The nominal fit window, common to the two analyses, is $[5100,5600]\,\MeV$ and contains $19{,}731$ candidates ($11{,}636$ magnet down, $8095$ magnet up). Below $\sim$5150\,\MeV\ the background rises, which a single exponential cannot describe; the window includes the start of this rise, described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}).
-
+The three tracks are assigned the charged-kaon mass and their four-momenta are summed to reconstruct $m(KKK)$. The \textbf{nominal fit window}, common to the two analyses, is $[5100,5600]\,\MeV$ and contains $19{,}731$ candidates ($11{,}636$ magnet down, $8095$ magnet up). Below $\sim$5150\,\MeV\ the background rises, which a single exponential cannot describe; the window includes the start of this rise, described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}).
 \subsection{Data Exploration}
 \label{sec:data_exploration}
+
+Figure~\ref{fig:mass_spectrum} shows the spectrum in the fit window. The peak at $m\approx5284\,\MeV$ over a falling combinatorial background has the same shape for the two charges and the two polarities, which allows a mass and a resolution common to $B^+$ and $B^-$ in the model (Sec.~\ref{sec:model}). The \emph{counting asymmetry} of all candidates, signal and background together, is $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.043\pm0.007$ (binomial uncertainty); the fits of Secs.~\ref{sec:frequentist} and \ref{sec:bayesian} refine it by separating signal and background.
+
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/mass_spectrum_col.pdf}
@@ -22,11 +22,5 @@ The three tracks are assigned the charged-kaon mass and their four-momenta are s
 \label{fig:mass_spectrum}
 \end{figure}
 
-Figure~\ref{fig:mass_spectrum} shows the spectrum in the fit window. The peak at $m\approx5284\,\MeV$ over a falling combinatorial background has the same shape for the two charges and the two polarities, which allows a mass and a resolution common to $B^+$ and $B^-$ in the model (Sec.~\ref{sec:model}). The counting asymmetry of all candidates, signal and background together, is $A_{\mathrm{count}}=(N^--N^+)/(N^-+N^+)=-0.043\pm0.007$ (binomial uncertainty); the fits of Secs.~\ref{sec:frequentist} and \ref{sec:bayesian} refine it by separating signal and background.
-
 \subsection{Additional Results}
-\emph{Branches and cut flow.} The analysis reads momentum, particle-identification likelihoods, muon flag and charge of each track; the kaon-identification requirement on the three tracks is by far the most selective\appref{app:cutflow}.
-
-\emph{Charge combinations.} $H1$ is always the kaon of charge opposite to the $B$ and $H2$, $H3$ the same-sign pair, so the Dalitz variables are the two opposite-sign invariant masses\appref{app:ext_data}.
-
-\emph{Shared tracks and window.} Only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate and all are kept; the mass is computed with the kaon hypothesis on all tracks, and the window includes the start of the rise of the background below $\sim5150\,\MeV$\appref{app:ext_data}.
+\emph{Selection.} The kaon-identification requirement on the three tracks is by far the most selective step of the preselection, and only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate; all are kept\apprefs{app:cutflow}{app:ext_data}.

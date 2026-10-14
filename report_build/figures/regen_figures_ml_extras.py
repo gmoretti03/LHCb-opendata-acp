@@ -1,8 +1,8 @@
 """Extra figures of the machine-learning appendix: weak labels on the mass spectrum, regularization scan of the logistic
 regression, silhouette and inertia of K-means against K, and the FFNN architecture search.
 
-Inputs: Code_general/Machine_Learning/results/nominal/{data_labels,models,kmeans,ffnn_search}.jsonl/json (wt_mach_lear),
-        raw data via Code_general/Bayesian/bayesian_nominal.load_candidates (wt_bayes).
+Inputs: Code_general/Machine_Learning/results/nominal/{data_labels,models,kmeans,ffnn_search}.jsonl/json ,
+        raw data via Code_general/Bayesian/bayesian_nominal.load_candidates .
 usage (cern env):  python regen_figures_ml_extras.py [OUTDIR]
 """
 import json, os, sys
@@ -12,12 +12,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+CG = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Code_general")       # LHCb/Code_general
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
-WORK = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
-ML = os.environ.get("REGEN_ML_DIR", os.path.join(WORK, "wt_mach_lear", "LHCb", "Code_general", "Machine_Learning", "results", "nominal"))
-BAYES = os.environ.get("REGEN_BAYES_CODE", os.path.join(WORK, "wt_bayes", "LHCb", "Code_general", "Bayesian"))
-DATA = os.environ.get("LHCB_DATA_DIR", os.path.join(WORK, "fededegu_martiborsa", "LHCb", "opendata-project", "Data"))
+ML = os.environ.get("REGEN_ML_DIR", os.path.join(CG, "Machine_Learning", "results", "nominal"))
+BAYES = os.environ.get("REGEN_BAYES_CODE", os.path.join(CG, "Bayesian"))
+DATA = os.environ.get("LHCB_DATA_DIR", os.path.join(os.path.dirname(CG), "opendata-project", "Data"))
 sys.path.insert(0, HERE)
 import plot_style as ps
 ps.use(); C = ps.COLORS
@@ -31,7 +31,7 @@ def save(fig, name):
 lab = json.load(open(os.path.join(ML, "data_labels.json")))
 mu, sg = lab["mu"], lab["sigma"]
 sys.path.insert(0, BAYES)
-import bayesian_nominal as bn
+import bayes_model as bn
 m = bn.select(bn.load_candidates(DATA), bn.NOMINAL).m.to_numpy()
 sig = np.abs(m - mu) < 2 * sg
 bkg = ((m >= 5150) & (m < mu - 4 * sg)) | ((m > mu + 4 * sg) & (m <= 5600))

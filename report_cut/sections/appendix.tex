@@ -175,7 +175,7 @@ The result is shown in Figure~\ref{fig:bayes_trace}.
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/bayes_nominal_trace.pdf}
-\caption{Trace plot of the nominal fit with the 32 walkers initialized uniformly over the prior box (one line per walker, every 10th step), for $A$, $N_s$, $\sigma$ and the steep-background fraction $f_+$. Left: first 3000 steps, full range; right: whole chain, zoomed on the posterior. The first half of the chain (dotted line) is discarded as burn-in.}
+\caption{Trace plot of the nominal fit with the 32 walkers initialized uniformly over the prior box (one grey line per walker, every 10th step; colored: median over the walkers), for $A$, $N_s$, $\sigma$ and the steep-background fraction $f_+$. Left: first 3000 steps, full range; right: whole chain, zoomed on the posterior. The first half of the chain (dotted line) is discarded as burn-in.}
 \label{fig:bayes_trace}
 \end{figure*}
 
@@ -203,15 +203,6 @@ $\lambda_1^+$ [MeV$^{-1}$] & $0.0350$ & $[0.0281,0.0431]$ & $[0.0274,0.0423]$ & 
 \caption{Equal-tailed and highest-posterior-density $68\%$ intervals and skewness of the marginal posteriors.}
 \label{tab:checks_hpd}
 \end{table}
-
-The result is shown in Figure~\ref{fig:bayes_corner}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.55\textwidth]{figures/bayes_nominal_corner.pdf}
-\caption{Posterior of the six physics parameters of the nominal fit (the six background-shape parameters are marginalized). Diagonal: marginal posteriors with the 16th, 50th and 84th percentiles (dashed lines and titles). Off-diagonal: 2D marginals, contours enclosing the regions of the $1\sigma$ and $2\sigma$ levels of a 2D Gaussian ($39\%$ and $86\%$).}
-\label{fig:bayes_corner}
-\end{figure*}
 
 \subsection{Savage--Dickey Ratio}
 \label{sec:appendix_sd}
@@ -388,6 +379,43 @@ $D^0$, $J/\psi$, $\chi_{c0}$ vetoes & $16367$ & $-0.0423$ & $[-0.0516,-0.0329]$ 
 \label{tab:bayes_all}
 \end{table*}
 
+The result is shown in Table~\ref{tab:syst}.
+
+\begin{table}[t]
+\centering
+\small
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{llcc}
+\toprule
+Group & Variant & Bayesian & Frequentist \\
+\midrule
+Window & $[5050,5600]$ & $-0.0003$ ($0.0009$) & $-0.0004$ ($0.0005$) \\
+ & $[5150,5600]$ & $-0.0001$ ($0.0007$) & $-0.0005$ ($0.0021$) \\
+ & $[5100,5450]$ & $+0.0002$ ($0.0009$) & $-0.0001$ ($0.0003$) \\
+ & $[5100,5700]$ & $-0.0014$ ($0.0010$) & $-0.0014$ ($0.0001$) \\
+& \emph{group uncertainty} & $\mathit{0.0014}$ & $\mathit{0.0014}$ \\
+\midrule
+Background & single exponential (rejected) & $-0.0037$ & $-0.0039$ \\
+ & shape shared between charges & $-0.0037$ & $-0.0040$ \\
+ & symmetric, $A_b=0$ & $-0.0028$ & $-0.0031$ \\
+& \emph{group uncertainty} & $\mathit{0.0037}$ & $\mathit{0.0040}$ \\
+\midrule
+Signal & Crystal Ball & $-0.0002$ & $-0.0006$ \\
+ & $\mu,\sigma$ per charge & $-0.0000$ & $-0.0001$ \\
+& \emph{group uncertainty} & $\mathit{0.0002}$ & $\mathit{0.0006}$ \\
+\midrule
+Preselection & $\texttt{ProbK}>0.4$ & $-0.0032$ ($0.0038$) & $-0.0032$ ($0.0037$) \\
+ & $\texttt{ProbK}>0.6$ & $+0.0058$ ($0.0048$) & $+0.0058$ ($0.0050$) \\
+ & $\texttt{ProbPi}<0.4$ & $+0.0022$ ($0.0022$) & $+0.0020$ ($0.0023$) \\
+ & $\texttt{ProbPi}<0.6$ & $-0.0004$ ($0.0020$) & $-0.0006$ ($0.0017$) \\
+& \emph{group uncertainty} & $\mathit{0.0058}$ & $\mathit{0.0058}$ \\
+\midrule
+\multicolumn{2}{l}{Total (quadrature)} & $0.0070$ & $0.0072$ \\
+\bottomrule
+\end{tabular}}
+\caption{Systematic study common to the Bayesian and frequentist fits: shift $\Delta$ of $\Araw$ for each variant and, in parentheses and for the variants that change the sample, the expected statistical spread $\sigma_B$ of the shift. The largest contributing shift of each group is its uncertainty (italics); the groups are added in quadrature. The single exponential is rejected by the data and excluded. For the window $[5150,5600]$ the frequentist uncertainty is scaled from the number of events, since the Hesse matrix of that fit is not accurate.}
+\label{tab:syst}
+\end{table}
+
 \subsection{List of the Variants}
 \emph{In short: thirteen variants of the nominal choices, in four groups (window, background, signal, preselection), fitted by both methods on exactly the same candidates.}
 
@@ -400,17 +428,17 @@ $D^0$, $J/\psi$, $\chi_{c0}$ vetoes & $16367$ & $-0.0423$ & $[-0.0516,-0.0329]$ 
 \subsection{Shifts of All Variants}
 \label{app:syst_variants}
 \emph{In short: the shifts of the Bayesian and frequentist fits coincide variant by variant; the preselection group dominates, and the single exponential, rejected by the data, is drawn open.}
-The result is shown in Figure~\ref{fig:syst_variants}.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/syst_variants.pdf}
-\caption{Shift $\Delta=A_{\mathrm{raw}}^{\mathrm{var}}-A_{\mathrm{raw}}^{\mathrm{nom}}$ of every variant of the systematic study, Bayesian and frequentist fits; bars: expected spread $\sigma_B$ of a nested subsample (variants that change the sample only). Open symbols: variant rejected by the data. The dotted lines separate the groups (window, background, signal, preselection).}
-\label{fig:syst_variants}
-\end{figure}
 
 \subsection{Scan of the Particle-Identification Cuts}
 \emph{In short: on the tight side the shift scatters around zero within $1.3\,\sigma_B$ and the pion requirement is flat; loosening $\texttt{ProbK}$ moves $\Araw$ monotonically, which supports the nominal requirement.}
+The result is shown in Figure~\ref{fig:syst_pid_scan}.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/short_pid_scan.pdf}
+\caption{Shift of $\Araw$ (frequentist fit) as a function of (a) the $\mathtt{ProbK}$ lower cut and (b) the $\mathtt{ProbPi}$ upper cut, in steps of $0.05$, with the expected statistical spread of the nested sample ($\pm\sigma_B$ dark, $\pm2\sigma_B$ light; zero at the nominal cut, dash-dotted line). On the tight side of $\mathtt{ProbK}$ the points scatter around zero without trend and the pion requirement is flat; loosening $\mathtt{ProbK}$ moves $\Araw$ monotonically.}
+\label{fig:syst_pid_scan}
+\end{figure*}
 
 \subsection{Sensitivity of $\sigma_B$ to Differences between the Methods}
 \emph{In short: $\sigma_B$ is the difference of two nearly equal uncertainties and is sensitive to small differences between the methods; a variant at the threshold can be classified differently without changing the result.}
@@ -641,18 +669,12 @@ The result is shown in Figure~\ref{fig:bayes_lowstat}.
 \subsection{Weak Labels and Feature Set}
 \label{sec:ml_labels}
 \emph{In short: a classifier separates a signal-enriched window from the mass sidebands ($15{,}130$ signal-like and $1940$ background-like candidates, $20$ features, $60/20/20$ split); by the Neyman-Pearson argument of the CWoLa approach it is also the signal/background classifier, if the features carry no information on the mass.}
-The result is shown in Figure~\ref{fig:ml_labels}.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/ml_weak_labels.pdf}
-\caption{Weak labels on the mass spectrum of the fit window: signal-like candidates ($|m-\mu|<2\sigma$, $15{,}130$) and background-like candidates (sidebands beyond $4\sigma$ and above $5150\,\MeV$, $1940$); the $2$--$4\sigma$ gap is left unlabeled and the region below $5150\,\MeV$, where the background rises towards partially reconstructed decays, is excluded.}
-\label{fig:ml_labels}
-\end{figure}
 
 \subsection{Model Comparison}
 \label{sec:ml_models}
 \emph{In short: six classifiers; the tree ensembles and the neural network reach test AUC $0.857$--$0.864$, about $0.09$ above the linear models and indistinguishable from each other within the test-set uncertainty ($0.012$); gradient boosting, best in cross-validation, is the reference.}
+The result is shown in Table~\ref{tab:ml_models}.
+
 \begin{table}[h]
 \centering
 \begin{tabular}{lccc}
@@ -738,14 +760,6 @@ The result is shown in Figure~\ref{fig:ml_kmeans_sel}.
 \caption{(a) Inertia and (b) mean silhouette of the $K$-means partition of the Dalitz plane for $K=2$--$12$; the dashed line marks the $K=8$ fixed in advance and the dash-dotted line the maximum of the silhouette, $K=3$.}
 \label{fig:ml_kmeans_sel}
 \end{figure*}
-The result is shown in Figure~\ref{fig:ml_kmeans}.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/ml_nominal_kmeans.pdf}
-\caption{$K$-means partition ($K=8$) of the Dalitz plane, all candidates of the fit window, same axes as Fig.~\ref{fig:bayes_dalitz}. Color and labels: local significance of each cluster with respect to the global asymmetry, $S_k=(A_k-A_{\mathrm{glob}})/\sigma(A_k)$, on the same scale as panel (c) of Fig.~\ref{fig:bayes_dalitz}.}
-\label{fig:ml_kmeans}
-\end{figure}
 
 \subsection{Stability of $\Araw$ under ML Selection}
 \label{sec:ml_stability}
@@ -758,6 +772,8 @@ The result is shown in Figure~\ref{fig:ml_threshold}.
 \caption{Counting asymmetry after a cut on the gradient-boosting score, vs.\ threshold, with its binomial uncertainty. Dotted line: counting asymmetry of the full fit window; band: expected statistical spread of a nested subsample around it, $\pm\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$.}
 \label{fig:ml_threshold}
 \end{figure}
+The result is shown in Table~\ref{tab:three_methods}.
+
 \begin{table*}[t]
 \centering
 \begin{tabular}{lccc}
@@ -772,14 +788,6 @@ Counting        & $-0.0432\pm0.0071$ & $-0.0446\pm0.0080$ & $-0.0014\,(0.0036)$ 
 \caption{$\Araw$ on the full fit window ($19{,}731$ candidates) and after the cut on the gradient-boosting score ($15{,}709$), by the three methods. The expected shift is the statistical spread of a nested subsample, $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$. Counting includes the background.}
 \label{tab:three_methods}
 \end{table*}
-The result is shown in Figure~\ref{fig:ml_three}.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{figures/ml_nominal_three_methods.pdf}
-\caption{$\Araw$ from the Bayesian fit, the frequentist fit and counting, for the full sample and the ML-selected one (Table~\ref{tab:three_methods}).}
-\label{fig:ml_three}
-\end{figure}
 The result is shown in Figure~\ref{fig:ml_mass_cut}.
 
 \begin{figure*}[t]

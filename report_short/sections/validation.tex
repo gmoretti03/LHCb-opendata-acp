@@ -2,13 +2,9 @@
 \label{sec:validation}
 \label{sec:validation_estimator}
 \emph{In short: toy-MC experiments show an unbiased estimator at the minimum variance bound, intervals with nominal coverage and a test of $A=0$ with the nominal size.}
-Toy-MC experiments generated from the fitted model of Sec.~\ref{sec:model} (Poisson yields, masses drawn from the model; $1000$ at the fitted value $A_{\mathrm{true}}=-0.0441$ and $300$ at each of $-0.1$, $-0.02$, $0$ and $+0.05$, $1$--$3\%$ of the fits not valid and excluded) verify the estimator and the profile-likelihood ratio\appref{app:ext_valid}. The bias of $\hat A$ is at most $0.0008$ ($1.6$ standard errors; $-0.0005$, $-0.0001$, $-0.0008$, $+0.0002$, $-0.0004$ for the five values), its spread equals the mean Hesse uncertainty within $6\%$ and the pulls have width $0.94$--$1.05$: the estimator is unbiased and reaches the minimum variance bound.
-
+Toy-MC experiments generated from the fitted model of Sec.~\ref{sec:model} (Poisson yields, masses drawn from the model; $1000$ at the fitted value $A_{\mathrm{true}}=-0.0441$ and $300$ at each of $-0.1$, $-0.02$, $0$ and $+0.05$, $1$--$3\%$ of the fits not valid and excluded) verify the estimator and the profile-likelihood ratio\appref{app:ext_valid}. The bias of $\hat A$ is at most $0.0008$ ($1.6$ standard errors; $-0.0005$, $-0.0001$, $-0.0008$, $+0.0002$, $-0.0004$ for the five values), its spread equals the mean Hesse uncertainty within $6\%$ and the pulls have width $0.94$--$1.05$: the estimator is \textbf{unbiased} and reaches the \textbf{minimum variance bound}.
 At the fitted value the coverage of $t(A_{\mathrm{true}})\leq1$ is $0.696\pm0.015$ ($68.3\%$ level) and $0.954\pm0.007$ ($95.4\%$ level); the $68\%$ coverage over the five values is $0.71$, $0.70$, $0.69$, $0.69$ and $0.61$, the last, at $+0.05$ ($0.614\pm0.028$), $2.5$ standard deviations low, not unexpected among five values.
-
 Inverting the Neyman construction of the same experiments at the observed $\hat A$\appref{sec:checks_belt} gives the $68\%$ interval $[-0.0528,-0.0351]$, against the Minos interval $[-0.0526,-0.0356]$; Figure~\ref{fig:validation_injection} shows bias, pull width and power as a function of the injected asymmetry.
-
-Under $A_{\mathrm{true}}=0$ the test $q(0)>3.84$ rejects in $0.051\pm0.013$ of the experiments, the nominal size, with $q(0)$ compatible with $\chi^2_1$ (Kolmogorov-Smirnov $p=0.79$); its power is $1.00$ at the fitted value and $0.68$ ($0.27$ at $3\sigma$) at $A_{\mathrm{true}}=-0.02$, so with $19{,}731$ candidates an asymmetry below $\sim0.02$ is not resolved\appref{sec:validation_power}. The $5.2\sigma$ of the data is an extrapolation of the $\chi^2_1$ tail, which the $293$ experiments check only down to the $3\sigma$ level.
 
 \begin{figure*}[!t]
 \centering
@@ -17,7 +13,8 @@ Under $A_{\mathrm{true}}=0$ the test $q(0)>3.84$ rejects in $0.051\pm0.013$ of t
 \label{fig:validation_injection}
 \end{figure*}
 
+Under $A_{\mathrm{true}}=0$ the test $q(0)>3.84$ rejects in $0.051\pm0.013$ of the experiments, the \textbf{nominal size}, with $q(0)$ compatible with $\chi^2_1$ (Kolmogorov-Smirnov $p=0.79$); its power is $1.00$ at the fitted value and $0.68$ ($0.27$ at $3\sigma$) at $A_{\mathrm{true}}=-0.02$, so with $19{,}731$ candidates an asymmetry below $\sim0.02$ is \emph{not} resolved\appref{sec:validation_power}. The $5.2\sigma$ of the data is an extrapolation of the $\chi^2_1$ tail, which the $293$ experiments check only down to the $3\sigma$ level.
+
 \subsection{Additional Results}
 \emph{Asymptotic behavior.} With the number of candidates the bias tends to zero, the spread scales as $N^{-1/2}$ and the distribution of $\hat A$ becomes Gaussian\appref{sec:checks_scaling}.
-
 \emph{Goodness of fit and binning.} The binned $\chi^2$ of toy experiments follows its asymptotic distribution, so its $p$-values are accurate: the misfit of the data is $5.4$ standard deviations in $10\,\MeV$ bins and $2.0$ in $2.5\,\MeV$ bins, because it lives on the scale of the flanks of the peak\appref{sec:validation_gof}.

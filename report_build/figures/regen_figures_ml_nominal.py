@@ -20,13 +20,13 @@ os.makedirs(OUT, exist_ok=True)
 REPO = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
 DATA_DIR = os.path.join(REPO, "LHCb", "opendata-project", "Data")
 ML_DIR = "LHCb/Code_general/Machine_Learning"
-LOCAL = os.environ.get("REGEN_ML_DIR")
+LOCAL = os.environ.get("REGEN_ML_DIR", os.path.join(REPO, "LHCb", "Code_general", "Machine_Learning", "results", "nominal"))
 
 
 def raw(rel):
     """bytes of `rel` (relative to the ML directory) from REGEN_ML_DIR/the local tree or the mach_lear branch."""
     if LOCAL:
-        path = os.path.join(LOCAL, os.path.basename(rel)) if rel.startswith("results/") else os.path.join(LOCAL, "..", "..", rel)
+        path = os.path.join(LOCAL, os.path.basename(rel)) if rel.startswith("results/") else os.path.join(LOCAL, "..", "..", {"ml_nominal.py": "ml_tools.py"}.get(rel, rel))
         with open(path, "rb") as f:
             return f.read()
     return subprocess.check_output(["git", "-C", REPO, "show", f"mach_lear:{ML_DIR}/{rel}"])

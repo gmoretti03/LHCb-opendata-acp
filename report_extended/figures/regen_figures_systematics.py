@@ -2,8 +2,8 @@
 and the charge-permutation test of the Dalitz homogeneity statistic.
 
 Inputs (written by the analysis scripts):
-  freq_systematics.json, freq_pid_scan.json   in  Code_general/Frequentist/results   (wt_freq)
-  nominal_summary.json                        in  Code_general/Bayesian/results/nominal (wt_bayes)
+  freq_systematics.json, freq_pid_scan.json   in  Code_general/Frequentist/results   
+  nominal_summary.json                        in  Code_general/Bayesian/results/nominal 
   raw data + bayesian_nominal.load_candidates for the permutation test
 usage (cern env):  python regen_figures_systematics.py [OUTDIR]
 """
@@ -15,12 +15,12 @@ import numpy as np
 from scipy import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+CG = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Code_general")       # LHCb/Code_general
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
-WORK = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
-FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(WORK, "wt_freq", "LHCb", "Code_general", "Frequentist", "results"))
-BAYES = os.environ.get("REGEN_BAYES_DIR", os.path.join(WORK, "wt_bayes", "LHCb", "Code_general", "Bayesian"))
-DATA = os.environ.get("LHCB_DATA_DIR", os.path.join(WORK, "fededegu_martiborsa", "LHCb", "opendata-project", "Data"))
+FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(CG, "Frequentist", "results"))
+BAYES = os.environ.get("REGEN_BAYES_DIR", os.path.join(CG, "Bayesian"))
+DATA = os.environ.get("LHCB_DATA_DIR", os.path.join(os.path.dirname(CG), "opendata-project", "Data"))
 sys.path.insert(0, HERE)
 import plot_style as ps
 ps.use(); C = ps.COLORS
@@ -75,7 +75,7 @@ plt.tight_layout(); save(fig, "syst_pid_scan.pdf")
 
 # ---------------------------------------------------------------- (3) charge-permutation test, 8x8 Dalitz grid
 sys.path.insert(0, os.path.join(BAYES))
-import bayesian_nominal as bn
+import bayes_model as bn
 cands = bn.select(bn.load_candidates(DATA), bn.NOMINAL)
 q = cands.q.to_numpy(); m12 = cands.m12.to_numpy() ** 2 / 1e6; m13 = cands.m13.to_numpy() ** 2 / 1e6   # GeV^2
 lo, hi = np.minimum(m12, m13), np.maximum(m12, m13)

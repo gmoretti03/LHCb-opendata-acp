@@ -3,7 +3,6 @@
 \label{app:freq}
 \emph{In short: the likelihood maximized for the two charges together gives $N_s=15{,}328\pm133$ and $\hat A=-0.0441$ with Minos intervals; $A=0$ is rejected at $5.2\sigma$ and the interval has nominal coverage in $1000$ bootstrap replicas.}
 The Frequentist analysis estimates \Araw by maximizing the extended unbinned likelihood of Eq.~\eqref{eq:likelihood} with \texttt{iminuit}~\cite{iminuit}; the uncertainty and the test of $A=0$ come from the profile likelihood, the other parameters being nuisance parameters (Secs.~\ref{sec:freq_model}--\ref{sec:freq_ci}).
-
 \subsection{Mass Model and Fit Strategy}
 \label{sec:freq_model}
 \label{sec:freq_simfit}
@@ -43,14 +42,11 @@ Wilks' theorem is asymptotic, so the coverage was checked on the data with $1000
 \emph{In short: the Hesse matrix is the inverse of the Fisher information, the test statistic is the profile likelihood ratio, and the significance is $Z=\sqrt{q(0)}$.}
 \paragraph{Hesse uncertainties.}
 For $n$ independent candidates the likelihood contains the information on the parameters $\theta$ through the Fisher information matrix, $I_{ij}=-E\big[\partial^2\ln L/\partial\theta_i\partial\theta_j\big]$. The information inequality (minimum variance bound) states that the variance of an estimator cannot be smaller than the inverse of $I$ (for an unbiased one), and the maximum-likelihood estimate reaches the bound asymptotically, where it is also unbiased and Gaussian~\cite{cowan}. The covariance matrix of the fit is therefore $V\simeq I^{-1}$ evaluated at the best-fit point, with the second derivatives of $-\ln L$ computed numerically: this is the Hesse matrix of \texttt{iminuit}, and $\sigma(A)=0.0085$ is the square root of the diagonal element of $V$ for $A$, which includes the effect of the eleven nuisance parameters. It assumes that $-\ln L$ is parabolic around the minimum. The Minos intervals do not: they follow the profile likelihood on each side of the minimum, and their agreement with the Hesse error ($-0.0085$, $+0.0085$) shows that the parabola is a good description here.
-
 \paragraph{Test of $A=0$.}
 The null hypothesis $H_0$: $A=0$ is tested against the alternative $H_1$: $A$ free, the other parameters being free in both. The test statistic is the profile likelihood ratio,
 $q(0)=-2\ln\big[L(0,\hat{\hat\theta})/L(\hat A,\hat\theta)\big]=2\Delta\mathrm{NLL}$ (NLL: negative log-likelihood), large when the data disfavor $H_0$. For two simple hypotheses the likelihood ratio is the most powerful test of a given size, i.e.\ the one with the highest probability of rejecting $H_0$ when $H_1$ is true (Neyman-Pearson lemma~\cite{neyman_pearson}); the profile likelihood ratio is its extension to hypotheses with unspecified parameters, with no optimality guarantee in general. By Wilks' theorem~\cite{wilks}, under $H_0$ the statistic follows a $\chi^2$ distribution with one degree of freedom, the number of parameters fixed by $H_0$, whatever the number of nuisance parameters, so the $p$-value is $P(\chi^2_1\geq q_{\mathrm{obs}})$; this is the probability, under $H_0$, of a result at least as discrepant as the data, not the probability of $H_0$.
-
 \paragraph{Significance.}
 A $\chi^2_1$ variable is the square of a standard normal one, so $p=P(|N|\geq\sqrt{q})$ and the significance quoted is $Z=\sqrt{q(0)}$ ($q\simeq27$, $p=2.05\times10^{-7}$, $Z=5.20$). This is a two-sided convention: the one-sided one, $Z=\Phi^{-1}(1-p)$, applied to the same $p$ would give $5.06$. For a parabolic likelihood $\sqrt{q}$ coincides with the Hesse significance $|\hat A|/\sigma(A)=5.19$.
-
 \subsection{Neyman Construction and Dependence on the Momentum}
 \label{sec:checks_belt}
 \emph{In short: inverting the test of $A_{\mathrm{true}}$ with toy-MC experiments gives the same interval as the likelihood ratio, and $\Araw$ does not depend on the momentum of the $B$.}
@@ -134,5 +130,4 @@ Figure~\ref{fig:uncertainties_12} shows the same comparison as the ratio to the 
 \label{sec:checks_multistart}
 \emph{In short: $29$ of $30$ fits from random starting points reach the same minimum; the steep-background fraction is the weakly constrained direction, as the long chain of the Bayesian fit already showed.}
 The nominal fit was repeated from $30$ starting points drawn at random (yields and slopes multiplied by a log-normal factor of width $0.5$, the fractions uniform, the asymmetry uniform in $(-0.2,0.2)$): $29$ reach the minimum of the nominal fit ($\hat A=-0.0441$); the remaining one stops in a local minimum $96$ units of $-2\ln L$ above, at $\hat A=-0.052$, which would be rejected by comparing the likelihood values. The profile likelihood of the fraction of the steep component for $B^+$ (the parameter whose chain mixes slowly in the narrow window, Sec.~\ref{sec:bayes_gof}) is asymmetric: $q(f_+)=1$ at $0.085$ and $0.140$ around the best value $0.112$, with a longer tail towards large fractions where the two exponentials exchange their roles. The uncertainty of $A$ does not depend on it (correlation below $0.1$).
-
 \FloatBarrier

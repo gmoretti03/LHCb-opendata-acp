@@ -8,6 +8,8 @@ analysis becomes a section of its own. Nothing in the numbers is changed.
 usage: python3 report_build/split_body_appendix/build_full.py
 """
 import os, re, shutil, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from float_place import place_floats, never_cited
 
 BUILD = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.abspath(os.path.join(BUILD, '..'))
@@ -189,7 +191,8 @@ MAC = ('\\usepackage{xspace}\\newcommand{\\appref}[1]{\\unskip~(Sec.~\\ref{#1})\
        '\\newcommand{\\apprefs}[2]{\\unskip~(Secs.~\\ref{#1} and~\\ref{#2})\\xspace}\n')
 FIG = {'frequentist_wilks_coverage': 'short_coverage', 'bayes_nominal_savage_dickey': 'short_savage_dickey',
        'syst_pid_scan': 'short_pid_scan', 'validation_injection_power': 'short_injection_power',
-       'validation_profile_polarity': 'short_profile_polarity', 'bayes_nominal_dalitz_maps': 'short_dalitz_maps'}
+       'validation_profile_polarity': 'short_profile_polarity', 'bayes_nominal_dalitz_maps': 'short_dalitz_maps',
+       'ml_nominal_three_methods': 'short_ml_three', 'ml_weak_labels': 'short_ml_labels', 'ml_nominal_kmeans': 'short_ml_kmeans'}
 _PROT = re.compile(r'(\\(?:label|ref|eqref|cite|includegraphics|input|href)(?:\[[^\]]*\])?\{[^}]*\})')
 
 
@@ -251,6 +254,14 @@ for m in re.finditer(FIGRE, text['data'], flags=re.S):
 \label{fig:mass_spectrum}
 \end{figure}""")
 # the coverage figure of the frequentist section is already the new one (override); the validation body keeps its own text
+
+# the trace plot and the scan of the PID cuts are cited where they are shown
+text['bayesian'] = text['bayesian'].replace('; trace plot in Fig.~\\ref{fig:bayes_trace})', ')', 1)
+text['systematics'] = text['systematics'].replace('The scan of each cut in steps of $0.05$ (Fig.~\\ref{fig:syst_pid_scan})', 'The scan of each cut in steps of $0.05$ (Sec.~\\ref{sec:syst_pid_scan})', 1)
+text['systematics'] = text['systematics'].replace('\\subsection{Scan of the Particle-Identification Cuts}\n', '\\subsection{Scan of the Particle-Identification Cuts}\n\\label{sec:syst_pid_scan}\n', 1)
+# every float right after the paragraph that cites it first
+for n in text:
+    text[n] = place_floats(text[n])
 
 # ------------------------------------------------------------------ main file and output
 main = open(f'{SRC}/main.tex').read()

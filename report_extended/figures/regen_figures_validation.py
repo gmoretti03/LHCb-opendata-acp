@@ -3,7 +3,7 @@
 Inputs (written by the validation scripts, not by the notebooks):
   FREQ_DIR   = Code_general/Frequentist/results/validation  (freq_validation.py: profiles.json, toys.jsonl, belt.jsonl, ...)
   BAYES_DIR  = Code_general/Bayesian/results/nominal         (bayes_validation.py: validation.json; nominal_posterior_thinned.npy)
-Both default to the sibling git worktrees ../wt_freq and ../wt_bayes; override with REGEN_FREQ_DIR / REGEN_BAYES_DIR.
+Both default to LHCb/Code_general; override with REGEN_FREQ_DIR / REGEN_BAYES_DIR.
 usage (cern env):  python regen_figures_validation.py [OUTDIR]
 Every figure is produced only if its inputs exist.
 """
@@ -15,11 +15,11 @@ import numpy as np
 from scipy import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+CG = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Code_general")       # LHCb/Code_general
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
-WORK = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))        # .../Work
-FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(WORK, "wt_freq", "LHCb", "Code_general", "Frequentist", "results", "validation"))
-BAYES = os.environ.get("REGEN_BAYES_DIR", os.path.join(WORK, "wt_bayes", "LHCb", "Code_general", "Bayesian", "results", "nominal"))
+FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(CG, "Frequentist", "results", "validation"))
+BAYES = os.environ.get("REGEN_BAYES_DIR", os.path.join(CG, "Bayesian", "results", "nominal"))
 sys.path.insert(0, HERE)
 import plot_style as ps
 ps.use(); C = ps.COLORS

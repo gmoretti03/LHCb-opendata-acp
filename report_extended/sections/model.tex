@@ -17,7 +17,6 @@ with $E(m;\lambda)\propto e^{-\lambda m}$ a truncated exponential normalized on 
 N_s^{\pm}=\tfrac{N_s}{2}(1\mp A),\qquad N_b^{\pm}=\tfrac{N_b}{2}(1\mp A_b),
 \]
 so that $A=(N_s^--N_s^+)/(N_s^-+N_s^+)$, the raw asymmetry \Araw of Eq.~\eqref{eq:araw}, is itself a parameter of the fit, the parameter of interest (POI, all the others being nuisance parameters), and the background asymmetry $A_b$ is free. The parameter vector has twelve components, $\theta=(N_s,N_b,A,A_b,\mu,\sigma,\lambda_1^{\pm},\lambda_2^{\pm},f_{\pm})$.
-
 Given the data $D=\{(m_i,q_i)\}_{i=1}^{N}$ (mass and charge of each candidate), the extended unbinned likelihood of the two charge samples is
 \begin{multline}
 \mathcal{L}(D\mid\theta)\propto e^{-(N_s+N_b)}
@@ -26,22 +25,17 @@ Given the data $D=\{(m_i,q_i)\}_{i=1}^{N}$ (mass and charge of each candidate), 
 \label{eq:likelihood}
 \end{multline}
 where $S(m_i)\equiv S(m_i;\mu,\sigma)$. The likelihood is extended (the yields are parameters, hence the Poisson term, Sec.~\ref{app:model}); it is the common ground of the two mass analyses: Sec.~\ref{sec:frequentist} maximizes it and Sec.~\ref{sec:bayesian} multiplies it by a prior. Since both use this model unchanged, any difference between their results can only come from the inference.
-
 \subsection{Extended Likelihood}
 \emph{In short: with a Poisson total number of candidates the likelihood is $e^{-(N_s+N_b)}\prod_i[N_s S+N_b B]$ up to a constant, which constrains the yields and $A$ together.}
 If the total number of candidates $N$ is Poisson-distributed with mean $\nu=N_s+N_b$ and each candidate is drawn independently from the normalized density $f(m,q)=[N_s S+N_b B]/\nu$, the likelihood of the sample is $\frac{\nu^N e^{-\nu}}{N!}\prod_{i}f(m_i,q_i)=\frac{e^{-\nu}}{N!}\prod_i[N_s S(m_i)+N_b B(m_i)]$. The factor $1/N!$ does not depend on the parameters and is dropped, which gives the extended likelihood of Eq.~\eqref{eq:likelihood}. Unlike the likelihood with a fixed total, it constrains the yields $N_s$ and $N_b$ through $N$ itself, and the asymmetry $A$ is estimated together with them.
-
 \subsection{Extended Likelihood versus a Mixture with Fixed Total}
 \emph{In short: the extended form differs from a mixture with fixed total only by the Poisson term of the total yield, which carries no information on $A$; the purity of the signal window is about $96\%$.}
 The extended form differs from a mixture of signal and background with a fixed total number of candidates and a signal fraction only through the Poisson term for the total yield, which carries no information on $A$ and does not change its estimate; it is used because the yields of the two charges are the natural parameters of the model. Bayes' theorem applied to the fitted yields gives the probability that a candidate in the signal window $|m-\mu|<2\sigma$ is a signal decay, about $96\%$: a purity, not a property of the single candidate, which depends on the signal fraction of the sample (here $78\%$ of the candidates in the fit window).
-
 \subsection{Label Switching of the Background Components}
 \emph{In short: the mixture is invariant under the exchange of the two exponentials, which would give two identical modes; the ordering $\lambda_1>\lambda_2$ removes the symmetry.}
 The mixture is invariant under the exchange $(\lambda_1,f)\leftrightarrow(\lambda_2,1-f)$, which would give the posterior two identical modes (label switching); the ordering $\lambda_1>\lambda_2$ removes this symmetry.
-
 \subsection{Minimal Model as a Cross-Check}
 \label{sec:bayes_minimal}
 \emph{In short: a six-parameter model on a narrower window gives $\Araw=-0.0497$ (68\% CI $[-0.058,-0.041]$), compatible with the nominal result within its uncertainty; it is the model used for the low-statistics comparison.}
 Before the nominal model was fixed, the same analysis was carried out with a minimal six-parameter model: a narrower window, $[5150,5450]\,\MeV$, which excludes most of the rising background below the peak, a single exponential background with a shape and a yield shared by the two charges, and the same Gaussian signal. On its $17{,}839$ candidates it gives $\Araw=-0.0497$ (68\% CI $[-0.058,-0.041]$) with $\chi^2/\text{ndof}=127.4/54$, and $-0.0457$ when the background yields of the two charges are left free. Its toy validation, with 500 toy-MC datasets, gives coverage consistent with nominal (0.664 and 0.962 for the 68\% and 95\% intervals). The difference from the nominal result, $0.005$, is driven by the background treatment, as in the systematic study of Sec.~\ref{sec:syst}, and is smaller than the statistical uncertainty.
-
 \FloatBarrier

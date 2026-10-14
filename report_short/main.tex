@@ -7,7 +7,7 @@
 ]{revtex4-2}
 
 \input{preamble}
-\usepackage{xspace}\newcommand{\appref}[1]{}\newcommand{\apprefs}[2]{}\newcommand{\secorapp}[2]{\ref{#1}}\newcommand{\apponly}[1]{--}
+\usepackage{xspace}\newcommand{\appref}[1]{}\newcommand{\apprefs}[2]{}\newcommand{\secorapp}[2]{\ref{#1}}\newcommand{\apponly}[1]{--}\newcommand{\bnum}[1]{\textbf{\boldmath$#1$}}
 
 \begin{document}
 \pagestyle{plain}
@@ -29,9 +29,10 @@
 \input{sections/model}
 \input{sections/frequentist}
 \input{sections/bayesian}
-\input{sections/systematics}
 \input{sections/validation}
+\input{sections/ml}
 \input{sections/dalitz}
+\input{sections/systematics}
 \input{sections/conclusions}
 
 \bibliography{biblio}

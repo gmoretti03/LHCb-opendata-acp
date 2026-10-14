@@ -2,14 +2,11 @@
 \label{sec:validation}
 \label{app:ext_valid}
 \emph{In short: toy-MC experiments generated from the fitted model show that the maximum-likelihood estimate of $A$ is unbiased and attains the minimum variance bound, that the Wilks interval has the nominal coverage, and that the test of $A=0$ has the expected size and a power that is known as a function of the injected asymmetry.}
-
 The asymptotic properties of the maximum-likelihood estimator and of the profile-likelihood ratio were verified on toy-MC experiments generated from the fitted model (Sec.~\ref{sec:validation_toys}), which allow the true value of $A$ to be chosen.
-
 \subsection{Generation of the Toy-MC Experiments}
 \label{sec:validation_toys}
 \emph{In short: toy experiments are generated from the fitted model (Poisson yields, masses by the transformation method) and fitted with the nominal procedure: $1000$ at the fitted value and $300$ at each of four other values of $A$.}
 The Frequentist results of Sec.~\ref{sec:frequentist} rest on asymptotic properties of the maximum-likelihood estimator and of the profile-likelihood ratio, and Sec.~\ref{sec:freq_coverage} verified the coverage by resampling the data. Here the same questions are asked of toy-MC experiments generated from the fitted model, as was done for the Bayesian interval in Sec.~\ref{sec:bayes_toymc}, which allows the true value of $A$ to be chosen. The fitted model of Sec.~\ref{sec:model} defines the toy-MC datasets: for each charge the yields of signal and background are Poisson-fluctuated, the signal masses are drawn from the truncated Gaussian and the background masses from the two truncated exponentials by the transformation method. Each dataset is fitted with the nominal Frequentist procedure; the likelihood ratio $t(A_{\mathrm{true}})=-2\ln[L(A_{\mathrm{true}})/L(\hat A)]$ and the statistic of the test of $A=0$, $q(0)$, are computed with the other eleven parameters profiled. One thousand toy-MC experiments were generated at the fitted value, $A_{\mathrm{true}}=-0.0441$, and $300$ at each of $A_{\mathrm{true}}=-0.1$, $-0.02$, $0$ and $+0.05$; between $1\%$ and $3\%$ of the fits are not flagged as valid by \texttt{MIGRAD} and are excluded.
-
 \subsection{Bias, Efficiency and Coverage}
 \label{sec:validation_estimator}
 \emph{In short: no bias larger than $0.0008$, an estimator spread equal to the Hesse uncertainty within $6\%$, and coverage of $0.70\pm0.01$ and $0.95\pm0.01$ at the fitted value; the test of $A=0$ has size $0.051\pm0.013$ and power $0.68$ at $A=-0.02$.}
@@ -33,10 +30,6 @@ $+0.05$ & $293$ & $-0.0004\pm0.0005$ & $1.05$ & $0.61$ & $0.96$ \\
 \end{table}
 
 Together, the estimator is unbiased and efficient, the interval has its nominal coverage and the test its nominal size (Sec.~\ref{sec:validation_power}); the $5.2\sigma$ of the data is an extrapolation of the $\chi^2_1$ tail, which the $293$ experiments check only down to the $3\sigma$ level.
-
-
-
-
 \subsection{Asymptotic Behavior of the Estimator}
 \label{sec:checks_scaling}
 \emph{In short: with the number of candidates the bias tends to zero, the spread scales as $N^{-1/2}$ and the distribution of $\hat A$ becomes Gaussian, as the central limit theorem and the asymptotic properties of the maximum-likelihood estimate predict.}
@@ -69,8 +62,6 @@ Under $A_{\mathrm{true}}=0$ the fraction of toy-MC experiments with $q(0)>3.84$ 
 \caption{Toy-MC experiments, validity of Wilks' theorem. (a) Fraction of experiments with $q(0)$ above the observed value, for $A_{\mathrm{true}}=0$, compared with the $\chi^2_1$ distribution. (b) $p$-value of $t(A_{\mathrm{true}})$ against a uniform distribution, at the fitted value and pooled over the injected values. (c) Distribution of $t(A_{\mathrm{true}})$ at the fitted value and $\chi^2_1$.}
 \label{fig:validation_null}
 \end{figure*}
-
-
 
 \begin{figure*}[!t]
 \centering

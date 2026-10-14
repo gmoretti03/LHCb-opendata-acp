@@ -20,7 +20,7 @@ os.makedirs(OUT, exist_ok=True)
 REPO = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
 DATA_DIR = os.path.join(REPO, "LHCb", "opendata-project", "Data")
 BAYES_DIR = "LHCb/Code_general/Bayesian"
-LOCAL = os.environ.get("REGEN_NOMINAL_DIR")
+LOCAL = os.environ.get("REGEN_NOMINAL_DIR", os.path.join(REPO, "LHCb", "Code_general", "Bayesian", "results", "nominal"))
 
 work = tempfile.mkdtemp(prefix="regen_nominal_")
 def fetch(rel_in_bayes_dir, binary=False):
@@ -28,7 +28,7 @@ def fetch(rel_in_bayes_dir, binary=False):
     dst = os.path.join(work, os.path.basename(rel_in_bayes_dir))
     if LOCAL:   # local test: results from LOCAL, module from the Bayesian directory two levels up
         src = os.path.join(LOCAL, "..", rel_in_bayes_dir[len("results/"):]) if rel_in_bayes_dir.startswith("results/") \
-            else os.path.join(LOCAL, "..", "..", rel_in_bayes_dir)
+            else os.path.join(LOCAL, "..", "..", {"bayesian_nominal.py": "bayes_model.py"}.get(rel_in_bayes_dir, rel_in_bayes_dir))
         with open(src, "rb") as f, open(dst, "wb") as g:
             g.write(f.read())
     else:
@@ -223,13 +223,20 @@ n_early = 3000 // thin
 fig, axs = plt.subplots(len(show), 2, figsize=(ps.DOUBLE, 7.5), sharex="col", gridspec_kw={"width_ratios": [1, 2.2]})
 for row, (k, lab) in enumerate(show):
     y = ch[:, :, tnames.index(k)]
-    axs[row, 0].plot(steps[:n_early], y[:n_early], lw=0.4, alpha=0.6)
-    axs[row, 1].plot(steps, y, lw=0.3, alpha=0.4)
+    axs[row, 0].plot(steps[:n_early], y[:n_early], color="0.55", lw=0.4, alpha=0.35)
+    axs[row, 1].plot(steps, y, color="0.55", lw=0.3, alpha=0.25)
+    axs[row, 0].plot(steps[:n_early], np.median(y[:n_early], axis=1), color=C["bayes"], lw=1.6)
+    axs[row, 1].plot(steps, np.median(y, axis=1), color=C["bayes"], lw=1.2)
     lo_q, hi_q = np.percentile(y[ch.shape[0] // 2:], [0.5, 99.5]); pad = 0.5 * (hi_q - lo_q)
     axs[row, 1].set_ylim(lo_q - pad, hi_q + pad)
     axs[row, 1].axvline(ch.shape[0] * thin // 2, color="k", ls=":", lw=1)
     axs[row, 0].set_ylabel(lab)
 axs[-1, 0].set_xlabel("Step"); axs[-1, 1].set_xlabel("Step")
+axs[0, 0].set_title("(a) first 3000 steps, full range", loc="left", fontsize=12, fontweight="bold")
+axs[0, 1].set_title("(b) full chain, zoomed", loc="left", fontsize=12, fontweight="bold")
+axs[0, 1].legend(handles=[plt.Line2D([], [], color="0.55", lw=1, label="walkers"),
+                          plt.Line2D([], [], color=C["bayes"], lw=1.6, label="median over walkers")],
+                 loc="upper right", fontsize=10, ncol=2)
 plt.tight_layout()
 save(fig, "bayes_nominal_trace.pdf")
 

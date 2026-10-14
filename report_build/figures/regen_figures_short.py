@@ -23,6 +23,7 @@ BAYES = os.path.join(CG, "Bayesian", "results", "nominal")
 sys.path.insert(0, HERE)
 import plot_style as ps
 ps.use(); C = ps.COLORS
+BC = BLUE = C["bayes"]  # one Bayesian colour in every figure
 plt.rcParams.update({"axes.spines.top": False, "axes.spines.right": False, "axes.linewidth": 1.0,
                      "xtick.direction": "out", "ytick.direction": "out", "legend.frameon": False})
 
@@ -75,12 +76,12 @@ for k, (nm, lab, lim, ylim, prior_half) in enumerate((("A", r"$A$", (-0.1, 0.02)
     st = NOM[nm]; mu, sd = st["mean"], st["sd"]                      # as in the analysis (nominal_summary.json)
     xs = np.linspace(*lim, 600)
     kde = stats.gaussian_kde(x, bw_method=0.18)
-    a.fill_between(xs, 1e-12, kde(xs), color=C["bayes"], alpha=0.30, lw=0, label="Posterior (MCMC)")
-    a.plot(xs, stats.norm.pdf(xs, mu, sd), color=C["bayes"], lw=2.0, label="Gaussian approximation")
+    a.fill_between(xs, 1e-12, kde(xs), color=BC, alpha=0.28, lw=0, label="Posterior (MCMC)")
+    a.plot(xs, stats.norm.pdf(xs, mu, sd), color=BC, lw=2.2, ls=(0,(5,1.5)), label="Gaussian approximation")
     a.axhline(1 / (2 * prior_half), color=C["count"], lw=1.4, ls="--", label=r"Prior, uniform on $(-1,1)$")
     a.axvline(0, color="k", lw=0.9, ls=":")
     p0 = stats.norm.pdf(0, mu, sd)
-    a.plot([0], [p0], "o", color=C["bayes"], ms=8, zorder=5, mec="white")
+    a.plot([0], [p0], "D", color=BC, ms=8, zorder=5, mec="white")
     a.plot([0], [1 / (2 * prior_half)], "o", color=C["count"], ms=8, zorder=5, mec="white")
     bf = p0 / (1 / (2 * prior_half))
     a.set_yscale("log"); a.set_xlim(*lim); a.set_ylim(*ylim)
@@ -162,13 +163,13 @@ prof = json.load(open(os.path.join(VAL, "profiles.json")))
 jf = json.load(open(os.path.join(VAL, "jointfit.json")))["profile"]
 A_p, q_p = np.array(jf["A"]), np.array(jf["q"])
 post = th[:, names.index("A")]
-fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 4.4), gridspec_kw={"wspace": 0.22})
+fig, axs = plt.subplots(1, 2, figsize=(ps.DOUBLE, 3.5), gridspec_kw={"wspace": 0.22})
 a = axs[0]; ps.letter(a, "a")
 xs = np.linspace(-0.085, -0.005, 400)
 like = np.exp(-0.5 * np.interp(xs, A_p, q_p)); like /= np.trapezoid(like, xs)
-a.hist(post, bins=48, range=(xs[0], xs[-1]), density=True, color=C["bayes"], alpha=0.35, edgecolor="white", lw=0.4, label="Bayesian posterior")
-a.plot(xs, like, color=C["freq"], lw=2.8, label=r"Frequentist $e^{-q(A)/2}$")
-a.axvline(np.median(post), color=C["bayes"], lw=1.0, ls=":")
+a.hist(post, bins=48, range=(xs[0], xs[-1]), density=True, color=BLUE, alpha=0.30, edgecolor=BLUE, lw=1.0, histtype="stepfilled", label="Bayesian posterior")
+a.plot(xs, like, color=C["freq"], lw=2.4, ls="--", label=r"Frequentist $e^{-q(A)/2}$")
+a.axvline(np.median(post), color=BLUE, lw=1.0, ls=":")
 a.set_xlabel(r"$A_{\mathrm{raw}}$"); a.set_ylabel("Density"); a.legend(loc="upper left", fontsize=11)
 b = axs[1]; ps.letter(b, "b")
 def par(A, q):
@@ -244,3 +245,193 @@ for i_ in range(len(el) - 1):
             axs[2].add_patch(Rectangle((el[i_], eh[j_]), el[i_ + 1] - el[i_], eh[j_ + 1] - eh[j_], fill=False, ec="k", lw=2.2))
             axs[2].text(el[i_] + 1, eh[j_] + 1.9, f"{sg[i_, j_]:+.1f}", ha="center", va="center", fontsize=10, color="w", fontweight="bold")
 save(fig, "short_dalitz_maps.pdf")
+
+# ---------------------------------------------------------------- A_raw with the three methods, before and after the ML selection
+rows3 = (("Bayesian fit", C["bayes"], (-0.0443, 0.0085), (-0.0451, 0.0087), (-0.0008, 0.0018)),
+         ("Frequentist fit", C["freq"], (-0.0441, 0.0085), (-0.0447, 0.0086), (-0.0006, 0.0012)),
+         ("Counting", C["count"], (-0.0432, 0.0071), (-0.0446, 0.0080), (-0.0014, 0.0036)))
+fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.0))
+ax.axvspan(-0.0443 - 0.0085, -0.0443 + 0.0085, color=C["bayes"], alpha=0.08, lw=0)
+ax.axvline(-0.0443, color=C["bayes"], lw=0.9, ls=":")
+for k, (lab, col, full, sel, sh) in enumerate(rows3):
+    y = 2 - k
+    ax.errorbar(full[0], y + 0.14, xerr=full[1], fmt="o", color=col, ms=8, capsize=0, lw=2.4, mec="white", zorder=3)
+    ax.errorbar(sel[0], y - 0.14, xerr=sel[1], fmt="s", color=col, mfc="white", mec=col, mew=2.0, ms=8, capsize=0, lw=2.0, zorder=3)
+    ax.text(0.985, (y + 0.0) , rf"${sh[0]:+.4f}$ ($\pm{sh[1]:.4f}$)", transform=ax.get_yaxis_transform(), ha="right", va="center", fontsize=10.5)
+ax.set_yticks([2, 1, 0]); ax.set_yticklabels([r[0] for r in rows3]); ax.set_ylim(-0.7, 2.7)
+ax.set_xlim(-0.0655, -0.0215)
+ax.set_xticks([-0.06, -0.05, -0.04, -0.03]); ax.set_xticklabels(["-0.06", "-0.05", "-0.04", "-0.03"])
+ax.set_xlabel(r"$A_{\mathrm{raw}}$")
+ax.text(0.985, 1.02, "shift (expected spread)", transform=ax.transAxes, ha="right", va="bottom", fontsize=10.5, color="0.35")
+ax.legend(handles=[Line2D([], [], marker="o", color="0.3", lw=2, ms=8, mec="white", label=r"Full window ($19{,}731$)"),
+                   Line2D([], [], marker="s", color="0.3", lw=2, ms=8, mfc="white", mew=2, label=r"Score $>0.5$ ($15{,}709$)")],
+          loc="lower center", bbox_to_anchor=(0.5, -0.30), ncol=2, fontsize=10.5, handlelength=1.6, columnspacing=1.2)
+ax.spines["left"].set_visible(False); ax.tick_params(axis="y", length=0)
+save(fig, "short_ml_three.pdf")
+
+# ---------------------------------------------------------------- ML: weak labels on the mass spectrum, K-means partition of the Dalitz plane
+if "m" not in globals() or True:
+    import pandas as pd, uproot, subprocess
+    LO_, HI_, MK_ = 5100.0, 5600.0, 493.677
+    REPO_ = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
+    DATA_ = os.path.join(REPO_, "LHCb", "opendata-project", "Data")
+    br_ = [f"H{i}_{v}" for i in (1, 2, 3) for v in ("PX", "PY", "PZ", "ProbK", "ProbPi", "isMuon", "Charge")]
+    d_ = pd.concat([uproot.open(os.path.join(DATA_, f"B2HHH_Magnet{p}.root"))["DecayTree"].arrays(br_, library="pd") for p in ("Down", "Up")],
+                   ignore_index=True)
+    s_ = np.ones(len(d_), bool)
+    for i in (1, 2, 3):
+        s_ &= (d_[f"H{i}_ProbPi"] < 0.5) & (d_[f"H{i}_ProbK"] > 0.5) & (~d_[f"H{i}_isMuon"].astype(bool))
+    d_ = d_[s_].reset_index(drop=True)
+    P_ = {i: d_[[f"H{i}_PX", f"H{i}_PY", f"H{i}_PZ"]].to_numpy() for i in (1, 2, 3)}
+    E__ = {i: np.sqrt((P_[i] ** 2).sum(1) + MK_ ** 2) for i in (1, 2, 3)}
+    m_B = np.sqrt(np.clip(sum(E__.values()) ** 2 - (sum(P_.values()) ** 2).sum(1), 0, None))
+    q_ = (d_.H1_Charge + d_.H2_Charge + d_.H3_Charge).to_numpy()
+    w_ = (m_B > LO_) & (m_B < HI_) & np.isin(q_, [1, -1])
+    mm = m_B[w_]
+    def m2_(i, j):
+        return np.clip((E__[i] + E__[j]) ** 2 - ((P_[i] + P_[j]) ** 2).sum(1), 0, None)[w_] / 1e6
+    lo2_, hi2_ = np.minimum(m2_(1, 2), m2_(1, 3)), np.maximum(m2_(1, 2), m2_(1, 3))
+
+    # weak labels
+    mu_, sg_ = 5284.39, 18.00
+    fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.4))
+    edges_ = np.arange(LO_, HI_ + 1e-9, 5.0)
+    cnt, _ = np.histogram(mm, bins=edges_)
+    cen_ = 0.5 * (edges_[:-1] + edges_[1:])
+    sig = np.abs(cen_ - mu_) < 2 * sg_
+    bkg = ((cen_ >= 5150) & (cen_ < mu_ - 4 * sg_)) | ((cen_ > mu_ + 4 * sg_) & (cen_ <= HI_))
+    gap = ~sig & ~bkg & (cen_ >= 5150)
+    exc = cen_ < 5150
+    for mask, col, hatch in ((sig, C["sig_like"], None), (bkg, C["bkg_like"], None), (gap, "0.85", None), (exc, "white", "////")):
+        ax.bar(cen_[mask], cnt[mask], width=5.0, color=col, edgecolor="0.55" if hatch else col, hatch=hatch, lw=0.0 if not hatch else 0.0)
+    ax.step(edges_[:-1], cnt, where="post", color="k", lw=1.0)
+    ax.set_yscale("log"); ax.set_ylim(8, 6000); ax.set_xlim(LO_, HI_)
+    ax.set_xlabel(r"$m(K^+K^+K^-)$ [MeV]"); ax.set_ylabel("Candidates / 5 MeV")
+    n_sig = int(np.sum(np.abs(mm - mu_) < 2 * sg_))
+    n_bkg = int(np.sum(((mm >= 5150) & (mm <= mu_ - 4 * sg_)) | ((mm >= mu_ + 4 * sg_) & (mm <= HI_))))
+    ax.text(mu_, 2800, "signal-like\n" + rf"${n_sig:,}$".replace(",", "{,}"), ha="center", va="top", fontsize=11, color="white", fontweight="bold",
+            bbox=dict(boxstyle="round,pad=0.2", fc=C["sig_like"], ec="none"))
+    ax.text(5480, 60, "background-like\n" + rf"${n_bkg:,}$".replace(",", "{,}"), ha="center", va="bottom", fontsize=11,
+            bbox=dict(boxstyle="round,pad=0.2", fc=C["bkg_like"], ec="none", alpha=0.9))
+    ax.text(5125, 330, "not used\n" + r"($<5150$)", ha="center", va="bottom", fontsize=9.5, color="0.3")
+    ax.text(0.5, 0.97, r"$m$ is not an input of the classifier", transform=ax.transAxes, ha="center", va="top", fontsize=10.5, color="0.35",
+            style="italic")
+    save(fig, "short_ml_labels.pdf")
+
+    # K-means partition
+    CGML = os.path.join(CG, "Machine_Learning", "results", "nominal")
+    km8_ = np.load(os.path.join(CGML, "kmeans8_labels.npy"))
+    kmj = json.load(open(os.path.join(CGML, "kmeans.json")))
+    if len(km8_) == len(mm):
+        groups_ = {g["group"]: g for g in kmj["8"]["all"]["groups"]}
+        S_ = np.array([groups_[k]["S_vs_global"] for k in km8_])
+        fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.0))
+        order_ = np.argsort(np.abs(S_))                       # significant clusters on top
+        sct = ax.scatter(lo2_[order_], hi2_[order_], c=S_[order_], cmap="RdBu_r", vmin=-4, vmax=4, s=4, alpha=0.75, lw=0, rasterized=True)
+        for k in range(int(km8_.max()) + 1):
+            sel_ = km8_ == k
+            ax.text(np.median(lo2_[sel_]), np.median(hi2_[sel_]), (f"{groups_[k]['S_vs_global']:+.1f}" if abs(groups_[k]['S_vs_global']) >= 0.05 else "0.0"), ha="center", va="center", fontsize=11,
+                    fontweight="bold", bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="0.5", alpha=0.9, lw=0.6))
+        ax.set_xlabel(r"$m^2_{\mathrm{lo}}(K^+K^-)$ [GeV$^2$]"); ax.set_ylabel(r"$m^2_{\mathrm{hi}}(K^+K^-)$ [GeV$^2$]")
+        ax.set_xlim(0, 16); ax.set_ylim(0, 30)
+        cb = fig.colorbar(sct, ax=ax, pad=0.02); cb.set_label(r"$S_k=(A_k-A_{\mathrm{glob}})/\sigma(A_k)$")
+        save(fig, "short_ml_kmeans.pdf")
+    else:
+        print("K-means labels do not match the sample:", len(km8_), len(mm))
+
+# ---------------------------------------------------------------- corner plot of the six physics parameters (Bayesian posterior)
+PN = ["A", "A_b", "N_s", "N_b", "mu", "sigma"]
+PL = [r"$A$", r"$A_b$", r"$N_s$", r"$N_b$", r"$\mu$ [MeV]", r"$\sigma$ [MeV]"]
+X = np.column_stack([th[:, names.index(p)] for p in PN])
+n_p = len(PN)
+from matplotlib.ticker import FormatStrFormatter
+fig, axs = plt.subplots(n_p, n_p, figsize=(ps.DOUBLE, 5.6), gridspec_kw={"wspace": 0.08, "hspace": 0.08})
+lims = [(np.percentile(X[:, k], 0.1), np.percentile(X[:, k], 99.9)) for k in range(n_p)]
+for i in range(n_p):
+    for j in range(n_p):
+        a = axs[i, j]
+        if j > i:
+            a.axis("off"); continue
+        if i == j:
+            a.hist(X[:, i], bins=50, range=lims[i], density=True, color=BC, alpha=0.30, edgecolor=BC, lw=0.8, histtype="stepfilled")
+            lo, md, hi = np.percentile(X[:, i], [15.865, 50, 84.135])
+            a.axvline(md, color=BC, lw=1.4, ls="--")
+            a.axvspan(lo, hi, color=BC, alpha=0.10, lw=0)
+            a.set_yticks([]); a.spines["left"].set_visible(False)
+            fmt = "{:.4f}" if i < 2 else ("{:.0f}" if i in (2, 3) else "{:.2f}")
+            a.set_title(fr"{fmt.format(md)} $\pm$ {fmt.format(0.5 * (hi - lo))}", fontsize=10, pad=3)
+        else:
+            a.hist2d(X[:, j], X[:, i], bins=40, range=[lims[j], lims[i]], cmap="Reds", cmin=1, rasterized=True)
+            r = np.corrcoef(X[:, j], X[:, i])[0, 1]
+            a.text(0.95, 0.95, rf"${r:+.2f}$", transform=a.transAxes, ha="right", va="top", fontsize=9,
+                   bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.8))
+        a.set_xlim(lims[j])
+        if i < n_p - 1:
+            a.set_xticklabels([])
+        else:
+            a.set_xlabel(PL[j]); a.xaxis.set_major_locator(plt.MaxNLocator(3)); a.tick_params(axis="x", labelsize=9)
+            a.ticklabel_format(axis="x", useOffset=False, style="plain")
+            if j == 4: a.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+        if j > 0 or i == 0:
+            a.set_yticklabels([]) if i != j else None
+        if j == 0 and i > 0:
+            a.set_ylabel(PL[i]); a.set_ylim(lims[i]); a.yaxis.set_major_locator(plt.MaxNLocator(3)); a.tick_params(axis="y", labelsize=9)
+            a.ticklabel_format(axis="y", useOffset=False, style="plain")
+            if i == 4: a.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+        elif i != j:
+            a.set_ylim(lims[i])
+save(fig, "short_corner.pdf")
+
+# ---------------------------------------------------------------- shifts of the 13 variants, Bayesian and frequentist
+fs = json.load(open(os.path.join(FREQ, "freq_systematics.json")))["systematics"]
+bs = summ["systematics"]
+LABV = [("window", [("window_lo5050", r"$[5050,5600]$"), ("window_lo5150", r"$[5150,5600]$"), ("window_hi5450", r"$[5100,5450]$"),
+                    ("window_hi5700", r"$[5100,5700]$")]),
+        ("background", [("bkg_single_exp", "single exponential"), ("bkg_shared_shape", "shape shared"), ("bkg_symmetric", r"symmetric, $A_b=0$")]),
+        ("signal", [("signal_crystal_ball", "Crystal Ball"), ("signal_per_charge", r"$\mu,\sigma$ per charge")]),
+        ("preselection", [("presel_probk_0.4", r"$\mathtt{ProbK}>0.4$"), ("presel_probk_0.6", r"$\mathtt{ProbK}>0.6$"),
+                          ("presel_probpi_0.4", r"$\mathtt{ProbPi}<0.4$"), ("presel_probpi_0.6", r"$\mathtt{ProbPi}<0.6$")])]
+fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.0))
+y = 0.0; ticks = []; labs = []; seps = []; gl = []
+for gname, items in LABV:
+    y0 = y
+    for key, lab in items:
+        for src, col, off, mk in ((bs, C["bayes"], 0.17, "o"), (fs, C["freq"], -0.17, "s")):
+            v = src["variations"][key]; sb = v.get("sigma_barlow")
+            rej = v.get("rejected_by_data")
+            if sb:
+                ax.plot([v["shift"] - sb, v["shift"] + sb], [-(y + off)] * 2, color=col, lw=2.6, alpha=0.35, solid_capstyle="butt", zorder=1)
+            ax.plot([v["shift"]], [-(y + off)], mk, color=col, ms=7, mfc="white" if rej else col, mec=col, mew=1.6, zorder=3)
+        ticks.append(-y); labs.append(lab); y += 1.0
+    seps.append(-(y - 0.5))
+    gu = (bs["groups"][gname], fs["groups"][gname])
+    gl.append((-(y0 + y - 1) / 2, gname, gu))
+    y += 0.35
+for sp in seps[:-1]:
+    ax.axhline(sp - 0.17, color="0.8", lw=0.8, ls=":")
+ax.axvline(0, color="k", lw=0.9)
+ax.set_yticks(ticks); ax.set_yticklabels(labs, fontsize=10.5)
+ax.set_xlim(-0.0085, 0.0112)
+ax.set_xlabel(r"Shift $\Delta=A_{\mathrm{raw}}^{\mathrm{var}}-A_{\mathrm{raw}}^{\mathrm{nom}}$")
+for yy, g, gu in gl:
+    ax.text(1.01, yy, f"{g}\n{gu[0]:.4f} / {gu[1]:.4f}", transform=ax.get_yaxis_transform(), fontsize=9.5, va="center", ha="left", color="0.25")
+ax.text(1.01, 1.0, "group\nuncertainty", transform=ax.transAxes, fontsize=9.5, va="bottom", ha="left", color="0.25")
+ax.legend(handles=[Line2D([], [], marker="o", color=C["bayes"], lw=0, ms=7, label="Bayesian"),
+                   Line2D([], [], marker="s", color=C["freq"], lw=0, ms=7, label="Frequentist"),
+                   Line2D([], [], color="0.5", lw=2.6, alpha=0.5, label=r"$\pm\sigma_B$"),
+                   Line2D([], [], marker="o", color="0.4", mfc="white", lw=0, ms=7, label="rejected by the data")],
+          loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=9.5, frameon=False)
+ax.set_ylim(min(ticks) - 0.8, 0.8)
+ax.set_xticks([-0.005, 0.0, 0.005, 0.010]); ax.set_xticklabels(["-0.005", "0", "0.005", "0.010"])
+save(fig, "short_syst_variants.pdf")
+
+
+# ---------------------------------------------------------------- profile likelihood against posterior (one panel)
+fig, a = plt.subplots(figsize=(ps.SINGLE, 3.6))
+xs = np.linspace(-0.085, -0.005, 400)
+like = np.exp(-0.5 * np.interp(xs, A_p, q_p)); like /= np.trapezoid(like, xs)
+a.hist(post, bins=48, range=(xs[0], xs[-1]), density=True, color=BLUE, alpha=0.30, edgecolor=BLUE, lw=1.0, histtype="stepfilled", label="Bayesian posterior")
+a.plot(xs, like, color=C["freq"], lw=2.4, ls="--", label=r"Frequentist $e^{-q(A)/2}$")
+a.set_xlabel(r"$A_{\mathrm{raw}}$"); a.set_ylabel("Density"); a.legend(loc="upper left", fontsize=10.5)
+a.set_ylim(0, a.get_ylim()[1] * 1.05)
+save(fig, "short_profile_posterior.pdf")

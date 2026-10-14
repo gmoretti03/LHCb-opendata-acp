@@ -15,10 +15,10 @@ COLORS = {
     "pos": "tab:blue", "neg": "tab:red",              # B+ / B-
     "down": "tab:green", "up": "tab:orange",          # magnet polarity
     # fit components
-    "data": "k", "model": "crimson", "signal": "steelblue", "background": "gray",
-    "observed": "crimson", "replica": "steelblue",
+    "data": "k", "model": "#1a2f5a", "signal": "steelblue", "background": "gray",
+    "observed": "k", "replica": "steelblue",
     # inference methods (comparison figures)
-    "bayes": "#7b3294",                               # Bayesian (purple)
+    "bayes": "#a8412f",                               # Bayesian (brick red)
     "freq": "#00897b",                                # frequentist (teal)
     "count": "#555555",                               # counting (dark grey)
     "ml": "#b8860b",                                  # machine learning / score cut (dark goldenrod)

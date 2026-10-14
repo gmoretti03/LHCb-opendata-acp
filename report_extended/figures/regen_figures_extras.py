@@ -1,8 +1,8 @@
 """Extra validation figures: asymmetry in the phi(1020) band and in the significant Dalitz bins, Araw in terciles of the
 momentum of the B, and the uncertainties of the twelve parameters by three methods.
 
-Inputs: Code_general/Bayesian/results/nominal/dalitz_resonances.json (wt_bayes),
-        Code_general/Frequentist/results/validation/{momentum,cov_summary}.json (wt_freq).
+Inputs: Code_general/Bayesian/results/nominal/dalitz_resonances.json ,
+        Code_general/Frequentist/results/validation/{momentum,cov_summary}.json .
 usage (cern env):  python regen_figures_extras.py [OUTDIR]
 """
 import json, os, sys
@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+CG = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Code_general")       # LHCb/Code_general
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
-WORK = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
-FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(WORK, "wt_freq", "LHCb", "Code_general", "Frequentist", "results", "validation"))
-BAYES = os.environ.get("REGEN_BAYES_DIR", os.path.join(WORK, "wt_bayes", "LHCb", "Code_general", "Bayesian", "results", "nominal"))
+FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(CG, "Frequentist", "results", "validation"))
+BAYES = os.environ.get("REGEN_BAYES_DIR", os.path.join(CG, "Bayesian", "results", "nominal"))
 sys.path.insert(0, HERE)
 import plot_style as ps
 ps.use(); C = ps.COLORS
