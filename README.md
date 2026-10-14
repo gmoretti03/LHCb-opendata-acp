@@ -1,7 +1,7 @@
 # Frequentist, Bayesian and machine-learning analysis of the raw asymmetry in B± → K± K+ K−
 
 Final project for the *Statistics and Data Analysis* course (Università di Milano-Bicocca, A.Y. 2025–2026),
-Giacomo Moretti and Marco Belotti. The report is `report_complete/main.pdf`.
+Giacomo Moretti and Marco Belotti. The complete report is `report_extended/main.pdf`.
 
 ## Data
 
@@ -52,7 +52,24 @@ comparison figures of notebook 02.
 
 ## Report and figures
 
-`report_complete/main.tex` (compile with `tectonic main.tex`) only sets the document up: packages and macros are in `report_complete/preamble.tex`, and each section is a separate file in `report_complete/sections/` (`introduction.tex`, `data.tex`, `frequentist.tex`, `bayesian.tex`, `systematics.tex`, `ml.tex`, `comparison.tex`, `limitations.tex`, `conclusions.tex`, `contributions.tex`, `code.tex`, `appendix.tex`, `abstract.tex`), included with `\input`. `plot_style.py` holds the common style. The figures of the Bayesian and machine-learning parts are produced by the notebooks listed above (`Code_general/Bayesian/figures/`, `Code_general/Machine_Learning/figures/`), from the saved results, without rerunning any fit.
+Three versions of the report are built from the same sources:
+
+| Folder | Version | Content |
+|---|---|---|
+| `report_extended/` | **complete report** (`main.pdf`, ~43 pages) | every analysis, check and figure in its natural place: data, model, frequentist and Bayesian analyses, systematic study, validation, Dalitz plane, machine learning, comparison, limitations |
+| `report_cut/` | body of 10 pages + appendices | the short body with a pointer to the appendix where each result is justified; the appendices summarize what was done and show the tables and figures |
+| `report_short/` | body only (11 pages) | the version without appendix |
+
+`report_extended/main.tex` only sets the document up (packages and macros in `preamble.tex`); each section is a file in
+`report_extended/sections/` (`introduction.tex`, `data.tex`, `model.tex`, `frequentist.tex`, `bayesian.tex`,
+`systematics.tex`, `validation.tex`, `dalitz.tex`, `ml.tex`, `comparison.tex`, `conclusions.tex`, `code.tex`,
+`contributions.tex`, `notation.tex`), included with `\input`; compile with `tectonic -X compile main.tex`. The
+figures are in `report_extended/figures/` together with the scripts that redraw them from the saved results
+(`regen_figures_*.py`, common style `plot_style.py`). `report_build/` holds the sources and the scripts that build the
+three versions: `split_body_appendix/build_full.py` assembles the complete report; `make_cut.py` and then
+`make_short.py` build the cut and the short version. The figures of the Frequentist, Bayesian and machine-learning
+parts are produced by the notebooks listed above (`Code_general/*/figures/`), from the saved results, without
+rerunning any fit.
 
 Where the numbers of the report come from:
 

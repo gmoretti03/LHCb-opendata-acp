@@ -1,7 +1,7 @@
 \section{Mass Model and Likelihood}
 \label{sec:model}
 \label{sec:bayes_model}
-\emph{In short: a Gaussian signal and a double-exponential background for each charge, with the raw asymmetry $A$ as a parameter of the fit; both inference methods use the same likelihood.}
+\emph{In short: one extended likelihood shared by the two analyses: a Gaussian signal with common mean and width, a double-exponential background for each charge and $A$ as a parameter.}
 The mass spectrum of each charge sample is described by a signal-plus-background mixture on the nominal fit window $[5100,5600]\,\MeV$ (Sec.~\ref{sec:data_mass}),
 \begin{equation}
 f^{\pm}(m)=N_s^{\pm}\,S(m;\mu,\sigma)+N_b^{\pm}\,B^{\pm}(m),
@@ -24,5 +24,7 @@ Given the data $D=\{(m_i,q_i)\}_{i=1}^{N}$ (mass and charge of each candidate), 
 \times\prod_{i:\,q_i=-1}\Big[N_s^{-}S(m_i)+N_b^{-}B^{-}(m_i)\Big],
 \label{eq:likelihood}
 \end{multline}
-where $S(m_i)\equiv S(m_i;\mu,\sigma)$. The likelihood is extended (the yields are parameters, hence the Poisson term, Appendix~\ref{app:model}); it is the common ground of the two mass analyses: Sec.~\ref{sec:frequentist} maximizes it and Sec.~\ref{sec:bayesian} multiplies it by a prior. Since both use this model unchanged, any difference between their results can only come from the inference.
+where $S(m_i)\equiv S(m_i;\mu,\sigma)$. The likelihood is extended (the yields are parameters, hence the Poisson term\appref{app:model}); it is the common ground of the two mass analyses: Sec.~\ref{sec:frequentist} maximizes it and Sec.~\ref{sec:bayesian} multiplies it by a prior. Since both use this model unchanged, any difference between their results can only come from the inference.
 
+\subsection{Additional Results}
+\emph{Minimal model.} A six-parameter model on a narrower window gives $\Araw=-0.0497$ ($68\%$ CI $[-0.058,-0.041]$), compatible with the nominal result within its uncertainty; it is the model of the low-statistics comparison\appref{sec:bayes_minimal}.

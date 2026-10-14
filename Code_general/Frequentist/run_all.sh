@@ -25,6 +25,8 @@ if [ -z "$1" ] || [ "$1" = "validation" ]; then
     caffeinate -i $PY freq_validation.py gof
     caffeinate -i $PY freq_validation.py cov
     caffeinate -i $PY freq_validation.py profile_par
+    caffeinate -i $PY freq_validation.py scans
+    caffeinate -i $PY freq_validation.py jointfit
     echo "[$(date '+%F %T')] validation done"
     } 2>&1 | tee -a results/validation/run.log
     $PY make_figures.py

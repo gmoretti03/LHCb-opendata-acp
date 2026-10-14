@@ -11,6 +11,10 @@ Modes (python freq_validation.py MODE [options]); results in results/validation/
   multistart random starting points of the nominal fit
   momentum   A_raw in bins of the B momentum
   barlow     bootstrap of the shift between the full and a tighter-PID sample vs the sqrt(|s_sub^2 - s_full^2|) rule
+  scans      stability scans of the nominal fit: window edges, signal region, grid of the two PID cuts (results/validation/scans.json)
+  bootcov    the 1000 bootstrap replicas of the coverage study of the notebook (same seed, same replicas), in parallel:
+             t = q(A_true), estimate and error of every replica (results/validation/bootcov.jsonl)
+  jointfit   binned data, fitted curves (2 and 1 exponential) and pulls of the simultaneous fit (results/validation/jointfit.json)
 
 Every long mode is parallel (multiprocessing) and appends one line per result, so it can be interrupted and resumed.
 """
@@ -410,9 +414,105 @@ def mode_gof(args):
         append(path, buf)
 
 
+def _bootcov_job(args):
+    k, idx, start, truth = args
+    d, s = sample()
+    smp = split(s.iloc[idx])
+    free = lf.fit_joint(smp, CFG, 2, start=start, fixed={}, hesse=False)
+    if not free.valid:
+        return dict(k=k, valid=False)
+    null = lf.fit_joint(smp, CFG, 2, start={**start, "A_CP": truth}, fixed={"A_CP": truth}, hesse=False)
+    if not null.valid:
+        return dict(k=k, valid=False)
+    return dict(k=k, valid=True, t=float(max(null.fval - free.fval, 0.0)), A=float(free.values["A_CP"]),
+                err=float(free.errors["A_CP"]))
+
+
+def mode_bootcov(args):
+    """Coverage of the Wilks interval on A: the same bootstrap replicas as run_coverage_study(seed=1) of the notebook."""
+    m = best_fit(); start = values_of(m); truth = start["A_CP"]
+    n = len(sample()[1])
+    rng = np.random.default_rng(1)
+    idx = [rng.integers(0, n, n) for _ in range(args.n)]
+    path = OUT / "bootcov.jsonl"
+    have = done_keys(path, ["k"])
+    jobs = [(k, idx[k], start, truth) for k in range(args.n) if (k,) not in have]
+    with Pool(NPROC) as pool:
+        buf = []
+        for j, r in enumerate(pool.imap_unordered(_bootcov_job, jobs, chunksize=2), 1):
+            buf.append(r)
+            if len(buf) >= 25:
+                append(path, buf); buf = []; print(f"  {j}/{len(jobs)}", flush=True)
+        append(path, buf)
+
+
+def mode_scans():
+    """Fit-window, signal-region and PID-cut grids of the stability study (same grids and calls as notebook 06)."""
+    import itertools
+    cut = OUT / "scans.json"
+    done = json.load(open(cut)) if cut.exists() else {}
+    d = lf.load_data(CFG)[CFG.columns]
+    loose = d[lf.kaon_preselection(d, replace(CFG, prob_k_min=0.4, prob_pi_max=0.6))].reset_index(drop=True)
+    lf.add_B_variables(loose, CFG)
+    nominal = d[lf.kaon_preselection(d, CFG)].reset_index(drop=True)
+    lf.add_B_variables(nominal, CFG)
+    del d
+    keep = ["left", "right", "sig_lo", "sig_hi", "prob_k_min", "prob_pi_max", "valid", "accurate", "n_events", "A_CP", "A_CP_err"]
+    grids = {
+        "window": lambda: lf.scan_fit_window(nominal, CFG, [5000, 5050, 5100, 5150, 5200],
+                                             [5350, 5400, 5450, 5500, 5550, 5600, 5650, 5700, 5750, 5800, 5850, 5900, 5950, 6000, 6050, 6100]),
+        "signal_region": lambda: lf.scan_signal_region(nominal, CFG, [5150, 5170, 5185, 5200, 5215, 5230, 5250],
+                                                       [5320, 5335, 5350, 5365, 5380, 5400, 5420]),
+        "pid": lambda: lf.scan_preselection_cuts(loose, CFG, np.arange(0.45, 0.81, 0.025), np.arange(0.30, 0.56, 0.025)),
+    }
+    for name, run in grids.items():
+        if name in done:
+            continue
+        t0 = time.time(); df = run()
+        done[name] = json.loads(df[[c for c in keep if c in df.columns]].to_json(orient="records"))
+        json.dump(done, open(cut, "w"), indent=1); print(f"scan {name}: {len(df)} fits in {time.time() - t0:.0f} s", flush=True)
+    nom = lf.fit_joint(split(lf.select_window(nominal, CFG.fit_window)), CFG)
+    done["nominal"] = dict(A_CP=float(nom.values["A_CP"]), A_CP_err=float(nom.errors["A_CP"]))
+    json.dump(done, open(cut, "w"), indent=1)
+
+
+def mode_jointfit():
+    """Data histogram (10 MeV bins), fitted curves and pulls of the simultaneous fit with 2 and 1 exponential."""
+    sm = split(sample()[1])
+    bins = 50; edges = np.linspace(*CFG.fit_window, bins + 1); centres = 0.5 * (edges[:-1] + edges[1:]); w = edges[1] - edges[0]
+    x = np.linspace(*CFG.fit_window, 600)
+    out = dict(centres=centres.tolist(), width=float(w), x=x.tolist())
+    for n in (2, 1):
+        m = lf.fit_joint(sm, CFG, n_exp=n, minos=False)
+        for side in ("pos", "neg"):
+            curve = lf._model_curve(lf.make_model(CFG, side, n), m.values)
+            counts, _ = np.histogram(sm[side], bins=edges)
+            # expected counts per bin by integrating the curve over the bin (5 points per bin)
+            xs = np.linspace(edges[0], edges[-1], bins * 20 + 1); ys = curve(0.5 * (xs[:-1] + xs[1:])) * (xs[1] - xs[0])
+            exp = ys.reshape(bins, 20).sum(axis=1)
+            out.setdefault(side, dict(counts=counts.tolist()))[f"curve_{n}"] = (w * curve(x)).tolist()
+            out[side][f"pull_{n}"] = ((counts - exp) / np.sqrt(np.maximum(exp, 1))).tolist()
+        out[f"A_{n}"] = float(m.values["A_CP"]); out[f"A_err_{n}"] = float(m.errors["A_CP"])
+        if n == 2:
+            v = m.values
+            for side, sgn in (("pos", -1), ("neg", +1)):
+                nsig = v["N_sig"] * (1 + sgn * v["A_CP"]) / 2
+                sig = nsig * lf.gauss_pdf(x, v["mu"], v["sigma"], CFG.fit_window) * w
+                bkg = v[f"N_bkg_{side}"] * lf.background_pdf(x, [v[f"lam1_{side}"], v[f"lam2_{side}"]], v[f"f_bkgs_{side}"],
+                                                            CFG.window_intervals) * w
+                out[side]["signal"] = sig.tolist(); out[side]["background"] = bkg.tolist(); out[side]["N_sig_side"] = float(nsig)
+            # profile likelihood ratio on a fine grid (the other eleven parameters re-minimized at every A)
+            a_grid, fval, _ = m.mnprofile("A_CP", size=86, bound=(-0.075, 0.010))
+            fval = np.asarray(fval)
+            out["profile"] = dict(A=np.asarray(a_grid).tolist(), q=((fval - fval.min()) / m.errordef).tolist(),
+                                  A_hat=float(v["A_CP"]))
+    json.dump(out, open(OUT / "jointfit.json", "w"))
+    print("jointfit saved")
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("mode", choices=["profiles", "toys", "belt", "multistart", "momentum", "barlow", "cov", "profile_par", "gof"])
+    p.add_argument("mode", choices=["profiles", "toys", "belt", "multistart", "momentum", "barlow", "cov", "profile_par", "gof", "scans", "jointfit", "bootcov"])
     p.add_argument("--n", type=int, default=300)
     p.add_argument("--n-other", dest="n_other", type=int, default=300)
     p.add_argument("--seed", type=int, default=2026)
@@ -435,3 +535,9 @@ if __name__ == "__main__":
         mode_profile_par(a)
     elif a.mode == "gof":
         mode_gof(a)
+    elif a.mode == "bootcov":
+        mode_bootcov(a)
+    elif a.mode == "scans":
+        mode_scans()
+    elif a.mode == "jointfit":
+        mode_jointfit()

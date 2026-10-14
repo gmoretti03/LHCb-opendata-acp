@@ -7,6 +7,7 @@
 ]{revtex4-2}
 
 \input{preamble}
+\usepackage{xspace}\newcommand{\appref}[1]{\unskip~(Appendix~\ref{#1})\xspace}\newcommand{\apprefs}[2]{\unskip~(Appendices~\ref{#1} and~\ref{#2})\xspace}\newcommand{\secorapp}[2]{App.~\ref{#2}}\newcommand{\apponly}[1]{App.~\ref{#1}}
 
 \begin{document}
 \pagestyle{plain}
@@ -31,8 +32,8 @@
 \input{sections/systematics}
 \input{sections/validation}
 \input{sections/dalitz}
-\input{sections/comparison}
 \input{sections/conclusions}
+
 \input{sections/appendix}
 
 \bibliography{biblio}

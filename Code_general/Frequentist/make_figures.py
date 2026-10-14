@@ -1,8 +1,9 @@
 """Figures of the frequentist analysis, from the saved results (no fit is run).
 
-Inputs  : results/validation/*.json(l)  (freq_validation.py),  results/freq_pid_scan.json  (notebook 06).
+Inputs  : results/validation/*.json(l)  (freq_validation.py, modes also scans and jointfit),  results/freq_pid_scan.json  (notebook 06).
 Outputs : figures/validation_{injection_power,power,null_wilks,gof_toys,neyman_belt,barlow}.pdf,
-          figures/momentum_terciles.pdf, figures/syst_pid_scan.pdf
+          figures/momentum_terciles.pdf, figures/syst_pid_scan.pdf,
+          figures/freq_profile.pdf, figures/freq_jointfit.pdf, figures/freq_stability.pdf
           (figures/frequentist_wilks_coverage.pdf is written by the notebook itself).
 Also rewrites the summaries results/validation/{toys,gof,belt,barlow}_summary.json used in the text of the report.
 usage (cern env):  python make_figures.py
@@ -229,3 +230,88 @@ axs[0].set_ylabel(r"Shift of $A_{\mathrm{raw}}$ (frequentist fit)")
 axs[0].legend(loc="lower left", fontsize=9)
 plt.tight_layout(); save(fig, "syst_pid_scan.pdf")
 
+
+# ------------------------------------------------ profile likelihood ratio q(A)
+jp = os.path.join(FREQ, "jointfit.json")
+if os.path.exists(jp):
+    jf = json.load(open(jp)); pr = jf["profile"]
+    A_ = np.array(pr["A"]); q_ = np.array(pr["q"]); a_hat = pr["A_hat"]
+
+    def cross(thr):
+        """A values where q(A) crosses thr (linear interpolation, one on each side of the minimum)"""
+        k = np.where(np.diff(np.sign(q_ - thr)))[0]
+        return [A_[i] + (thr - q_[i]) * (A_[i + 1] - A_[i]) / (q_[i + 1] - q_[i]) for i in k]
+    lo68, hi68 = cross(1.0); lo95, hi95 = cross(3.84)
+    q0 = float(np.interp(0.0, A_, q_))
+    fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.8))
+    ax.plot(A_, q_, color=C["freq"], lw=2.4, zorder=3)
+    for thr, lo, hi, col, lab in ((1.0, lo68, hi68, C["freq"], "68%"), (3.84, lo95, hi95, C["freq"], "95%")):
+        ax.hlines(thr, lo, hi, color="k", lw=2.0, zorder=4)
+        ax.vlines([lo, hi], 0, thr, color="k", lw=0.8, ls=":", zorder=1)
+        ax.text(hi + 0.0015, thr, f"{lab}: [{lo:.4f}, {hi:.4f}]", fontsize=10, va="center", ha="left")
+    ax.plot([a_hat], [0], "o", color=C["observed"], ms=7, zorder=5, label=rf"$\hat A={a_hat:.4f}$")
+    ax.axvline(0, color="0.6", lw=0.9, ls="-")
+    ax.plot([0], [q0], "s", color=C["observed"], ms=7, zorder=5)
+    ax.annotate(rf"$A=0$: $q={q0:.0f}$, $Z=\sqrt{{q}}={np.sqrt(q0):.1f}\sigma$", xy=(0, q0), xytext=(-0.0725, q0 + 3.2),
+                fontsize=11, va="top", ha="left")
+    ax.set_xlim(-0.075, 0.01); ax.set_ylim(0, 31)
+    ax.set_xlabel(r"$A$"); ax.set_ylabel(r"$q(A)=-2\ln[L(A)/L(\hat A)]$")
+    ax2 = ax.secondary_yaxis("right", functions=(lambda v: np.sqrt(np.clip(v, 0, None)), lambda z: z ** 2))
+    ax2.set_yticks([1, 2, 3, 4, 5]); ax2.set_yticklabels([rf"${z}\sigma$" for z in (1, 2, 3, 4, 5)]); ax2.set_ylabel(r"$Z=\sqrt{q}$")
+    for z in (1, 2, 3, 4, 5):
+        ax.axhline(z ** 2, color="0.85", lw=0.6, zorder=0)
+    ax.legend(loc="upper left", fontsize=10, bbox_to_anchor=(0.0, 0.88))
+    plt.tight_layout(); save(fig, "freq_profile.pdf")
+
+# ------------------------------------------------ simultaneous fit: data, signal and background, pulls
+if os.path.exists(jp):
+    cen = np.array(jf["centres"]); x = np.array(jf["x"]); w = jf["width"]
+    fig, axs = plt.subplots(2, 2, figsize=(ps.DOUBLE, 5.6), sharex=True, gridspec_kw={"height_ratios": [3.2, 1.2], "hspace": 0.05, "wspace": 0.18})
+    for k, (side, lab, col) in enumerate((("pos", r"$B^+$", C["pos"]), ("neg", r"$B^-$", C["neg"]))):
+        a, b = axs[0, k], axs[1, k]; d = jf[side]; cts = np.array(d["counts"])
+        a.fill_between(x, 0.1, np.array(d["background"]), color=C["background"], alpha=0.35, lw=0, label="Background")
+        a.plot(x, np.array(d["signal"]) + np.array(d["background"]), color=col, lw=2.2, label="Signal + background")
+        a.plot(x, d["signal"], color=col, lw=1.2, ls="--", label="Signal")
+        a.errorbar(cen, cts, yerr=np.sqrt(cts), fmt="o", color="k", ms=3.5, lw=0.9, label="Data", zorder=5)
+        a.set_yscale("log"); a.set_ylim(4, 4e3); ps.letter(a, "ab"[k])
+        a.text(0.04, 0.9, rf"{lab}: $N_s={d['N_sig_side']:,.0f}$".replace(",", "{,}"), transform=a.transAxes, fontsize=12, va="top",
+               bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="none", alpha=0.85))
+        if k == 0:
+            a.set_ylabel(f"Candidates / {w:.0f} MeV"); a.legend(loc="upper right", fontsize=10)
+        b.bar(cen, d["pull_2"], width=w * 0.9, color=col, alpha=0.85)
+        b.axhline(0, color="k", lw=0.8); b.axhline(2, color="0.6", lw=0.6, ls=":"); b.axhline(-2, color="0.6", lw=0.6, ls=":")
+        b.set_ylim(-4.5, 4.5); b.set_xlabel(r"$m(K^+K^+K^-)$ [MeV]")
+        if k == 0:
+            b.set_ylabel("Pull")
+    plt.tight_layout(); save(fig, "freq_jointfit.pdf")
+
+# ------------------------------------------------ stability scans: window, signal region, PID grid
+sp = os.path.join(FREQ, "scans.json")
+if os.path.exists(sp):
+    import pandas as pd
+    sc = json.load(open(sp)); A0 = sc["nominal"]["A_CP"]; s0 = sc["nominal"]["A_CP_err"]
+
+    def table(name):
+        d = pd.DataFrame(sc[name]); d = d[d.valid & d.accurate]
+        return d
+
+    fig, axs = plt.subplots(1, 3, figsize=(ps.TRIPLE, 4.4), gridspec_kw={"width_ratios": [1.5, 1.0, 1.0]})
+    specs = (("window", "left", "right", r"Upper edge of the fit window [MeV]", r"Lower edge [MeV]", 1e3, r"$10^{-3}$"),
+             ("signal_region", "sig_lo", "sig_hi", r"Upper edge of the signal region [MeV]", r"Lower edge [MeV]", 1e5, r"$10^{-5}$"),
+             ("pid", "prob_k_min", "prob_pi_max", r"$\mathtt{ProbPi}$ upper cut", r"$\mathtt{ProbK}$ lower cut", 1e3, r"$10^{-3}$"))
+    for k, (ax, (name, yc, xc, xl, yl, scale, unit)) in enumerate(zip(axs, specs)):
+        d = table(name); ps.letter(ax, "abc"[k])
+        piv = d.pivot(index=yc, columns=xc, values="A_CP")
+        shift = (piv - A0) * scale
+        lim = np.nanmax(np.abs(shift.values))
+        im = ax.pcolormesh(piv.columns, piv.index, shift.values, shading="nearest", cmap="RdBu_r", vmin=-lim, vmax=lim)
+        cb = fig.colorbar(im, ax=ax); cb.set_label(r"$A-A_{\mathrm{nom}}$ [" + unit + "]")
+        ax.set_xlabel(xl); ax.set_ylabel(yl)
+        if name == "pid":
+            ax.plot([0.5], [0.5], "k*", ms=9)
+        else:
+            lo, hi = (5100, 5600) if name == "window" else (5200, 5350)
+            ax.plot([hi], [lo], "k*", ms=9)
+        ps.panel_label(ax, f"max $|\\Delta A|={np.nanmax(np.abs(piv.values - A0)):.4f}$".replace("0.0000", "6\\times10^{-5}") if name != "signal_region"
+                       else f"max $|\\Delta A|={np.nanmax(np.abs(piv.values - A0)):.1e}$".replace("e-05", r"\times10^{-5}"), loc="upper right")
+    plt.tight_layout(); save(fig, "freq_stability.pdf")

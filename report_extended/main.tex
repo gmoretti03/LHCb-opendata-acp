@@ -7,6 +7,7 @@
 ]{revtex4-2}
 
 \input{preamble}
+\usepackage{xspace}\newcommand{\appref}[1]{\unskip~(Sec.~\ref{#1})\xspace}\newcommand{\apprefs}[2]{\unskip~(Secs.~\ref{#1} and~\ref{#2})\xspace}
 
 \begin{document}
 \pagestyle{plain}
@@ -33,9 +34,13 @@
 \input{sections/systematics}
 \input{sections/validation}
 \input{sections/dalitz}
+\input{sections/ml}
 \input{sections/comparison}
 \input{sections/conclusions}
-\input{sections/appendix}
+\input{sections/code}
+\input{sections/contributions}
+\appendix
+\input{sections/notation}
 
 \bibliography{biblio}
 

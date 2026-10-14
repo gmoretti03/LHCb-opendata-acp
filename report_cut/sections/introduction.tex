@@ -1,20 +1,18 @@
 \section{Introduction}
 \label{sec:intro}
-Charge-parity (CP) violation -- the small observed asymmetry between the behavior of matter and antimatter -- is one of the necessary ingredients for the matter-dominated universe we observe, yet the CP violation built into the Standard Model is far too small to account for it. Studying CP violation in the decays of $B$ mesons, where it is comparatively large and experimentally accessible, is one of the main ways to test the Standard Model's Cabibbo-Kobayashi-Maskawa (CKM) description of the effect and search for physics beyond it. Charmless three-body decays such as $B^{\pm}\to h^{\pm}h^{+}h^{-}$ ($h=K,\pi$) are especially interesting in this respect: unlike a two-body decay, the three-body phase space (the Dalitz plot) allows the asymmetry to be studied not only as a single global number, but also \emph{locally}, since interference between intermediate resonances can concentrate CP-violating effects in specific kinematic regions rather than spreading them uniformly~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}.
-
-The quantity measured in this work is the raw asymmetry between the signal yields of the two charges,
+The observable of this work is the raw charge asymmetry of the signal yields of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ decays,
 \begin{equation}
-\Araw=\frac{N(B^-)-N(B^+)}{N(B^-)+N(B^+)} .
+\Araw=\frac{N(B^-)-N(B^+)}{N(B^-)+N(B^+)} ,
 \label{eq:araw}
 \end{equation}
-It differs from the physical asymmetry $\ACP$ by the production asymmetry $A_P$ of $B^\pm$ mesons in $pp$ collisions and by the detection asymmetry $A_D$ of the final state; to first order in these small quantities,
+which in three-body charmless $B$ decays can be studied globally and locally over the Dalitz plane~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}. It differs from the $CP$ asymmetry $\ACP$ by the production asymmetry $A_P$ of $B^\pm$ in $pp$ collisions and by the detection asymmetry $A_D$ of the final state~\cite{lhcb_cpv_prd2023},
 \begin{equation}
-\ACP\approx\Araw-A_P-A_D ,
+\ACP\approx\Araw-A_P-A_D .
 \label{eq:acp}
 \end{equation}
-where $A_D$ arises mainly from the different interaction cross sections of $K^+$ and $K^-$ with the detector material and depends on the kaon momenta~\cite{lhcb_cpv_prd2023}. Neither correction is applied here, so $\Araw$ is not a measurement of $\ACP$. The corrections applied in the published analysis are discussed in Sec.~\ref{sec:comparison_published}.
+Neither correction is applied here, so $\Araw$ is not a measurement of $\ACP$; the corrections of the published analysis are discussed in Sec.~\ref{sec:comparison_published}.
 
-In this work we use the LHCb Open Data record for $B^{\pm}\to K^{\pm}K^{+}K^{-}$~\cite{opendata_record,opendata_notebook}, a subset of the 2011 data on which the first evidence of an inclusive $CP$ asymmetry in this decay was published~\cite{lhcb_cpv_2013}, to ask: \emph{to what extent do frequentist likelihood fits and Bayesian inference produce consistent, well-controlled estimates of the raw asymmetry $\Araw$?} The aim is a methodological comparison of the two frameworks on the same data and, by construction, on the same likelihood, so that any difference between the two results comes from the inference and not from the model; it is not a competitive measurement of $\ACP$, which cannot be obtained from this record because it lacks the control channel for $A_P$ and $A_D$ (Appendix~\ref{sec:limitations}); the other three channels of the record need a different selection and a model of peaking backgrounds and are not analysed. Secs.~\ref{sec:data}--\ref{sec:model} describe the data and the common model, Secs.~\ref{sec:frequentist}--\ref{sec:bayesian} the two fits, and Secs.~\ref{sec:syst}--\ref{sec:comparison} the systematic study, the validation, the Dalitz plane and the comparison; a machine-learning selection is in Appendix~\ref{sec:ml}. The main results are in Table~\ref{tab:summary}.
+We use the LHCb Open Data record for this decay~\cite{opendata_record,opendata_notebook}, a subset of the 2011 data on which the first evidence of an inclusive $CP$ asymmetry was published~\cite{lhcb_cpv_2013}, to ask: \emph{to what extent do Frequentist likelihood fits and Bayesian inference produce consistent, well-controlled estimates of $\Araw$?} The aim is a methodological comparison of the two frameworks on the same data and on the same likelihood, so that any difference comes from the inference and not from the model; the record lacks the control channel needed for $A_P$ and $A_D$\appref{sec:limitations}. Secs.~\ref{sec:data}--\ref{sec:model} describe the data and the common model, Secs.~\ref{sec:frequentist}--\ref{sec:bayesian} the two fits, and Secs.~\ref{sec:syst}--\ref{sec:comparison} the systematic study, the validation, the Dalitz plane and the comparison, which includes a machine-learning selection\appref{sec:ml}. The main results are in Table~\ref{tab:summary}.
 
 \begin{table*}[t]
 \centering
@@ -25,9 +23,9 @@ Method & Sample & $\Araw$ & Statistical & Systematic & Section \\
 Counting (no fit) & fit window, $19{,}731$ & $-0.0432$ & $0.0071$ & -- & \ref{sec:data_exploration} \\
 Frequentist fit & fit window, $19{,}731$ & $-0.0441$ & $0.0085$ & $0.0072$ & \ref{sec:frequentist}, \ref{sec:syst} \\
 Bayesian fit & fit window, $19{,}731$ & $-0.0443$ & $0.0085$ & $0.0070$ & \ref{sec:bayesian}, \ref{sec:syst} \\
-Bayesian fit, $D^0$ veto & $18{,}744$ & $-0.0496$ & $0.0088$ & -- & \ref{sec:bayes_checks} \\
-Bayesian fit, ML selection & score $>0.5$, $15{,}709$ & $-0.0451$ & $0.0087$ & -- & App.~\ref{sec:ml_stability} \\
-Frequentist fit, ML selection & score $>0.5$, $15{,}709$ & $-0.0447$ & $0.0086$ & -- & App.~\ref{sec:ml_stability} \\
+Bayesian fit, $D^0$ veto & $18{,}744$ & $-0.0496$ & $0.0088$ & -- & \apponly{sec:bayes_checks} \\
+Bayesian fit, ML selection & score $>0.5$, $15{,}709$ & $-0.0451$ & $0.0087$ & -- & \secorapp{sec:comparison}{sec:ml_stability} \\
+Frequentist fit, ML selection & score $>0.5$, $15{,}709$ & $-0.0447$ & $0.0086$ & -- & \secorapp{sec:comparison}{sec:ml_stability} \\
 Bayesian fit, Dalitz region of Ref.~\cite{lhcb_cpv_2013} & $2146$ & $-0.234$ & $0.025$ & -- & \ref{sec:dalitz} \\
 \midrule
 Published analysis (same data)~\cite{lhcb_cpv_2013} & different selection and model & $-0.060$ & $0.007$ & -- & -- \\

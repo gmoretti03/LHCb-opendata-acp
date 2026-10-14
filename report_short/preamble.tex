@@ -1,0 +1,40 @@
+% Packages and macros of the report (included by main.tex)
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{comment}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{placeins}
+\usepackage{hyperref}
+\hypersetup{colorlinks = true, linkcolor = blue!55!black, citecolor = blue!55!black, urlcolor = blue!55!black}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{xspace}
+
+\renewcommand{\thefigure}{\Roman{figure}}
+
+% unit / symbol macros, mirroring the style used in lhc_anomaly_detection/main.tex
+\newcommand{\GeV}{\ensuremath{\,\text{Ge\hspace{-.08em}V}}\xspace}
+\newcommand{\MeV}{\ensuremath{\,\text{Me\hspace{-.08em}V}}\xspace}
+\newcommand{\Araw}{\ensuremath{A_{\mathrm{raw}}}\xspace}
+\newcommand{\ACP}{\ensuremath{A_{CP}}\xspace}
+
+% Left-aligned, justified cell of fixed width inside a tabular (replaces p{...} columns, which revtex4-2 breaks with array >= 2.7)
+\newcommand{\pcell}[2]{\parbox[t]{#1}{\leftskip=0pt\rightskip=0pt\parfillskip=0pt plus 1fil\relax #2}}
+
+% TODO markers -- remove once every section has real content
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+% allow two wide floats on the top of a page (results figures cited together)
+\renewcommand{\dbltopfraction}{0.85}
+\renewcommand{\dblfloatpagefraction}{0.7}
+\setcounter{dbltopnumber}{3}

@@ -23,6 +23,8 @@ The coverage figure `frequentist_wilks_coverage.pdf` is written by the notebook 
 | `toys.jsonl`, `toys_summary.json` | `toys` | parametric toys at five injected asymmetries: $\hat A$, Hesse error, $t(A_{\rm true})$, $q(0)$; bias, coverage, size, power |
 | `belt.jsonl`, `belt_summary.json` | `belt` | toys on a grid of $A_{\rm true}$, Neyman confidence belt and its 68 % interval |
 | `barlow.jsonl`, `barlow_summary.json` | `barlow` | bootstrap of the shift between nested samples against $\sigma_B$ |
+| `scans.json` | `scans` | stability grids: fit-window edges (80 fits), signal-region edges (49), ProbK and ProbPi cuts (165); used by `freq_stability.pdf` |
+| `jointfit.json` | `jointfit` | binned data, fitted curves (two and one exponential) and pulls of the simultaneous fit; used by `freq_jointfit.pdf` |
 | `momentum.json` | `momentum` | $A_{\rm raw}$ in terciles of the momentum of the $B$ |
 | `cov.jsonl`, `cov_summary.json`, `cov_hesse.json` | `cov` | bootstrap covariance of the twelve parameters against Hesse |
 | `gof.jsonl`, `gof_data.json`, `gof_summary.json` | `gof` | binned $\chi^2$ of toys from the fitted model with 50, 100 and 200 bins |

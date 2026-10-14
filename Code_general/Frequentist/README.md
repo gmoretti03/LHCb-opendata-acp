@@ -8,8 +8,9 @@ Read the notebook from the top. It starts with a table of the sections and figur
 
 Code: `lhcb_freq.py` (data, preselection, mass model, fits, profile likelihood, scans, systematic combination — used by
 the notebook and by `freq_validation.py`), `freq_validation.py` (toy-MC validation of the estimator and of the
-intervals: `profiles`, `toys`, `belt`, `multistart`, `momentum`, `barlow`, `cov`, `gof`, `profile_par`),
-`make_figures.py` (figures of the validation, of the momentum terciles and of the PID scan, from `results/`).
+intervals: `profiles`, `toys`, `belt`, `multistart`, `momentum`, `barlow`, `cov`, `gof`, `profile_par`, `scans`, `jointfit`),
+`make_figures.py` (figures of the validation, profile likelihood, simultaneous fit with pulls, stability grids, momentum
+terciles and PID scan, from `results/`).
 
 ## Running
 
