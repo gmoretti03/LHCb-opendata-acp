@@ -60,7 +60,7 @@ class Config:
 
 
 NOMINAL = Config()
-# common list of variations, identical in the frequentist analysis (freq: Frequentist_Systematics.ipynb)
+# common list of variations, identical in the frequentist analysis (freq: Frequentist_Analysis.ipynb)
 VARIATIONS = [
     replace(NOMINAL, name="window_lo5050", lo=5050.0),
     replace(NOMINAL, name="window_lo5150", lo=5150.0),
