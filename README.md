@@ -32,7 +32,7 @@ from them when the notebook is run again; the notebooks are delivered already ex
 
 | Notebook | What it does | Runtime | Output (`results/`) |
 |---|---|---|---|
-| `Code_general/Frequentist/Frequentist_Analysis.ipynb` | data, preselection, frequentist fits (separate and simultaneous), profile likelihood, Wilks test, coverage, stability scans, common systematic study (13 variants), charm vetoes, Dalitz plots | ~1 h | `freq_systematics.json`, `freq_pid_scan.json`, `frequentist_wilks_coverage.pdf` |
+| `Code_general/Frequentist/06_frequentist_fit_stability_systematics.ipynb` | data, preselection, frequentist fits (separate and simultaneous), profile likelihood, Wilks test, coverage, stability scans, common systematic study (13 variants), charm vetoes, Dalitz plots | ~1 h | `freq_systematics.json`, `freq_pid_scan.json`; `figures/frequentist_wilks_coverage.pdf` |
 | `Code_general/Bayesian/01_bayes_mass_fit_and_asymmetry.ipynb` | nominal Bayesian model: posterior of $A_{\rm raw}$, Bayes factors, systematic variants, 200 toys, magnet polarities, Dalitz plane, charm vetoes | ~2.5 h (10 cores); minutes with saved results | `nominal/` |
 | `Code_general/Bayesian/02_bayes_model_checks_and_priors.ipynb` | posterior predictive checks, trace plot, independent Metropolis–Hastings sampler, sensitivity to the priors, HPD intervals, sequential update, $\phi(1020)$ band, comparison with the frequentist profile likelihood | ~25 min; minutes with saved results | `nominal/` |
 | `Code_general/Bayesian/03_bayes_vs_frequentist_low_statistics.ipynb` | six-parameter model on the data; Bayesian vs frequentist intervals on the same likelihood at low statistics (toys, N = 50–2000) | ~2.5 h (10 cores); seconds with saved results | `lowstat/` |
