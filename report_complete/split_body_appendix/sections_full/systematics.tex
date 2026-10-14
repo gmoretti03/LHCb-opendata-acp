@@ -40,3 +40,19 @@ The results are in Table~\ref{tab:syst}, and all the Bayesian fits in Table~\ref
 \end{gather*}
 
 The preselection dominates, through the single variant $\texttt{ProbK}>0.6$ ($+0.0058$, $1.2\,\sigma_B$). The scan of each cut in steps of $0.05$ (Fig.~\ref{fig:syst_pid_scan} of Appendix~\ref{app:syst}) shows that this value is a fluctuation: on the tight side the shifts scatter around zero within $1.3\,\sigma_B$ without a trend, whereas loosening $\texttt{ProbK}$ moves $\Araw$ monotonically, as expected if misidentified decays not in the mass model enter the sample. The nominal requirement is therefore well placed and the preselection uncertainty conservative. The background group is second, driven by the charge dependence of the background, and the window third.
+
+\subsection{Stability Checks of the Frequentist Fit}
+\label{sec:freq_syst}
+While the systematic uncertainties study is shared with the Bayesian approach -- and discussed in detail in Sec.~\ref{sec:syst} -- three specific stability checks were performed within the frequentist one, to evaluate the robustness of the fitted raw asymmetry $\Araw$. Each test consists of a two-dimensional grid scan in which two selection or fit parameters are varied simultaneously, performing a simultaneous fit with the nominal double-exponential background model at each point and observing the stability of $\Araw$.
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Fit Window Scan:} The lower and upper boundaries of the invariant mass fit window, nominally set to $[5100, 5600]\,\MeV$, were scanned over the ranges $[5000, 5200]\,\MeV$ and $[5350, 6100]\,\MeV$, respectively, with a 50 \MeV step. This test evaluates the sensitivity of $\Araw$ to the exponential background parametrization, and is useful to choose the nominal window: too small or too asymmetric fit window produces unstable fit, due to worse background estimation.
+
+    \item \textbf{Signal Region Scan:} Changing the extremes of the signal region not significant fluctation in $\Araw$ are observed, suggesting that the sideband preliminar fit could be avoided.
+
+    \item \textbf{Particle Identification Cut Scan:} The preselection cuts on the final-state kaon PID likelihoods (\texttt{ProbK} and \texttt{ProbPi}) were varied simultaneously towards a better kaon purity (larger than $0.5$ for kaons, smaller than $0.5$ for pions). This influences significantly the $\Araw$ estimation, but always within the $68\%$ CI, confirming the cut selection as reasonable.
+\end{enumerate}
+
+Across all scan configurations, the maximum observed variation in $\Araw$ remains below the statistical uncertainty ($\Delta \Araw < \sigma_{\mathrm{stat}}$), demonstrating the stability of the nominal fit result.
+
+The numbers of the three scans are given in Appendix~\ref{sec:freq_stab_numbers}.

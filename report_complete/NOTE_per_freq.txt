@@ -80,3 +80,21 @@ L. [FATTO da Giacomo/Claude, 2026-10-11: inseriti in frequentist.tex, correggi i
    Coverage of the Wilks Intervals:
    \emph{In short: in $1000$ bootstrap replicas the $68\%$ interval contains the fitted value in $68.4\pm1.5\%$ of the cases, the nominal coverage.}
    (N_s: usa 15,328, vedi B4; "Separate vs. Simultaneous": le due stime e le incertezze sono quelle del tuo testo.)
+
+M. [2026-10-14, dopo il merge di freq in main] CODICE E REPORT RIALLINEATI (Giacomo/Claude)
+   1. Il commit e558490 (12/10) aveva riportato frequentist.tex alla versione precedente: le modifiche J e L erano andate perse.
+      Riapplicate (stesse parole, sections/ e split_body_appendix/sections_full/):
+      - J1: "the common mass model of Sec. III" / "the nominal model is the common one of Sec. III";
+      - J2: la sottosezione dei tre scan e' di nuovo in Sec. VI ("Stability Checks of the Frequentist Fit", fine di systematics.tex),
+        testo di Marco parola per parola; i numeri sono nell'appendice "Stability Scans of the Frequentist Fit: Numbers";
+      - L: righe "In short" nelle quattro sottosezioni; B4: N_s = 15,328; I: paragrafo di Wilks scommentato.
+      Restano a te (non toccati): A1 (la frase "Delta A < sigma_stat" nello scan PID e' falsa: 0.0126 contro 0.0085, vedi appendice),
+      A2, A3, refusi "fluctation"/"preliminar", righe % con numeri vecchi, D11 (limiti del fit), E12 (stile figura coverage).
+   2. Codice: la cartella Code_general/Frequentist e' ora un solo notebook, 06_frequentist_fit_stability_systematics.ipynb, nello stile
+      di Bayesian/ e Machine_Learning/ (README, run_all.sh, figures/, make_figures.py, results/README.md). Parte da Bis (con le
+      correzioni) e include: chi2 160/88 (50 bin), Minos 95%, Ns/Nb, sideband subtraction, Z = sqrt(q), coverage su A (68.4 +- 1.5%),
+      scansioni con sigma_B (scan PID da data_loose: max 0.0126), studio sistematico (13 varianti), veti charm 'D' e 'all', Dalitz.
+      Il tuo notebook originale (Ter) e Bis/Systematics sono INTATTI in Code_general/Frequentist_Origin/.
+      Differenze di Ter rispetto al report, per tua informazione: coverage nel piano (A, mu) con soglia 2.30 (67.2%) invece che su A
+      (68.4%); Z = norm.ppf(1-p) (5.06) invece di sqrt(q) (5.20); scan PID da data gia' preselezionata (max 0.0112, i tagli piu'
+      larghi coincidono col nominale); veto charm ['D','chi'] senza J/psi; path Windows; cella TODO finale.
