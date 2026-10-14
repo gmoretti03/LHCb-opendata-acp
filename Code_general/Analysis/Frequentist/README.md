@@ -14,7 +14,7 @@ terciles and PID scan, from `results/`).
 
 ## Running
 
-* Environment: `environment.yml` at the root of the repository; data in `../../opendata-project/Data`
+* Environment: `environment.yml` at the root of the repository; data in `../../../opendata-project/Data`
   (or the directory in `LHCB_DATA_DIR`).
 * `./run_all.sh` runs the notebook in place and then the validation and `make_figures.py`
   (`./run_all.sh 06` only the notebook, `./run_all.sh validation` only the validation). Set `JUPYTER` if `jupyter` is

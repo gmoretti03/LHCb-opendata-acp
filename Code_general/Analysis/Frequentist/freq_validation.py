@@ -30,7 +30,7 @@ from scipy.stats import truncnorm
 warnings.filterwarnings("ignore")
 import lhcb_freq as lf
 
-DATA = Path(os.environ.get("LHCB_DATA_DIR", "../../opendata-project/Data"))
+DATA = Path(os.environ.get("LHCB_DATA_DIR", "../../../opendata-project/Data"))
 CFG = lf.Config(data_dir=DATA, sim_file=DATA / "PhaseSpaceSimulation.root")
 OUT = Path(os.environ.get("VALIDATION_DIR", "results/validation")); OUT.mkdir(parents=True, exist_ok=True)
 NPROC = int(os.environ.get("NPROC", 9))

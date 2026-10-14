@@ -5,7 +5,7 @@
 # Usage:  ./run_all.sh            (notebook, validation, figures)
 #         ./run_all.sh 06         (only the notebook)      ./run_all.sh validation   (only the validation + figures)
 cd "$(dirname "$0")"
-export LHCB_DATA_DIR="${LHCB_DATA_DIR:-../../opendata-project/Data}"
+export LHCB_DATA_DIR="${LHCB_DATA_DIR:-../../../opendata-project/Data}"
 JUPYTER="${JUPYTER:-jupyter}"
 PY="${PY:-python}"
 if [ -z "$1" ] || [[ "06_frequentist_fit_stability_systematics" == "$1"* ]]; then

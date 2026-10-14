@@ -19,17 +19,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import plot_style as ps                                  # also gives the paths: ps.ANALYSIS, ps.DATA
 MODE = sys.argv[1]
 OUT = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else HERE
 os.makedirs(OUT, exist_ok=True)
 REPO = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
-DATA_DIR = os.path.join(REPO, "LHCb", "opendata-project", "Data")
+DATA_DIR = ps.DATA
 
 BRANCH, NB_DIR, NB_NAME, EXTRA = {
-    "bayes": ("bayes", "LHCb/Code_general/Bayesian", "Bayesian_Analysis.ipynb",
+    "bayes": ("bayes", "LHCb/Code_general/Analysis/Bayesian", "Bayesian_Analysis.ipynb",
               ["bayesian_model.py", "results/posterior_summary.json",
                "results/toy_mc_coverage_final.json"]),
-    "ml": ("mach_lear", "LHCb/Code_general/Machine_Learning", "ML_Analysis.ipynb", []),
+    "ml": ("mach_lear", "LHCb/Code_general/Analysis/Machine_Learning", "ML_Analysis.ipynb", []),
 }[MODE]
 CELLS = {
     # bayes cells are located by content, so the script keeps working when cells are added

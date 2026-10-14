@@ -12,12 +12,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CG = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Code_general")       # LHCb/Code_general
+sys.path.insert(0, HERE)
+import plot_style as ps                                  # also gives the paths: ps.ANALYSIS, ps.DATA
+CG = ps.ANALYSIS                                         # LHCb/Code_general/Analysis
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
 ML = os.environ.get("REGEN_ML_DIR", os.path.join(CG, "Machine_Learning", "results", "nominal"))
 BAYES = os.environ.get("REGEN_BAYES_CODE", os.path.join(CG, "Bayesian"))
-DATA = os.environ.get("LHCB_DATA_DIR", os.path.join(os.path.dirname(CG), "opendata-project", "Data"))
+DATA = ps.DATA
 sys.path.insert(0, HERE)
 import plot_style as ps
 ps.use(); C = ps.COLORS

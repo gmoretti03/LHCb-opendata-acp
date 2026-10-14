@@ -15,7 +15,7 @@ Bayesian fit. The classifiers never see the mass. Helper functions (data, weak l
 ## Running
 
 * Needs the Bayesian notebook 01 (`../Bayesian/results/nominal/nominal_summary.json`) and the data in
-  `../../opendata-project/Data`.
+  `../../../opendata-project/Data`.
 * `./run_all.sh` runs 04 → 05 in place (`./run_all.sh 05` runs one). Set `JUPYTER` if `jupyter` is not on the PATH.
 * Every long block resumes from `results/nominal/`: with the saved results the two notebooks take about 5 minutes;
   from scratch about 3 h (04) and 1.5 h (05) on 10 cores. Seeds are fixed and TensorFlow op determinism is enabled.

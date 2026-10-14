@@ -14,7 +14,7 @@ Code: `bayes_model.py` (mass model, priors, sampler, toy generator, systematic s
 
 ## Running
 
-* Environment: `environment.yml` at the root of the repository; data in `../../opendata-project/Data`.
+* Environment: `environment.yml` at the root of the repository; data in `../../../opendata-project/Data`.
 * `./run_all.sh` runs 01 → 02 → 03 in place (`./run_all.sh 02` runs one). Set `JUPYTER` if `jupyter` is not on the PATH.
 * Every long block resumes from `results/`: with the saved results the three notebooks take about one minute;
   from scratch about 2 h 20 min (01), 25 min (02) and 2 h 30 min (03) on 10 cores. Delete a result file to recompute

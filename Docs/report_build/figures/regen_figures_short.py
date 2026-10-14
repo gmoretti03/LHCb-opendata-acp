@@ -15,8 +15,10 @@ import numpy as np
 from scipy import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import plot_style as ps                                  # also gives the paths: ps.ANALYSIS, ps.DATA
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
-CG = os.path.abspath(os.path.join(HERE, "..", "..", "Code_general"))
+CG = ps.ANALYSIS
 FREQ = os.path.join(CG, "Frequentist", "results")
 VAL = os.path.join(FREQ, "validation")
 BAYES = os.path.join(CG, "Bayesian", "results", "nominal")
@@ -196,7 +198,7 @@ import uproot
 from matplotlib.patches import Rectangle
 LO, HI, MK = 5100.0, 5600.0, 493.677
 REPO = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
-DATA = os.path.join(REPO, "LHCb", "opendata-project", "Data")
+DATA = ps.DATA
 br = [f"H{i}_{v}" for i in (1, 2, 3) for v in ("PX", "PY", "PZ", "ProbK", "ProbPi", "isMuon", "Charge")]
 df = pd.concat([uproot.open(os.path.join(DATA, f"B2HHH_Magnet{p}.root"))["DecayTree"].arrays(br, library="pd") for p in ("Down", "Up")],
                ignore_index=True)
@@ -274,7 +276,7 @@ if "m" not in globals() or True:
     import pandas as pd, uproot, subprocess
     LO_, HI_, MK_ = 5100.0, 5600.0, 493.677
     REPO_ = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
-    DATA_ = os.path.join(REPO_, "LHCb", "opendata-project", "Data")
+    DATA_ = ps.DATA
     br_ = [f"H{i}_{v}" for i in (1, 2, 3) for v in ("PX", "PY", "PZ", "ProbK", "ProbPi", "isMuon", "Charge")]
     d_ = pd.concat([uproot.open(os.path.join(DATA_, f"B2HHH_Magnet{p}.root"))["DecayTree"].arrays(br_, library="pd") for p in ("Down", "Up")],
                    ignore_index=True)

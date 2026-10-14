@@ -1,15 +1,15 @@
-"""Builds report_cut from report_complete.
+"""Builds report_cut from the sources in report_build.
 
-report_cut = report_complete with (i) the body (Secs. I-X) copied 1:1, (ii) the appendices reduced to headings, the
+report_cut = report_build with (i) the body (Secs. I-X) copied 1:1, (ii) the appendices reduced to headings, the
 "In short" summary of every section and subsection, and the figures and tables, and (iii) no table of contents.
 
-usage: python3 report_complete/split_body_appendix/make_cut.py   (then: cd report_cut && tectonic main.tex)
-Run again after report_complete changes (e.g. after merging Marco's frequentist.tex): nothing is edited by hand.
+usage (from LHCb/Docs): python3 report_build/split_body_appendix/make_cut.py, then make_short.py (then: cd report_cut && tectonic main.tex)
+Run again after the sources in report_build change: nothing is edited by hand.
 """
 import os, re, shutil
 
-BUILD = os.path.dirname(os.path.abspath(__file__))                      # report_complete/split_body_appendix
-SRC = os.path.abspath(os.path.join(BUILD, '..'))                        # report_complete
+BUILD = os.path.dirname(os.path.abspath(__file__))                      # Docs/report_build/split_body_appendix
+SRC = os.path.abspath(os.path.join(BUILD, '..'))                        # Docs/report_build
 HERE = os.path.abspath(os.path.join(SRC, '..', 'report_cut'))           # output folder
 os.makedirs(HERE + '/sections', exist_ok=True)
 os.makedirs(HERE + '/figures', exist_ok=True)

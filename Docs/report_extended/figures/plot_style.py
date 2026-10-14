@@ -3,7 +3,24 @@
 Figure widths are chosen so that, at the width used in main.tex (\\columnwidth for single panels,
 0.95\\textwidth for figure*), the text in every figure comes out at about the same size (~7 pt).
 """
+import os
 import matplotlib.pyplot as plt
+
+
+# ---- where the analysis code, its saved results and the data are: found by walking up from this folder (the LHCb
+# folder is the first one that contains both Code_general and opendata-project), so the figures folder can be moved.
+def _find_lhcb(start):
+    d = os.path.abspath(start)
+    while d != os.path.dirname(d):
+        if os.path.isdir(os.path.join(d, "Code_general")) and os.path.isdir(os.path.join(d, "opendata-project")):
+            return d
+        d = os.path.dirname(d)
+    raise RuntimeError("LHCb folder not found above " + start + "; set LHCB_DIR")
+
+
+LHCB = os.environ.get("LHCB_DIR") or _find_lhcb(os.path.dirname(os.path.abspath(__file__)))
+ANALYSIS = os.path.join(LHCB, "Code_general", "Analysis")                        # Bayesian/, Frequentist/, Machine_Learning/
+DATA = os.environ.get("LHCB_DATA_DIR", os.path.join(LHCB, "opendata-project", "Data"))
 
 SINGLE = 6.4          # inches, one-column figure (\columnwidth)
 DOUBLE = 12.5         # two panels side by side (figure*, 0.95\textwidth)

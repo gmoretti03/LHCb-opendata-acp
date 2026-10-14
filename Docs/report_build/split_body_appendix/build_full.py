@@ -1,11 +1,11 @@
-"""Builds the complete report (natural order, no body/appendix split) in LHCb/report_extended.
+"""Builds the complete report (natural order, no body/appendix split) in LHCb/Docs/report_extended.
 
 Sources: report_extended/sections (body sections and the detailed appendix sections), short_overrides (text of the
 frequentist section and of the conclusions, rewritten) and the figures redrawn for the short version.
 Every detailed subsection of the former appendix is placed after the body of its own section; the machine-learning
 analysis becomes a section of its own. Nothing in the numbers is changed.
 
-usage: python3 report_build/split_body_appendix/build_full.py
+usage (from LHCb/Docs): python3 report_build/split_body_appendix/build_full.py
 """
 import os, re, shutil, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

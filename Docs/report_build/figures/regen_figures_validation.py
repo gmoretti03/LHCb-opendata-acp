@@ -3,7 +3,7 @@
 Inputs (written by the validation scripts, not by the notebooks):
   FREQ_DIR   = Code_general/Frequentist/results/validation  (freq_validation.py: profiles.json, toys.jsonl, belt.jsonl, ...)
   BAYES_DIR  = Code_general/Bayesian/results/nominal         (bayes_validation.py: validation.json; nominal_posterior_thinned.npy)
-Both default to LHCb/Code_general; override with REGEN_FREQ_DIR / REGEN_BAYES_DIR.
+Both default to LHCb/Code_general/Analysis; override with REGEN_FREQ_DIR / REGEN_BAYES_DIR.
 usage (cern env):  python regen_figures_validation.py [OUTDIR]
 Every figure is produced only if its inputs exist.
 """
@@ -15,7 +15,9 @@ import numpy as np
 from scipy import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CG = os.path.join(os.path.dirname(os.path.dirname(HERE)), "Code_general")       # LHCb/Code_general
+sys.path.insert(0, HERE)
+import plot_style as ps                                  # also gives the paths: ps.ANALYSIS, ps.DATA
+CG = ps.ANALYSIS                                         # LHCb/Code_general/Analysis
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
 FREQ = os.environ.get("REGEN_FREQ_DIR", os.path.join(CG, "Frequentist", "results", "validation"))

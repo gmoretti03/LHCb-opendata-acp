@@ -5,13 +5,13 @@ the result is still stated (the REWRITES list below, exact strings, each one mus
 of the stability subsection of the frequentist analysis that the numbers of the extended report contradict corrected.
 Nothing is edited by hand: run make_cut.py first, then this script, then  cd report_short && tectonic main.tex.
 
-usage: python3 report_extended/split_body_appendix/make_short.py
+usage (from LHCb/Docs): python3 report_build/split_body_appendix/make_short.py
 """
 import os, re, shutil, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from float_place import place_floats, never_cited, FLOAT as _FLOAT
 
-BUILD = os.path.dirname(os.path.abspath(__file__))                       # report_extended/split_body_appendix
+BUILD = os.path.dirname(os.path.abspath(__file__))                       # Docs/report_build/split_body_appendix
 CUT = os.path.abspath(os.path.join(BUILD, '..', '..', 'report_cut'))
 OUT = os.path.abspath(os.path.join(BUILD, '..', '..', 'report_short'))
 for d in ('sections', 'figures'):

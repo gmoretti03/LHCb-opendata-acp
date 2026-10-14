@@ -15,12 +15,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import plot_style as ps                                  # also gives the paths: ps.ANALYSIS, ps.DATA
 OUT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE
 os.makedirs(OUT, exist_ok=True)
 REPO = subprocess.check_output(["git", "-C", HERE, "rev-parse", "--show-toplevel"], text=True).strip()
-DATA_DIR = os.path.join(REPO, "LHCb", "opendata-project", "Data")
-BAYES_DIR = "LHCb/Code_general/Bayesian"
-LOCAL = os.environ.get("REGEN_NOMINAL_DIR", os.path.join(REPO, "LHCb", "Code_general", "Bayesian", "results", "nominal"))
+DATA_DIR = ps.DATA
+BAYES_DIR = "LHCb/Code_general/Analysis/Bayesian"
+LOCAL = os.environ.get("REGEN_NOMINAL_DIR", os.path.join(ps.ANALYSIS, "Bayesian", "results", "nominal"))
 
 work = tempfile.mkdtemp(prefix="regen_nominal_")
 def fetch(rel_in_bayes_dir, binary=False):
