@@ -3,10 +3,22 @@
 Final project for the *Statistics and Data Analysis* course (Università di Milano-Bicocca, A.Y. 2025–2026),
 Giacomo Moretti and Marco Belotti. The complete report is `Docs/report_extended/main.pdf`.
 
+## Layout of the repository
+
+```
+Code_general/
+  Report/      the notebooks that accompany the report (9 notebooks, self-contained, already executed)
+  Analysis/    the complete analysis: modules, long runs, saved results (Frequentist, Bayesian, Machine_Learning)
+Docs/          the report (sources and PDF), the papers used and the project proposals
+Statistics_course/   material of the course
+opendata-project/    CERN Open Data record 4900 (data, not tracked by git)
+environment.yml      conda environment of all the code
+```
+
 ## Data
 
 CERN Open Data record 4900, *Matter Antimatter Differences – B meson decays to three hadrons*
-(<https://opendata.cern.ch/record/4900>). Put the three files in `opendata-project/Data/`:
+(<https://opendata.cern.ch/record/4900>). The three files go in `opendata-project/Data/`:
 
 ```
 opendata-project/Data/B2HHH_MagnetDown.root
@@ -14,8 +26,9 @@ opendata-project/Data/B2HHH_MagnetUp.root
 opendata-project/Data/PhaseSpaceSimulation.root
 ```
 
-The frequentist code reads the data directory from the environment variable `LHCB_DATA_DIR`
-(e.g. `export LHCB_DATA_DIR=$PWD/opendata-project/Data`); the other notebooks use the relative path above.
+The notebooks of `Code_general/Report/` read `Code_general/Report/data/` first (a copy of the three files, so that the
+folder can be used on its own) and `opendata-project/Data/` otherwise. The notebooks of `Code_general/Analysis/` read
+`../../../opendata-project/Data` (frequentist code: environment variable `LHCB_DATA_DIR`).
 
 ## Environment
 
@@ -25,60 +38,72 @@ conda activate lhcb-kkk
 python -m ipykernel install --user --name cern
 ```
 
-All notebooks use the kernel `cern`. Every long block saves its results in `results/` as it goes and resumes
-from them when the notebook is run again; the notebooks are delivered already executed.
+All notebooks use the kernel `cern`.
 
-## Code
+## Notebooks of the report: `Code_general/Report/`
+
+A guided tour of the whole analysis **in miniature**: the same methods and the same order as the report, with fewer
+replicas, toy experiments and shorter chains, so that each notebook runs in 1–15 minutes. The numbers can differ
+slightly from the report; next to every result the notebook prints the value of the report (**report:**). Each notebook
+saves its figures in `figures/` and its numbers in `results/` (`NN_summary.json` and tables), and tags what goes beyond
+the techniques of the course as **[EXTRA]**. See `Code_general/Report/README.md`.
+
+| Notebook | Content | Run time |
+|---|---|---|
+| `01_Frequentist_fit` | data and preselection, extended unbinned likelihood (`iminuit`), Minos, profile likelihood, Wilks test | 1 min |
+| `02_Frequentist_validation` | bootstrap, toy experiments (bias, pulls, coverage, size, power), Neyman belt, momentum, goodness of fit and binning | 12 min |
+| `03_Frequentist_systematics` | 13 variants, Barlow criterion, scans of window, signal region and PID cuts | 3 min |
+| `04_Dalitz_plane` | local asymmetry, homogeneity test, null tests, φ(1020), published region, charm vetoes | < 1 min |
+| `05_Bayesian_fit` | priors, MCMC (`emcee`), convergence, credible/HPD intervals, Bayes factors, prior dependence | 4 min |
+| `06_Bayesian_systematics_and_checks` | Bayesian variants, coverage, posterior predictive check, polarities, comparison with the profile | 14 min |
+| `07_Bayesian_low_statistics` | credible against confidence intervals at 50–2000 candidates, asymptotic behaviour | 2 min |
+| `08_ML_classifiers` | weak labels, six classifiers, Ridge/Lasso, bias–variance, calibration, uncertainty, hyperparameters | 9 min |
+| `09_ML_measurement` | effect of the ML selection on A_raw, sculpting test, K-means on the Dalitz plane, high-background sample | 5 min |
+
+## Complete analysis: `Code_general/Analysis/`
+
+The production code and results behind the numbers of the report (long runs, saved in `results/` and resumed on
+rerun). Each directory has its own README.
 
 | Notebook | What it does | Runtime | Output (`results/`) |
 |---|---|---|---|
-| `Code_general/Analysis/Frequentist/06_frequentist_fit_stability_systematics.ipynb` | data, preselection, frequentist fits (separate and simultaneous), profile likelihood, Wilks test, coverage, stability scans, common systematic study (13 variants), charm vetoes, Dalitz plots | ~1 h | `freq_systematics.json`, `freq_pid_scan.json`; `figures/frequentist_wilks_coverage.pdf` |
-| `Code_general/Analysis/Bayesian/01_bayes_mass_fit_and_asymmetry.ipynb` | nominal Bayesian model: posterior of $A_{\rm raw}$, Bayes factors, systematic variants, 200 toys, magnet polarities, Dalitz plane, charm vetoes | ~2.5 h (10 cores); minutes with saved results | `nominal/` |
-| `Code_general/Analysis/Bayesian/02_bayes_model_checks_and_priors.ipynb` | posterior predictive checks, trace plot, independent Metropolis–Hastings sampler, sensitivity to the priors, HPD intervals, sequential update, $\phi(1020)$ band, comparison with the frequentist profile likelihood | ~25 min; minutes with saved results | `nominal/` |
-| `Code_general/Analysis/Bayesian/03_bayes_vs_frequentist_low_statistics.ipynb` | six-parameter model on the data; Bayesian vs frequentist intervals on the same likelihood at low statistics (toys, N = 50–2000) | ~2.5 h (10 cores); seconds with saved results | `lowstat/` |
-| `Code_general/Analysis/Machine_Learning/04_ml_signal_background_classifiers.ipynb` | weak labels, classifiers, regularization, bias–variance, calibration, uncertainty (RF, MC dropout, deep ensemble), hyperparameter search | ~3 h; ~5 min with saved results | `nominal/` |
-| `Code_general/Analysis/Machine_Learning/05_ml_selection_and_local_asymmetry.ipynb` | ML selection and stability of $A_{\rm raw}$, refits with the three methods, origin of the mass change, K-means and fixed binning on the Dalitz plane, null tests, comparison with the published analysis, high-background sample | ~1.5 h; ~5 min with saved results | `nominal/` |
+| `Frequentist/06_frequentist_fit_stability_systematics.ipynb` | data, preselection, frequentist fits (separate and simultaneous), profile likelihood, Wilks test, coverage, stability scans, common systematic study (13 variants), charm vetoes, Dalitz plots | ~1 h | `freq_systematics.json`, `freq_pid_scan.json` |
+| `Bayesian/01_bayes_mass_fit_and_asymmetry.ipynb` | nominal Bayesian model: posterior of A_raw, Bayes factors, systematic variants, 200 toys, magnet polarities, Dalitz plane, charm vetoes | ~2.5 h (10 cores); minutes with saved results | `nominal/` |
+| `Bayesian/02_bayes_model_checks_and_priors.ipynb` | posterior predictive checks, trace plot, Metropolis–Hastings sampler, sensitivity to the priors, HPD intervals, sequential update, φ(1020) band, comparison with the profile likelihood | ~25 min | `nominal/` |
+| `Bayesian/03_bayes_vs_frequentist_low_statistics.ipynb` | six-parameter model; Bayesian against frequentist intervals at low statistics (toys, N = 50–2000) | ~2.5 h (10 cores) | `lowstat/` |
+| `Machine_Learning/04_ml_signal_background_classifiers.ipynb` | weak labels, classifiers, regularization, bias–variance, calibration, uncertainty (RF, MC dropout, deep ensemble), hyperparameter search | ~3 h | `nominal/` |
+| `Machine_Learning/05_ml_selection_and_local_asymmetry.ipynb` | ML selection and stability of A_raw, refits with three methods, origin of the mass change, K-means and fixed binning, null tests, comparison with the published analysis, high-background sample | ~1.5 h | `nominal/` |
 
-The Bayesian and machine-learning notebooks are numbered in the order in which they have to be read and run
-(`run_all.sh` in each directory runs them in order). Each notebook starts with a table of the sections and figures
-of the report that it produces, and generates those figures itself (into `figures/`, next to the notebook).
-Python modules: `lhcb_freq.py` (frequentist fits), `bayes_model.py` (Bayesian mass model, sampler, toys,
-systematic study), `lowstat.py` (low-statistics comparison), `ml_tools.py` (machine-learning helpers),
-`Code_general/Analysis/plot_style.py` (common figure style). The machine-learning notebooks read the nominal Bayesian results
-(`Bayesian/results/nominal/nominal_summary.json`), so the Bayesian notebook 01 has to be run first; the frequentist
-module is only needed to recompute the frequentist fits of notebook 05 (their saved results are in `results/`).
-`Bayesian/results/external/` holds read-only copies of three result files of the frequentist analysis used for the
-comparison figures of notebook 02.
+Python modules: `Frequentist/lhcb_freq.py` (frequentist fits), `Frequentist/freq_validation.py` (toy-MC validation of
+the estimator and of the intervals; `run_all.sh`), `Frequentist/make_figures.py`, `Bayesian/bayes_model.py` (mass
+model, sampler, toys, systematic study), `Bayesian/lowstat.py`, `Machine_Learning/ml_tools.py` and
+`plot_style.py` (common figure style). The machine-learning notebooks read the nominal Bayesian results
+(`Bayesian/results/nominal/nominal_summary.json`), so `Bayesian/01_…` has to be run first; `Bayesian/results/external/`
+holds read-only copies of three frequentist result files used for the comparison figures of `Bayesian/02_…`.
+`Frequentist_Origin/` keeps the original frequentist notebooks, unchanged.
 
-## Report and figures
+Every long block saves its results in `results/` as it goes and resumes from them when the notebook is run again;
+the notebooks are delivered already executed. All random numbers are generated with fixed seeds.
 
-Three versions of the report are built from the same sources:
+## Report: `Docs/`
 
-| Folder | Version | Content |
-|---|---|---|
-| `Docs/report_extended/` | **complete report** (`main.pdf`, 42 pages) | every analysis, check and figure in its natural place: data, model, frequentist and Bayesian analyses, systematic study, validation, Dalitz plane, machine learning, comparison, limitations |
-| `Docs/report_cut/` | body of ~11 pages + appendices | the short body with a pointer to the appendix where each result is justified; the appendices summarize what was done and show the tables and figures |
-| `Docs/report_short/` | body only (12 pages with the references) | the version without appendix |
-
-`Docs/report_extended/main.tex` only sets the document up (packages and macros in `preamble.tex`); each section is a file in
-`Docs/report_extended/sections/` (`introduction.tex`, `data.tex`, `model.tex`, `frequentist.tex`, `bayesian.tex`,
-`systematics.tex`, `validation.tex`, `dalitz.tex`, `ml.tex`, `comparison.tex`, `conclusions.tex`, `code.tex`,
-`contributions.tex`, `notation.tex`), included with `\input`; compile with `tectonic -X compile main.tex`. The
-figures are in `Docs/report_extended/figures/` together with the scripts that redraw them from the saved results
-(`regen_figures_*.py`, common style `plot_style.py`). `Docs/report_build/` holds the sources and the scripts that build the
-three versions: `split_body_appendix/build_full.py` assembles the complete report; `make_cut.py` and then
-`make_short.py` build the cut and the short version. The figures of the Frequentist, Bayesian and machine-learning
-parts are produced by the notebooks listed above (`Code_general/Analysis/*/figures/`), from the saved results, without
-rerunning any fit. `Docs/papers/` holds the two reference papers (LHCb-PAPER-2013-027, arXiv:2403.19921) and
-`Docs/proposte/` the project proposals.
-
-Where the numbers of the report come from:
-
-| Report | Source |
+| Folder | Content |
 |---|---|
-| Bayesian results, goodness-of-fit and appendix tables, Bayes factors, toys, Dalitz | `Bayesian/results/nominal/nominal_summary.json`, `toys.jsonl` |
+| `Docs/report_extended/` | the complete report (`main.pdf`, LaTeX sources in `sections/`, figures in `figures/`) |
+| `Docs/report_build/` | sources of the report and the scripts that build it (figures and their `regen_*.py` scripts) |
+| `Docs/papers/`, `Docs/proposte/` | the LHCb papers used for the comparison and the project proposals |
+
+Compile with `tectonic -X compile main.tex` (or any LaTeX distribution) from the folder of the report. The figures of
+the frequentist, Bayesian and machine-learning parts are produced by the notebooks of `Code_general/Analysis/`
+(`figures/` next to each notebook) from the saved results, without rerunning any fit.
+
+## Where the numbers of the report come from
+
+| Report | Source (in `Code_general/Analysis/`) |
+|---|---|
+| Frequentist results, Wilks coverage, stability scans, PID scan | `Frequentist/results/freq_systematics.json`, `freq_pid_scan.json`, `Frequentist/results/validation/` |
+| Bayesian results, goodness of fit, Bayes factors, toys, Dalitz | `Bayesian/results/nominal/nominal_summary.json`, `toys.jsonl` |
 | Posterior predictive check, Dalitz by polarity | `Bayesian/results/nominal/ppc.json`, `dalitz_magnet.json` |
 | Systematic study table | `Bayesian/results/nominal/nominal_summary.json`, `Frequentist/results/freq_systematics.json` |
-| PID scan | `Frequentist/results/freq_pid_scan.json` |
 | Low-statistics comparison | `Bayesian/results/lowstat/summary.json` |
 | ML tables and figures, three-method comparison, mass after the cut, Dalitz null tests | `Machine_Learning/results/nominal/*.json` |

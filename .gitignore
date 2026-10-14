@@ -8,3 +8,7 @@ Code_general/*/results/*.npz
 .DS_Store
 .ipynb_checkpoints/
 __pycache__/
+
+# data of the project (CERN Open Data, 1 GB): downloaded separately, see README
+Code_general/Report/data/
+*.root
