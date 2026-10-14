@@ -1,0 +1,651 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[italian]{babel}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,longtable,array}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\setlist{itemsep=2pt,topsep=3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\sloppy
+\newcommand{\Araw}{A_{\mathrm{raw}}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\dom}[1]{\par\smallskip\noindent\textbf{#1}\par\nopagebreak}
+
+\title{Studio e confronto: il Machine Learning del corso (L9--L13, L18)\\e la sua applicazione al progetto $B^\pm\to K^\pm K^+K^-$}
+\author{Giacomo Moretti}
+\date{Ottobre 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Come usare questo documento}
+Per ogni lezione trovi: (A) il concetto spiegato con le formule, (B) che cosa fa il corso (slide ed esercizio), (C) che cosa abbiamo fatto noi, con le configurazioni reali e i numeri, (D) il confronto corso $\leftrightarrow$ progetto, (E) dove sta nel report, (F) le domande d'orale con la risposta breve.
+Le sorgenti sono: slide di \emph{Lecture 9, 10, 11, 12, 13, 18}; il notebook \code{ML\_Nominal.ipynb} e \code{ml\_nominal.py}; i risultati in \code{results/nominal/*.json}; il report (\code{ml.tex}, Appendice D e appendici estese).
+Tutti i numeri sono quelli del report.
+
+\section*{0. Il quadro generale}
+\begin{itemize}
+\item \textbf{Il problema fisico non \`e un problema di ML}: dobbiamo stimare l'asimmetria raw $\Araw=(N^--N^+)/(N^-+N^+)$ con un intervallo di incertezza e un test di $A=0$. Lo fanno il fit frequentista e il fit bayesiano.
+\item \textbf{Il ML ha tre ruoli}, tutti ausiliari:
+ \begin{enumerate}
+ \item \emph{classificazione} (supervisionata, con etichette deboli): costruire una selezione signal-like/background-like e verificare se tagliare sul punteggio cambia $\Araw$;
+ \item \emph{clustering} (non supervisionato, K-means): guardare asimmetrie locali sul piano di Dalitz;
+ \item \emph{incertezza} della predizione: confronto tra tre stimatori (spread della Random Forest, MC dropout, deep ensemble).
+ \end{enumerate}
+\item \textbf{Il risultato}: un taglio $>0.5$ sul punteggio del gradient boosting tiene il $92\%$ del segnale e il $36\%$ del fondo e non cambia $\Araw$ oltre lo spread statistico atteso ($-0.0451\pm0.0087$ bayesiano, $-0.0447\pm0.0086$ frequentista, contro $-0.0443$ e $-0.0441$). Il ML non migliora la precisione perch\'e c'\`e poco fondo; non pu\`o rimuovere il fondo mal identificato sotto il picco.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{p{1.4cm}p{5.6cm}p{7.4cm}}
+\toprule
+Lezione & Tema & Che cosa usiamo \\
+\midrule
+L9 & statistical learning, bias--varianza, loss come NLL & etichette deboli, split, BCE/Brier, bias--varianza del GBM \\
+L10 & regolarizzazione, PCA, K-means & scaler, PCA come test, scan di $C$ per L1/L2, K-means $K=8$ \\
+L11 & alberi, bagging, boosting, ROC/AUC & albero, RF, GBM, ROC/AUC, importanze \\
+L12 & reti feed-forward & FFNN $20\!\to\!32\!\to\!16\!\to\!1$ \\
+L13 & addestramento, ottimizzatori, dropout, sbilanciamento & Adam, early stopping, dropout, pesi di classe, calibrazione \\
+L18 & incertezza in ML & RF spread, MC dropout, deep ensemble \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\clearpage
+%==============================================================
+\section{L9 --- Statistical learning}
+%==============================================================
+\subsection*{A. Concetti}
+
+\dom{Il modello di fondo.} Si assume che l'uscita sia $Y=f(X)+\varepsilon$: $f$ \`e la relazione sconosciuta tra le $p$ variabili d'ingresso (feature) e l'uscita (target, label); $\varepsilon$ \`e rumore irriducibile (in fisica: risoluzione del rivelatore, pile-up). Imparare significa stimare $\hat f$ dai dati di training $(x_1,y_1),\dots,(x_N,y_N)$.
+
+\dom{I tre archetipi.}
+\begin{itemize}
+\item \textbf{Regressione}: $Y$ quantitativo (stimare un valore).
+\item \textbf{Classificazione}: $Y$ in un insieme finito e non ordinato (assegnare una classe).
+\item \textbf{Clustering} (non supervisionato): nessun $Y$, si cercano gruppi di oggetti simili.
+\end{itemize}
+Supervised vs unsupervised: nel primo caso si usano esempi etichettati; nel secondo \`e pi\`u difficile dire se si sta facendo bene, perch\'e non c'\`e un obiettivo noto. I metodi non supervisionati (PCA, clustering) possono preparare i dati per un passo supervisionato.
+
+\dom{Che cosa vogliamo da $f$.} (i) predire casi non visti; (ii) capire quali componenti di $X$ contano; (iii) valutare la qualit\`a di predizioni e inferenze. Il bilancio tra (i) e (ii) \`e il bilancio tra flessibilit\`a e interpretabilit\`a.
+
+\dom{Flessibilit\`a vs interpretabilit\`a.} Un modello molto flessibile segue bene i dati di training ma rischia l'\emph{overfitting}; un modello semplice \`e leggibile ma pu\`o perdere struttura (\emph{underfitting}). Per l'\emph{inferenza} si sceglie interpretabilit\`a, per la \emph{predizione} flessibilit\`a.
+
+\dom{Errore di test e decomposizione bias--varianza.} L'errore rilevante \`e quello su dati \emph{non usati} per costruire il modello. Per l'errore quadratico in un punto $x_0$:
+\[
+E\big[(y_0-\hat f(x_0))^2\big]=\underbrace{\mathrm{Var}\big(\hat f(x_0)\big)}_{\text{varianza}}+\underbrace{\big[\mathrm{Bias}\,\hat f(x_0)\big]^2}_{\text{bias}^2}+\underbrace{\mathrm{Var}(\varepsilon)}_{\text{irriducibile}}.
+\]
+Il \emph{bias} viene dal semplificare troppo il problema; la \emph{varianza} misura quanto $\hat f$ cambierebbe con un altro training set. Aumentando la flessibilit\`a il bias cala e la varianza cresce: l'errore di test ha un minimo a complessit\`a intermedia.
+
+\dom{Parametrici vs non parametrici.} I modelli parametrici hanno un numero fisso di parametri e assumono una forma (rigidi, rapidi, rischio di bias alto se la forma \`e sbagliata, es.\ regressione lineare). I non parametrici crescono con i dati (flessibili, richiedono pi\`u dati, rischio di varianza alta, es.\ alberi, clustering).
+
+\dom{La loss come verosimiglianza.} Se $\Pr(y\mid x)=\Pr(y\mid\theta)$ con $\theta=f[x,\phi]$ e i dati sono i.i.d., il criterio di massima verosimiglianza minimizza la \emph{negative log-likelihood}:
+\begin{itemize}
+\item rumore gaussiano di $\sigma$ costante: $-\ln L=\sum_i (y_i-f(x_i))^2/(2\sigma^2)+\text{cost.}\;\Rightarrow$ \textbf{MSE} (nel fit ai bin, $\chi^2$);
+\item uscita binaria di Bernoulli con $p_i=f(x_i)$: $-\ln L=-\sum_i\big[y_i\ln p_i+(1-y_i)\ln(1-p_i)\big]\;\Rightarrow$ \textbf{binary cross-entropy} (BCE).
+\end{itemize}
+Con uscite in $(0,1)$ la BCE punisce un errore sicuro in modo logaritmico: ``esplode'' se la predizione \`e sbagliata e sicura, molto pi\`u dell'MSE. \`E lo stesso principio dei nostri fit estesi: massimizzare la probabilit\`a dei dati osservati.
+
+\dom{Rasoio di Occam.} A parit\`a di adattamento si preferisce il modello con meno parametri; la regolarizzazione (L10) \`e il modo matematico per farlo.
+
+\subsection*{B. Nel corso}
+Slide con esempi (antispam, cifre di zip code, infarto, LANDSAT, classificazione di collisioni all'LHC). Esercizio: stelle della sequenza principale, polinomi di grado crescente per $L$ in funzione di $T$ (legge di Stefan--Boltzmann, $L\propto T^b$ con $b$ tra 5 e 7); domanda: quando il modello va in overfitting?
+
+\subsection*{C. Nel nostro progetto}
+\begin{itemize}
+\item \textbf{Formulazione}: classificazione binaria supervisionata, ma con \textbf{etichette deboli}: nessun candidato ha la verit\`a segnale/fondo. Si addestra tra due \emph{misture}:
+ \begin{itemize}
+ \item signal-like: $|m-\mu|<2\sigma$ attorno al picco ($\mu=5284.39$, $\sigma=18.00$ MeV): \textbf{15\,130} candidati;
+ \item background-like: sidebands $[5150,\mu-4\sigma]\cup[\mu+4\sigma,5600]$: \textbf{1\,940} candidati;
+ \item la regione $5100$--$5150$ MeV \`e esclusa dal fondo perch\'e contiene fondo parzialmente ricostruito con cinematica diversa.
+ \end{itemize}
+\item \textbf{Perch\'e funziona} (CWoLa, Neyman--Pearson): se le due misture hanno le stesse densit\`a di segnale $s(x)$ e fondo $b(x)$ ma frazioni di segnale diverse $f_1\neq f_2$, il rapporto delle densit\`a $p_1/p_2=[f_1s+(1-f_1)b]/[f_2s+(1-f_2)b]$ \`e monotono in $s/b$: il classificatore ottimo tra le misture \`e, a meno di una trasformazione monotona, quello ottimo tra segnale e fondo. \emph{Condizione}: le feature non devono portare informazione sulla massa.
+\item \textbf{Feature}: 20. Per ognuna delle 3 tracce: \code{PX}, \code{PY}, \code{PZ}, \code{ProbK}, \code{ProbPi}, \code{IPChi2} (18), pi\`u \code{B\_FlightDistance} e \code{B\_VertexChi2} (variabili del $B$ non usate nella preselezione; Kolmogorov--Smirnov $p<10^{-60}$ tra le classi).
+\item \textbf{Split} 60/20/20 stratificato: 10\,242 / 3\,414 / 3\,414 candidati; nel test solo \textbf{388} background-like, quindi differenze di AUC sotto $\sim0.01$ non si risolvono.
+\item \textbf{Errore di test}: il test non \`e mai usato per una scelta; il modello di riferimento (gradient boosting) \`e scelto sull'AUC in cross-validation a 5 fold stratificati.
+\item \textbf{Bias--varianza}: gradient boosting con $0$--$300$ stadi: il gap AUC train--test cresce da $0.018$ (20 stadi) a $0.084$ (300 stadi); l'AUC di test sale fino a $\sim0.865$ da $\sim150$ stadi e poi resta piatta. I 200 stadi di default non vanno in overfitting sull'AUC di test.
+\item \textbf{Loss come NLL}: BCE come NLL di Bernoulli; il Brier score $\frac1N\sum(p_i-y_i)^2$ \`e l'MSE della probabilit\`a.
+\item \textbf{Parametrico/non parametrico}, \textbf{interpretabile/flessibile}: tenere la logistica ($0.771$) e l'albero singolo ($0.824$) come baseline leggibili accanto agli ensemble ($0.860$--$0.864$).
+\end{itemize}
+
+\subsection*{D. Confronto corso $\leftrightarrow$ progetto}
+\begin{center}
+\begin{tabular}{p{4.2cm}p{4.2cm}p{6.2cm}}
+\toprule
+Corso & Noi & Perch\'e \\
+\midrule
+etichette vere (MC) & etichette \textbf{deboli} da regioni di massa & i dati reali non hanno verit\`a; la validit\`a poggia su CWoLa \\
+regressione e MSE & classificazione e BCE (Brier per valutare) & l'uscita \`e una probabilit\`a di classe \\
+overfitting con polinomi & overfitting con stadi del GBM & stessa idea: pi\`u complessit\`a, gap train--test crescente \\
+accuratezza & AUC; accuratezza sotto la classe maggioritaria ($0.886$) & con pesi bilanciati si minimizza l'errore \emph{pesato} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{E. Dove nel report}
+Corpo: Sec.\ ML ``Weak Labels and Feature Set'' (CWoLa, split, pesi). Appendice ML estesa: ``Regularization, Bias-Variance, and Calibration''. Appendice D: BCE come NLL, Brier, decomposizione.
+
+\subsection*{F. Domande d'orale}
+\begin{itemize}
+\item \emph{Perch\'e classificazione e non regressione?} L'oggetto da stimare \`e l'appartenenza a una classe (segnale/fondo); l'uscita \`e una probabilit\`a.
+\item \emph{Come si fa ML senza etichette vere?} CWoLa: tra due misture con frazioni diverse il classificatore ottimo \`e monotono in $s/b$ (lemma di Neyman--Pearson). Va verificato che le feature non rivelino la massa (\emph{sculpting}): addestrando senza i nove impulsi dei kaoni l'AUC resta $0.860$ e la degradazione del $\chi^2$ del fit non cambia.
+\item \emph{Cos'\`e l'overfitting e come lo vedete?} Gap train--test crescente con la complessit\`a (GBM: $0.018\to0.084$).
+\item \emph{Perch\'e BCE e non MSE?} \`E la NLL della Bernoulli; ha gradiente proporzionale all'errore sulla probabilit\`a anche quando l'uscita \`e saturata, l'MSE no.
+\end{itemize}
+
+\clearpage
+%==============================================================
+\section{L10 --- Regolarizzazione e riduzione di dimensione}
+%==============================================================
+\subsection*{A. Concetti}
+
+\dom{Curse of dimensionality.} In molte dimensioni il volume cresce esponenzialmente: per mantenere la stessa densit\`a servono dati esponenzialmente pi\`u numerosi; lo spazio \`e quasi vuoto anche con milioni di eventi; le distanze tra punti diventano indistinguibili (e gli algoritmi basati su distanza soffrono); il rischio di overfitting e il costo computazionale crescono.
+
+\dom{Regolarizzazione.} Si modifica la loss: $L_{\mathrm{reg}}(\theta)=L(\theta)+\lambda R(\theta)$, con $\lambda$ il peso della penalit\`a $R$ (che codifica una propriet\`a desiderata dei parametri). Per un modello lineare con RSS:
+\[
+\text{Ridge (L2): }\;\min_\beta\;\mathrm{RSS}+\lambda\sum_j\beta_j^2,\qquad
+\text{Lasso (L1): }\;\min_\beta\;\mathrm{RSS}+\lambda\sum_j|\beta_j|.
+\]
+\begin{itemize}
+\item \textbf{Ridge}: soluzione chiusa $\hat\beta=(X^TX+\lambda I)^{-1}X^Ty$; contrae tutti i coefficienti, ma non ne azzera nessuno. Aumentando $\lambda$: varianza $\downarrow$, bias $\uparrow$.
+\item \textbf{Lasso}: porta alcuni coefficienti \emph{esattamente} a zero, quindi fa \emph{selezione di feature}: pi\`u interpretabile. Da preferire se bastano poche feature; Ridge se la risposta dipende da molte feature con importanza simile.
+\item \textbf{Formulazione a budget}: $\min \mathrm{RSS}$ con $\sum\beta_j^2\le s$ (Ridge, vincolo sferico) o $\sum|\beta_j|\le s$ (Lasso, vincolo a rombo con spigoli sugli assi): l'ellisse dei livelli di RSS tocca il rombo di solito su uno spigolo, dove un coefficiente \`e zero.
+\end{itemize}
+
+\dom{Come si sceglie $\lambda$: cross-validation.} Suddividere i dati in $k$ fold; per $i=1,\dots,k$ addestrare su tutte tranne la $i$-esima e calcolare l'errore sulla $i$-esima; mediare. Si prende il $\lambda$ che minimizza l'errore di test stimato. Una sola divisione train/validation d\`a stime variabili.
+
+\dom{Preparazione dei dati.} \emph{Garbage in, garbage out}: dati inesatti, incompleti, distorti, rumorosi, outlier. Lo \textbf{standard scaler} porta ogni feature a media $\sim0$ e $\sigma\sim1$: evita che una feature domini solo perch\'e ha un'unit\`a diversa e aiuta la convergenza. Alternativa per le reti: min--max in $[0,1]$.
+
+\dom{PCA.} Metodo non supervisionato e non parametrico. Date $X$ ($n\times p$, colonne centrate), la prima componente $\varphi_1$ massimizza la varianza dei punteggi $z_{i1}=\varphi_1^Tx_i$ con $\|\varphi_1\|=1$ (equivalente: la retta pi\`u vicina ai punti in distanza quadratica). La seconda \`e ortogonale alla prima, e cos\`i via. Si risolve con la SVD di $X$ (o l'autodecomposizione di $X^TX$). La \emph{proporzione di varianza spiegata} dalle prime $m$ componenti dice quante tenerne. PCA e Lasso hanno scopi diversi: PCA ruota senza guardare il target, Lasso seleziona guardando il target.
+
+\dom{K-means.} $K$ cluster, fissato in anticipo. Si minimizza
+\[
+W=\sum_{\ell=1}^{K}\sum_{i\in C_\ell}\|x_i-\bar x_\ell\|^2
+\]
+(inerzia). \textbf{Algoritmo di Lloyd}: etichette iniziali casuali; si ripete: (i) calcolo dei centroidi, (ii) riassegnazione di ogni punto al centroide pi\`u vicino. Termina sempre (l'inerzia non aumenta), ma pu\`o fermarsi in un minimo \emph{locale} diverso a seconda dell'inizializzazione. Domande da porsi: il clustering \`e appropriato? quanti cluster? i cluster sono robusti (altri sottocampioni, altri algoritmi)? vanno scalate le variabili? la distanza euclidea cattura la dissimilarit\`a?
+
+\subsection*{B. Nel corso}
+Esercizio su 20 sensori (5 buoni, 5 distorti, 10 rotti) per vedere quali feature seleziona Lasso; esercizio Higgs con le domande: ``tutte le variabili contano allo stesso modo?'' e ``ha senso Ridge/Lasso con RSS in un problema di classificazione?'' (risposta: si usa la logistica con penalit\`a, cio\`e BCE pi\`u penalit\`a).
+
+\subsection*{C. Nel nostro progetto}
+\begin{itemize}
+\item \textbf{Scaler}: \code{StandardScaler().fit(X\_train)}, poi applicato a validation e test.
+\item \textbf{PCA come test}: sulle 20 feature standardizzate servono \textbf{15} componenti per il $90\%$ della varianza $\Rightarrow$ nessuna riduzione di dimensione applicata (le feature restano interpretabili).
+\item \textbf{Curse of dimensionality}: con 20 feature e $\sim10^4$ candidati di training non siamo nel regime critico per i metodi basati su distanza.
+\item \textbf{Ridge e Lasso come logistica penalizzata}: scansione di $C=1/\alpha$ su 30 valori log-spaziati, cross-validata (la logistica \`e $\mathrm{BCE}+\mathrm{penalit\grave a}$): AUC ottimo \textbf{uguale} per L1 e L2, $0.7686$, a $C_{L1}=0.12$ e $C_{L2}=9.2$. L1 \textbf{non azzera nessun coefficiente}: il modello lineare non soffre di varianza; il suo limite \`e il confine di decisione lineare.
+\item \textbf{K-means} sul piano di Dalitz $(m^2_{\mathrm{lo}},m^2_{\mathrm{hi}})$ standardizzato, \code{n\_init=10}:
+ \begin{itemize}
+ \item $K=8$ fissato in anticipo (compromesso tra risoluzione e numero di candidati per cluster, minimo $1\,233$); $K=3$ \`e l'ottimo della silhouette ($0.46$ contro $0.41$ per $K=8$) ed \`e aggiunto come confronto;
+ \item stabilit\`a: indice di Rand aggiustato (ARI) $>0.998$ cambiando inizializzazione;
+ \item significativit\`a locale: $S_k=(A_k-A_{\mathrm{glob}})/\sigma(A_k)$; per $K=8$ due cluster oltre $3\sigma$, omogeneit\`a $\chi^2=46.4/7$ ($p=7\cdot10^{-8}$); il pi\`u significativo ha $A=-0.127\pm0.017$ ($n=3601$, $S=-5.1$) a basso $m^2_{\mathrm{lo}}$ e $m^2_{\mathrm{hi}}$ intermedio; due cluster positivi ad alto $m^2_{\mathrm{hi}}$ ($+0.020$, $+0.040$); finestra del segnale: $\chi^2=62.3/7$.
+ \end{itemize}
+\end{itemize}
+
+\subsection*{D. Confronto corso $\leftrightarrow$ progetto}
+\begin{center}
+\begin{tabular}{p{4.2cm}p{4.4cm}p{6.0cm}}
+\toprule
+Corso & Noi & Nota \\
+\midrule
+Ridge/Lasso con RSS & logistica L1/L2 (BCE) & risposta all'esercizio ``ha senso RSS in classificazione?'' \\
+PCA per comprimere & PCA per verificare che non serve & 15 componenti su 20 \\
+$K$ per ispezione & $K$ fissato a priori + silhouette di controllo & silhouette e ARI sono oltre il corso (citati) \\
+K-means sul set di feature & K-means solo su 2 variabili & analisi \emph{locale} dell'asimmetria, non preprocessing \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{E. Dove nel report}
+Corpo: ``K-means on the Dalitz Plot'' e, nel Confronto, ``Local Asymmetries''. Appendice ML estesa: regolarizzazione. Appendice D: penalit\`a, inerzia, ARI.
+
+\subsection*{F. Domande d'orale}
+\begin{itemize}
+\item \emph{Ridge vs Lasso?} L2 contrae tutti i coefficienti, L1 ne azzera alcuni (selezione); geometria: vincolo sferico vs a rombo.
+\item \emph{Come scegliete $\lambda$ (o $C$)?} Cross-validation sul solo training; noi 30 valori log-spaziati, 5 fold.
+\item \emph{Perch\'e non fate PCA?} Servono 15 componenti su 20: guadagno piccolo, si perderebbe l'interpretabilit\`a delle feature (per esempio \code{IPChi2}).
+\item \emph{Il K-means \`e globalmente ottimo?} No, minimo locale; per questo \code{n\_init=10} e l'ARI tra inizializzazioni.
+\item \emph{Perch\'e $K=8$?} Compromesso risoluzione/statistica scelto a priori; $K=3$ (silhouette) d\`a lo stesso quadro ($\chi^2=15.2/2$, $p=5\cdot10^{-4}$).
+\end{itemize}
+
+\clearpage
+%==============================================================
+\section{L11 --- Metodi ad albero}
+%==============================================================
+\subsection*{A. Concetti}
+
+\dom{Albero di decisione (CART).} Partizioni binarie ricorsive dello spazio delle feature in rettangoli: ogni nodo interno applica una domanda $x_j\le t$ (s\`i $\to$ figlio sinistro, no $\to$ destro), ogni foglia ha una predizione. \`E la generalizzazione di un'analisi a tagli, ma senza scartare un evento che fallisce un criterio. I tagli sono allineati agli assi: le diagonali si approssimano con molti tagli. Ha alta interpretabilit\`a ed \`e \emph{non lineare}.
+
+\dom{Impurit\`a.} L'errore di classificazione $0/1$ \`e discontinuo e degenere (molti tagli danno lo stesso valore). Si usano misure continue, con $p_c$ la frazione della classe $c$ in un nodo:
+\[
+\text{Gini: }G=1-\sum_c p_c^2,\qquad \text{entropia: }H=-\sum_c p_c\ln p_c .
+\]
+Lo split sceglie la feature $j$ e la soglia $t$ che massimizzano la riduzione di impurit\`a pesata:
+$\Delta=G_{\mathrm{padre}}-\frac{n_L}{n}G_L-\frac{n_R}{n}G_R$.
+
+\dom{Greedy.} A ogni nodo si scandiscono tutte le feature e tutte le soglie e si prende il taglio migliore localmente, senza lookahead: non si garantisce l'ottimo globale (che richiederebbe di generare tutte le combinazioni).
+
+\dom{Quando fermarsi.} Un albero fino a nodi puri \`e overfitting. Regole di stop: dimensione minima dei figli, profondit\`a massima, numero massimo di nodi, riduzione minima di impurit\`a; oppure cross-validation su una griglia di condizioni; oppure \emph{potatura} a complessit\`a di costo: si minimizza errore $+\alpha\cdot$(numero di nodi), con $\alpha$ scelto per CV.
+
+\dom{Alberi di regressione.} Due modifiche: lo split minimizza l'MSE pesato dei figli (equivale a minimizzare la varianza) e la predizione in una foglia \`e la media dei $y$ del training in quella foglia.
+
+\dom{Pro e contro del singolo albero.} Pro: poca preparazione dei dati, variabili continue e categoriche, interpretabilit\`a. Contro: overfitting, sensibilit\`a alle fluttuazioni del training, ottimo globale non garantito, scelta della profondit\`a.
+
+\dom{Ensemble: combinare weak learner.}
+\begin{itemize}
+\item \textbf{Bagging} (bootstrap aggregation): si campionano i dati con reinserimento e si addestra un albero (poco regolarizzato, alta varianza e basso bias) su ogni campione; predizione = voto o media. \textbf{Riduce la varianza}. \emph{Random Forest} = bagging + sottoinsieme casuale di feature a ogni split, per decorrelare gli alberi.
+\item \textbf{Boosting}: alberi molto regolarizzati (basso varianza, alto bias) \emph{in sequenza}, ciascuno con pi\`u peso sugli esempi sbagliati dai precedenti; media pesata. \textbf{Riduce il bias}. Varianti: AdaBoost (pesi sugli esempi), \emph{gradient boosting} ($F_m=F_{m-1}+\nu h_m$, con $h_m$ addestrato sul gradiente negativo della loss, $\nu$ learning rate), XGBoost.
+\item Parametri del boosting: loss (logistica binaria per due classi), learning rate (pi\`u piccolo $=$ meglio ma pi\`u lento), subsample, numero di alberi (pi\`u alberi $=$ rischio overfitting).
+\end{itemize}
+
+\dom{ROC e AUC.} Per ogni soglia: $\mathrm{TPR}=\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ (sensibilit\`a), $\mathrm{FPR}=\mathrm{FP}/(\mathrm{FP}+\mathrm{TN})=1-\text{specificit\`a}$. La curva ROC \`e TPR contro FPR; l'AUC \`e l'area ed \`e la probabilit\`a che un esempio positivo scelto a caso riceva un punteggio maggiore di un negativo scelto a caso ($0.5$ casuale, $1$ perfetto).
+
+\dom{Importanza delle feature.} Impurit\`a (Gini) eliminata dagli split su quella feature, sommata sull'ensemble; oppure $|$coefficiente$|$ del Lasso sulle feature standardizzate. Le due misure vanno confrontate (esercizio Higgs).
+
+\subsection*{B. Nel corso}
+Esercizio ``Circular correlation with trees'': un modello lineare non separa due classi circolari, un albero s\`i. Esercizio Higgs: BDT, importanza delle feature, confronto con i coefficienti Lasso (concordano? perch\'e le variabili di alto livello discriminano meglio?), accuratezza di logistica penalizzata contro BDT.
+
+\subsection*{C. Nel nostro progetto}
+Tutti i modelli usano le stesse feature scalate e pesi di classe bilanciati ($w_c=N/(2N_c)$: $4.40$ per background-like, $0.56$ per signal-like).
+\begin{center}
+\small
+\begin{tabular}{p{3.3cm}p{5.4cm}ccc}
+\toprule
+Modello & Configurazione & CV AUC & Test AUC & Brier \\
+\midrule
+Logistica & L2 (default), pesi bilanciati & $0.769\pm0.016$ & $0.771\pm0.013$ & $0.197$ \\
+Logistica L1 & \code{liblinear} & -- & $0.771\pm0.013$ & $0.198$ \\
+Albero & depth 4, \code{min\_samples\_leaf}=20, Gini & $0.816\pm0.011$ & $0.824\pm0.013$ & $0.133$ \\
+Random Forest & 300 alberi, depth 8, \code{min\_samples\_leaf}=20 & $0.863\pm0.017$ & $0.860\pm0.012$ & $0.122$ \\
+Gradient Boosting & 200 stadi, depth 3, lr 0.05, sample weights bilanciati & $\mathbf{0.866\pm0.016}$ & $0.864\pm0.012$ & $0.116$ \\
+FFNN (L12) & $32\!\to\!16$, ReLU, dropout 0.2 & -- & $0.857\pm0.012$ & $0.134$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+\item \textbf{Riferimento}: il GBM, scelto sull'AUC in cross-validation (non sul test). RF e FFNN sono indistinguibili entro l'incertezza del test ($0.012$; differenze reciproche $\le0.007$); i tre sono $\sim0.09$ sopra la logistica e $\sim0.04$ sopra l'albero singolo.
+\item \textbf{Albero singolo}: profondit\`a fissata a priori come baseline interpretabile, non potato; il guadagno di AUC del bagging/boosting ($0.04$) \`e il costo in varianza dell'albero singolo.
+\item \textbf{Bagging contro boosting}: RF (bagging, taglia la varianza) e GBM (boosting, taglia il bias) danno lo stesso AUC entro l'incertezza.
+\item \textbf{ROC/AUC}: incertezza di test per bootstrap ($2\,000$ ricampionamenti); punto di lavoro score $>0.5$: $88\%$ del signal-like e $28\%$ del background-like sul test; $92\%$ e $36\%$ sul campione completo.
+\item \textbf{Importanza}: Gini della RF contro $|$coefficiente$|$ Lasso: Spearman $\rho=0.42$ (concordano solo in parte). Le pi\`u utili: \code{IPChi2} dei tre adroni e le due variabili del $B$ (\code{B\_FlightDistance}, \code{B\_VertexChi2}) non usate nella preselezione, analogo del risultato ``le variabili di alto livello discriminano meglio'' dell'esercizio.
+\item \textbf{Ricerca di iperparametri} (oltre l'esercizio): RF $120$ configurazioni, GBM $100$ (griglia $5\times5\times4$), FFNN $168$; la CV \`e ripetuta. Miglioramento dell'AUC di test $\le0.005$, sotto l'incertezza ($0.012$): i default sono vicini all'ottimo; il massimo in CV \`e ottimistico (\emph{winner's curse}: $0.871$ contro $0.866$ e $0.868$ contro $0.865$).
+\item \textbf{Uso nella fisica}: il punteggio del GBM si applica a \emph{tutti} i candidati della finestra, non solo a quelli etichettati; tagli da $0.1$ a $0.9$; ricalcolo di $\Araw$ con conteggio e con i due fit. Lo spread atteso tra un campione annidato e il completo \`e $\sigma_B=\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$ (Barlow); lo shift resta entro $1.4\,\sigma_B$ su tutta la scansione: nessun bias rivelabile.
+\item \textbf{Sculpting (cambia la forma della massa?)}: s\`i, il $\chi^2$ del fit passa da $164/88$ a $253/88$ (bayesiano) dopo il taglio. Due ipotesi: il classificatore ricostruisce la massa dagli impulsi, oppure la selezione cambia la composizione del fondo. Il test: addestrare senza i nove componenti di impulso (AUC $0.860$) d\`a la stessa degradazione ($\chi^2=533/388$) $\Rightarrow$ \`e la composizione del fondo; l'efficienza del taglio vs massa lo conferma ($0.89$--$0.90$ al picco, $\approx0.70$ sotto $5150$ MeV, $0.06$--$0.13$ sopra $5375$ MeV).
+\end{itemize}
+
+\subsection*{D. Confronto corso $\leftrightarrow$ progetto}
+\begin{center}
+\begin{tabular}{p{4.2cm}p{4.4cm}p{6.0cm}}
+\toprule
+Corso & Noi & Nota \\
+\midrule
+BDT su Higgs con etichette MC & GBM con etichette deboli & stessa tecnica, provenienza diversa delle etichette \\
+alberi di regressione & non usati & il problema \`e di classificazione \\
+potatura a complessit\`a di costo & non usata & profondit\`a fissa e CV sugli iperparametri \\
+AdaBoost/XGBoost & GBM di scikit-learn (Friedman) & stessa famiglia; nessuna differenza attesa sotto $0.012$ \\
+subsample del boosting & non usato (default $1.0$) & -- \\
+confronto con Lasso & fatto, Spearman $0.42$ & stessa conclusione qualitativa \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{E. Dove nel report}
+Corpo: ``Model Comparison'' (tabella dei modelli, ROC) e ``Stability of $\Araw$ under ML Selection'' (tabella dei tre metodi, soglia). Appendice ML estesa: importanze, iperparametri (tabelle di ricerca), bias--varianza, calibrazione.
+
+\subsection*{F. Domande d'orale}
+\begin{itemize}
+\item \emph{Bagging vs boosting?} Bagging: alberi profondi su bootstrap, media (taglia la varianza). Boosting: alberi superficiali in sequenza che correggono gli errori (taglia il bias).
+\item \emph{Perch\'e Gini/entropia e non l'errore $0/1$?} L'errore $0/1$ \`e discontinuo e degenere; Gini ed entropia sono continue e premiano la purezza.
+\item \emph{Come evitate l'overfitting dell'albero?} Profondit\`a massima e minimo di candidati per foglia; per gli ensemble stadi e learning rate; valutazione su test mai toccato.
+\item \emph{Cosa misura l'AUC?} La probabilit\`a che un signal-like riceva un punteggio maggiore di un background-like ($0.864$ per il GBM).
+\item \emph{Perch\'e il GBM \`e il riferimento?} Migliore AUC in CV ($0.866$); le altre sono entro l'incertezza; la scelta non usa il test.
+\item \emph{Il taglio cambia la forma della massa: \`e sculpting?} No: stessa degradazione senza gli impulsi; \`e la composizione del fondo (il classificatore tiene i $B$ genuini, anche parzialmente ricostruiti, e toglie il combinatorio).
+\end{itemize}
+
+\clearpage
+%==============================================================
+\section{L12 --- Reti neurali feed-forward}
+%==============================================================
+\subsection*{A. Concetti}
+
+\dom{Perch\'e non basta un modello lineare.} Un modello lineare stima un peso per ogni feature, indipendentemente: ma spesso le feature di basso livello (pixel, impulsi) non hanno significato da sole, conta la relazione tra esse. Una rete combina feature in modo non lineare, in strati.
+
+\dom{Che cos'\`e.} Una composizione di funzioni (strati) collegate a catena; ogni neurone calcola la somma pesata degli ingressi, aggiunge un bias e applica una \emph{funzione di attivazione}:
+\[
+a^{(\ell)}=\varphi\big(W^{(\ell)}a^{(\ell-1)}+b^{(\ell)}\big),\qquad a^{(0)}=x .
+\]
+\emph{Feed-forward}: informazione da sinistra a destra, nessun ciclo. Usi: regressione e classificazione (a due o pi\`u classi).
+
+\dom{Perch\'e serve la non linearit\`a.} Senza attivazioni non lineari una pila di strati lineari \`e ancora una trasformazione lineare. Le attivazioni non lineari permettono di apprendere pattern complessi.
+
+\dom{Attivazioni degli strati nascosti.} \textbf{ReLU} $\varphi(z)=\max(0,z)$: la pi\`u usata; consente dinamica non lineare, converge velocemente perch\'e non satura per $z>0$, non soffre di \emph{vanishing gradient} per $z>0$. La \textbf{sigmoide} $\sigma(z)=1/(1+e^{-z})$ non andrebbe usata in genere per gli strati densi/convoluzionali: il gradiente svanisce lontano da $z=0$ e l'uscita non \`e centrata in zero (zig-zag in SGD).
+
+\dom{Attivazioni dello strato di uscita.} \emph{Identit\`a}: regressione. \emph{Sigmoide}: classificazione binaria con un neurone (uscita $=P(y=1\mid x)$). \emph{Softmax}: $\mathbb R^n\to[0,1]^n$ con $\sum y_i=1$, classi mutuamente esclusive.
+
+\dom{Teorema di approssimazione universale.} Una rete con un solo strato nascosto e un numero finito di neuroni con attivazione non lineare pu\`o approssimare funzioni continue su compatti. \emph{Importante}: il teorema non dice nulla su quanto sia semplice \emph{apprendere} i parametri; tutta la pratica del DNN \`e trovare tecniche efficienti per farlo.
+
+\dom{Perch\'e andare in profondit\`a.} Un solo strato \`e sufficiente in linea di principio, ma le architetture profonde rappresentano pi\`u efficientemente classi di funzioni (meno parametri), riusano sotto-feature per pi\`u compiti, e la sovraparametrizzazione sembra rendere la loss pi\`u liscia (convergenza pi\`u facile).
+
+\dom{Addestramento (anticipazione di L13).} Pesi e bias sono inizializzati a caso e aggiustati con discesa del gradiente e backpropagation su una loss differenziabile; gli \emph{iperparametri} (numero di strati, neuroni, dropout, learning rate) con prove e griglie. \textbf{Curve di apprendimento}: l'errore di training cala e raggiunge un plateau che dipende da dimensione del training, architettura e pesi iniziali; se l'errore di validation risale c'\`e overfitting.
+
+\dom{Altre architetture.} Le FFNN sono modelli universali ma troppo flessibili; le architetture moderne introducono priori (CNN per immagini, ecc.).
+
+\subsection*{B. Nel corso}
+TensorFlow Playground (XOR e spirale: rete minima, bias/varianza); esercizi con Keras sul dataset Higgs (confronto FFNN vs alberi), classificazione multiclasse di jet, regressione su potenza solare. Si usa Keras (modello sequenziale).
+
+\subsection*{C. Nel nostro progetto}
+\begin{itemize}
+\item \textbf{Architettura}: 20 ingressi $\to$ 32 (ReLU, dropout 0.2) $\to$ 16 (ReLU, dropout 0.2) $\to$ 1 (sigmoide). Parametri: $20\cdot32+32=672$, $32\cdot16+16=528$, $16+1=17$: totale \textbf{1\,217}.
+\item \textbf{Loss e metrica}: BCE; monitoraggio dell'AUC su validation; input scalati sul training.
+\item \textbf{Esito}: AUC di test $0.857\pm0.012$, indistinguibile da RF e GBM; spread su 10 inizializzazioni $0.854\pm0.005$.
+\item \textbf{Ricerca dell'architettura}: $168$ configurazioni = 7 architetture $\times$ 4 dropout $\times$ 6 learning rate, CV $5\times2$; il migliore guadagna $0.004$ di AUC di test, paragonabile alla dispersione sulle inizializzazioni ($0.005$): i default sono sufficienti.
+\item \textbf{Perch\'e la rete non batte gli alberi}: dati tabulari eterogenei, $\sim10^4$ esempi di training e poche feature: regime in cui gli ensemble di alberi sono tipicamente altrettanto buoni; una rete pi\`u grande non troverebbe informazione in pi\`u.
+\end{itemize}
+
+\subsection*{D. Confronto corso $\leftrightarrow$ progetto}
+\begin{center}
+\begin{tabular}{p{4.2cm}p{4.4cm}p{6.0cm}}
+\toprule
+Corso & Noi & Nota \\
+\midrule
+FFNN su Higgs (confronto con BDT) & FFNN sui nostri dati, confronto con GBM & stessa conclusione: alberi e rete alla pari \\
+sigmoide in uscita per 2 classi & sigmoide, BCE & uscita $=$ probabilit\`a (poi ricalibrata) \\
+curve di apprendimento & early stopping sul val.\ AUC & -- \\
+regressione, multiclasse & non usate & il nostro \`e binario \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{E. Dove nel report}
+Corpo: ``Model Comparison'' (sesto modello della tabella). Appendice ML estesa: tabella della ricerca FFNN (168 configurazioni).
+
+\subsection*{F. Domande d'orale}
+\begin{itemize}
+\item \emph{Perch\'e una rete e non solo la logistica?} Per catturare interazioni non lineari tra feature; la logistica ha limite nel confine lineare ($0.771$ vs $0.857$).
+\item \emph{Cosa dice il teorema di approssimazione universale?} Esiste una rete con uno strato che approssima una funzione continua su un compatto; non garantisce che si riesca ad addestrarla.
+\item \emph{Perch\'e ReLU e non sigmoide nei nascosti?} Non satura per $z>0$, evita il vanishing gradient e converge pi\`u rapidamente.
+\item \emph{Perch\'e sigmoide in uscita?} Un solo neurone, classificazione binaria: uscita in $(0,1)$ interpretabile come probabilit\`a.
+\end{itemize}
+
+\clearpage
+%==============================================================
+\section{L13 --- Addestrare una rete}
+%==============================================================
+\subsection*{A. Concetti}
+
+\dom{Discesa del gradiente (GD).} Si parte da $w^{(0)}$; a ogni iterazione si calcola il gradiente della loss $\nabla_w\ell(w^{(t)})$ (direzione di massima crescita) e si fa un piccolo passo opposto:
+\[
+w^{(t+1)}=w^{(t)}-\eta\,\nabla_w\ell\big(w^{(t)}\big),
+\]
+con $\eta$ il learning rate. Limite: richiede un passaggio sull'\emph{intero} training a ogni passo.
+
+\dom{SGD e mini-batch.} Si stima il gradiente su un solo esempio (SGD) o su un mini-batch (es.\ 8--256 esempi): sfrutta le operazioni vettoriali, riduce la volatilit\`a dei passi (ma il rumore \`e anche utile), parallelizzabile. Non serve controllare l'errore di validation a ogni iterazione.
+
+\dom{Backpropagation.} Regola della catena per attribuire a ogni peso la ``colpa'' dell'errore. Con $z^{(\ell)}=W^{(\ell)}a^{(\ell-1)}+b^{(\ell)}$ e $\delta^{(\ell)}=\partial\ell/\partial z^{(\ell)}$:
+\[
+\delta^{(\ell)}=\big(W^{(\ell+1)\,T}\delta^{(\ell+1)}\big)\odot\varphi'(z^{(\ell)}),\qquad
+\frac{\partial\ell}{\partial W^{(\ell)}}=\delta^{(\ell)}\,a^{(\ell-1)\,T}.
+\]
+Si calcola in avanti l'uscita e all'indietro i $\delta$.
+
+\dom{Problemi di addestramento.}
+\begin{itemize}
+\item \textbf{Vanishing gradient}: con attivazioni saturanti i prodotti di derivate molto piccole cancellano il gradiente degli strati iniziali.
+\item \textbf{Batch normalization}: stabilizza le attivazioni degli strati interni (riduce l'\emph{internal covariate shift}) e accelera l'apprendimento.
+\item \textbf{Loss non convessa}: sensibilit\`a all'inizializzazione, minimi locali, punti di sella (pi\`u comuni in alta dimensione); in pratica i minimi \emph{piatti} generalizzano meglio di quelli stretti.
+\item \textbf{Learning rate annealing}: $\eta$ decresce durante il training.
+\end{itemize}
+
+\dom{Ottimizzatori.}
+\begin{itemize}
+\item \textbf{Momentum}: $v\leftarrow\beta v+g$, $w\leftarrow w-\eta v$ (una ``palla con massa'' che smorza le oscillazioni nelle direzioni di curvatura alta e accelera in quelle dolci).
+\item \textbf{Learning rate adattivi}: AdaGrad (normalizza per la somma dei quadrati dei gradienti passati), RMSProp/AdaDelta (media mobile con decadimento $\gamma\approx0.9$).
+\item \textbf{Adam}: stima media e varianza non centrata dei gradienti,
+ $m_t=\beta_1m_{t-1}+(1-\beta_1)g_t$, $v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2$, correzione del bias $\hat m_t,\hat v_t$, aggiornamento $w\leftarrow w-\eta\,\hat m_t/(\sqrt{\hat v_t}+\epsilon)$; tipico $\beta_1=0.9$, $\beta_2=0.999$, $\epsilon=10^{-8}$.
+\end{itemize}
+
+\dom{Regolarizzazione delle reti.}
+\begin{itemize}
+\item \textbf{Dropout}: durante il training si spegne a caso una frazione $p$ dei neuroni: impedisce alla rete di dipendere da insiemi particolari di feature (e, a inferenza, \`e il fondamento dell'MC dropout di L18).
+\item \textbf{Early stopping}: si interrompe quando la loss di validation raggiunge un plateau o risale.
+\item \textbf{Noise injection} e \textbf{data augmentation}: trasformazioni che preservano la fisica per rendere pi\`u ricco il training.
+\end{itemize}
+
+\dom{Dati sbilanciati.} Un modello addestrato su classi sbilanciate va male sulla minoritaria.
+\begin{itemize}
+\item \emph{Oversampling} della minoritaria (rischio di overfitting); \emph{undersampling} della maggioritaria (si perde informazione); \textbf{SMOTE} (punti sintetici per interpolazione tra vicini della minoritaria).
+\item \textbf{Pesi di classe}: pesare la loss. Il solo downsampling mostra al modello un mondo artificialmente pi\`u bilanciato di quello reale (bias di predizione): la ricetta del corso \`e \emph{downsample + upweight}: omettere esempi maggioritari e dare pi\`u peso alla loss sugli esempi mantenuti; il modello conosce sia il legame feature--label sia la distribuzione reale, e converge pi\`u in fretta.
+\end{itemize}
+
+\subsection*{B. Nel corso}
+Esercizio ``implementazione a mano'' di una FFNN (uno strato nascosto da 50 nodi) sul dataset dei vini bianchi (11 feature, regressione sulla qualit\`a), confronto con Keras; notebook MSE vs BCE.
+
+\subsection*{C. Nel nostro progetto}
+\begin{itemize}
+\item \textbf{Ottimizzatore}: Adam, learning rate $10^{-3}$, mini-batch di 256, fino a 100 epoche.
+\item \textbf{Early stopping}: sul \code{val\_auc}, \code{patience}=8, \code{restore\_best\_weights=True}.
+\item \textbf{Dropout}: 0.2 negli strati nascosti (valore migliorabile nella ricerca di architettura: dropout variato tra 4 valori).
+\item \textbf{Classi sbilanciate} ($1940/15\,130=0.128$): \textbf{pesi di classe bilanciati} $w_c=N/(2N_c)$ in tutti i modelli (\code{class\_weight}, e \code{sample\_weight} per il gradient boosting), cos\`i le due classi contribuiscono ugualmente alla loss. Il corso suggerisce anche downsample + upweight; nessun esempio viene scartato nella nostra scelta.
+\item \textbf{Conseguenza sulle probabilit\`a}: con i pesi, il modello stima non $p$ ma $\tilde p=w_sp/(w_sp+w_b(1-p))$: un mondo ``ribilanciato''. Con $w_b>w_s$ i punteggi grezzi \emph{sottostimano} la probabilit\`a di signal-like: a punteggio $0.25$ la frazione osservata \`e $0.58$.
+\item \textbf{Calibrazione}: regressione isotonica (\code{CalibratedClassifierCV}, $5$ fold) segue la diagonale e dimezza il Brier ($0.122\to0.062$); il ranking, e quindi AUC e tagli, non cambia perch\'e la trasformazione \`e monotona.
+\item \textbf{Riproducibilit\`a}: seed fissi, operazioni deterministiche.
+\end{itemize}
+
+\subsection*{D. Confronto corso $\leftrightarrow$ progetto}
+\begin{center}
+\begin{tabular}{p{4.2cm}p{4.4cm}p{6.0cm}}
+\toprule
+Corso & Noi & Nota \\
+\midrule
+SGD, mini-batch, momentum, Adam & Adam, batch 256 & ottimizzatore adattivo standard \\
+dropout, early stopping & entrambi & validazione sull'AUC \\
+batch norm, annealing, augmentation & non usati & rete piccola, training breve, dati tabulari \\
+SMOTE, over/undersampling & non usati & pesi di classe \\
+downsample + upweight & pesi di classe sul campione intero & stessa idea (correggere la loss) senza scartare esempi \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{E. Dove nel report}
+Corpo: ``Weak Labels and Feature Set'' (pesi di classe) e ``Model Comparison'' (ottimizzatore, early stopping). Appendice ML estesa: calibrazione (formula di $\tilde p$, isotonica, Brier). Appendice D: perdita pesata e ricalibrazione.
+
+\subsection*{F. Domande d'orale}
+\begin{itemize}
+\item \emph{Perch\'e Adam?} Combina momentum e learning rate adattivo per parametro; \`e robusto e richiede poca messa a punto.
+\item \emph{Come gestite lo sbilanciamento?} Pesi di classe bilanciati; si perde la calibrazione (si stima $\tilde p$), che si ripristina con la regressione isotonica senza cambiare ranking.
+\item \emph{Cos'\`e l'early stopping e che cosa regolarizza?} Ferma l'addestramento quando la validation smette di migliorare; limita la complessit\`a effettiva della rete.
+\item \emph{Cosa fa il dropout?} Spegne neuroni a caso: la rete non pu\`o contare su singole feature; a inferenza lasciato attivo d\`a un ensemble (MC dropout).
+\end{itemize}
+
+\clearpage
+%==============================================================
+\section{L18 --- Incertezza nelle reti}
+%==============================================================
+\subsection*{A. Concetti}
+
+\dom{L'idea.} Un modello dovrebbe restituire una predizione \emph{e} la sua incertezza (un intervallo, una distribuzione). Uncertainty quantification (UQ): sistemi che non fanno solo predizioni ma danno misure di confidenza. Utile per decidere se fidarsi di un'uscita, e per l'\emph{open set recognition} (una softmax classifica comunque un cavallo come gatto o cane).
+
+\dom{Aleatoria ed epistemica.}
+\begin{itemize}
+\item \textbf{Aleatoria}: rumore intrinseco nelle osservazioni (rumore di sensore, di etichetta, sovrapposizione delle classi). \emph{Omoschedastica} (costante) o \emph{eteroschedastica} (dipende dall'input). Non si riduce con pi\`u dati, ma con pi\`u feature descrittive.
+\item \textbf{Epistemica}: ignoranza del modello sui parametri, per dati di training insufficienti. Si riduce con pi\`u dati e svanisce nel limite di dati infiniti (modello identificabile).
+\end{itemize}
+
+\dom{Metodi.}
+\begin{itemize}
+\item \textbf{Bagging} (approccio frequentista): $M$ reti identiche addestrate su $M$ campioni bootstrap (N su N con reinserimento); la predizione \`e la media delle $M$ uscite, l'incertezza epistemica la loro varianza: si ``simula la variabilit\`a della popolazione'' con il solo campione disponibile.
+\item \textbf{Deep ensemble}: $M$ istanze della stessa architettura con inizializzazioni diverse, addestrate sullo stesso training; media e deviazione standard.
+\item \textbf{Regressione puntuale con varianza}: testa doppia che predice $\mu(x)$ e $\sigma^2(x)$, loss NLL gaussiana: cattura l'aleatoria ma non l'epistemica (non segnala campioni fuori distribuzione). Variante: \emph{quantile regression}.
+\item \textbf{MC dropout} (Gal e Ghahramani): lasciare il dropout \emph{attivo} a inferenza e ripetere $T$ volte: ogni passaggio \`e un campione dalla ``posterior'' dei pesi; la varianza dei passaggi stima l'ignoranza del modello. \`E equivalente a un'approssimazione variazionale.
+\item \textbf{Reti bayesiane} (Bayes by backprop): una distribuzione su ogni peso, parametri $(\mu_i,\rho_i)$; loss = ELBO (verosimiglianza + KL dal prior): con $N$ crescente la verosimiglianza domina e la posterior diventa guidata dai dati; costo: $2\times$ i parametri, addestramento pi\`u sensibile ai prior. Il VAE usa lo stesso motore (trucco della riparametrizzazione e ELBO) ma per l'incertezza dello spazio latente.
+\end{itemize}
+
+\subsection*{B. Nel corso}
+Notebook di Bayes by backprop implementato a mano (regressione); discussione della connessione VAE -- MC dropout -- BNN.
+
+\subsection*{C. Nel nostro progetto}
+\begin{itemize}
+\item \textbf{Tre stimatori} confrontati, ognuno con $M$ predizioni $p_m(x)$ per candidato e $\sigma(x)=\big[\frac1M\sum_m(p_m-\bar p)^2\big]^{1/2}$:
+ \begin{itemize}
+ \item \textbf{Random Forest}: $M=300$ alberi (bagging: ognuno su un bootstrap): incertezza media \textbf{0.178};
+ \item \textbf{MC dropout} sulla FFNN: $M=300$ passaggi con dropout attivo: \textbf{0.095} ($0.099\pm0.006$ su 10 inizializzazioni);
+ \item \textbf{Deep ensemble}: $M=10$ FFNN con inizializzazioni diverse: \textbf{0.050}.
+ \end{itemize}
+\item \textbf{Perch\'e differiscono (fattore $\sim3.5$)}: misurano fonti diverse. Il deep ensemble varia solo l'inizializzazione (stessi dati); MC dropout perturba anche la struttura; gli alberi della RF differiscono per dati (bootstrap) e feature, e ogni albero limitato in profondit\`a \`e uno stimatore povero e discreto di $p$. Correlazioni di Spearman tra stimatori $0.41$--$0.57$: correlati, non intercambiabili.
+\item \textbf{Aleatoria vs epistemica} sulla RF: lo spread \`e massimo per punteggio $\approx0.5$ (le classi si sovrappongono e gli alberi discordano: componente aleatoria) e cala con la dimensione del training, da $0.220$ (un quarto) a $0.204$ (met\`a) a $0.179$ (completo), mentre l'AUC di test resta a $0.860$--$0.862$: componente epistemica. Ai tre stimatori l'incertezza media \`e entro il $10\%$ per signal-like e background-like.
+\item \textbf{Limite onesto}: queste incertezze per candidato sono un \emph{diagnostico} del classificatore: non vengono propagate all'incertezza di $\Araw$, che nasce dal fit e dalla sistematica.
+\end{itemize}
+
+\subsection*{D. Confronto corso $\leftrightarrow$ progetto}
+\begin{center}
+\begin{tabular}{p{4.2cm}p{4.4cm}p{6.0cm}}
+\toprule
+Corso & Noi & Nota \\
+\midrule
+bagging (frequentista) & RF: spread degli alberi & stesso schema, ma alberi e non reti \\
+deep ensemble & 10 FFNN con seed diversi & uguale al corso \\
+MC dropout & 300 passaggi con \code{training=True} & uguale al corso \\
+regressione con $\mu,\sigma^2$, quantile & non usati & classificazione: l'uscita \`e gi\`a una probabilit\`a \\
+Bayes by backprop, ELBO & non usati & implementazione dedicata, MC dropout d\`a un ensemble simile a costo nullo \\
+VAE & non usato & fuori scopo \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{E. Dove nel report}
+Appendice ML estesa: ``Uncertainty Quantification'' (figura con le tre distribuzioni e lo spread vs dimensione del training). Appendice D: aleatoria/epistemica, varianza dell'ensemble, MC dropout.
+
+\subsection*{F. Domande d'orale}
+\begin{itemize}
+\item \emph{Differenza tra incertezza aleatoria ed epistemica?} Aleatoria: sovrapposizione intrinseca delle classi, non cala con pi\`u dati; epistemica: ignoranza del modello, cala con pi\`u dati.
+\item \emph{Come l'avete misurata?} Spread di tre ensemble; la parte epistemica si vede nel calo dello spread RF con il training ($0.220\to0.179$), l'aleatoria nel picco a punteggio $\approx0.5$.
+\item \emph{Perch\'e MC dropout stima la posterior?} Tenere il dropout attivo equivale a campionare reti diverse: approssimazione variazionale della posterior dei pesi.
+\item \emph{Perch\'e i tre valori sono diversi?} Variano cose diverse (dati, struttura, inizializzazione): non \`e un errore, \`e una differenza di definizione.
+\item \emph{Questa incertezza entra in $\Araw$?} No: $\Araw$ viene dal fit; le incertezze ML sono un diagnostico del classificatore.
+\end{itemize}
+
+\clearpage
+%==============================================================
+\section{Le differenze tra i modelli utilizzati}
+%==============================================================
+\subsection*{In una riga ciascuno}
+\begin{center}
+\begin{tabular}{p{3.6cm}p{7.6cm}p{3.0cm}}
+\toprule
+Modello & Idea & AUC di test \\
+\midrule
+\textbf{Logistica} (L2/L1) & combinazione \emph{lineare} delle feature, passata in una sigmoide & $0.771$ \\
+\textbf{Albero} & sequenza di tagli s\`i/no su una feature & $0.824$ \\
+\textbf{Random Forest} & tanti alberi profondi indipendenti, media & $0.860$ \\
+\textbf{Gradient boosting} & alberi piccoli in fila, ognuno corregge i precedenti & $0.864$ \\
+\textbf{FFNN} & strati di neuroni con attivazioni non lineari & $0.857$ \\
+\textbf{K-means} & raggruppa i punti per vicinanza, senza etichette & -- (non classifica) \\
+\bottomrule
+\end{tabular}
+\end{center}
+L'incertezza di test dell'AUC \`e $0.012$: RF, GBM e FFNN sono indistinguibili tra loro; la logistica e l'albero sono nettamente sotto.
+
+\subsection*{Come ragionano}
+\dom{Logistica (Ridge/Lasso).} Calcola $z=\beta_0+\sum_j\beta_jx_j$ e $p=\sigma(z)$: il confine di decisione \`e un \emph{iperpiano}, lineare. Ridge (L2) riduce tutti i coefficienti, Lasso (L1) ne azzera alcuni.
+\emph{Pro}: veloce, interpretabile (ogni $\beta_j$ dice quanto pesa una feature), bassa varianza. \emph{Contro}: non cattura interazioni n\'e confini curvi.
+Da noi L1 non azzera nessun coefficiente e Ridge e Lasso danno lo stesso AUC: il problema non \`e la varianza ma il fatto che il confine non \`e lineare.
+
+\dom{Albero.} Taglia lo spazio in rettangoli (tagli allineati agli assi), una predizione per foglia; non lineare.
+\emph{Pro}: leggibile, nessuno scaler. \emph{Contro}: \textbf{alta varianza} (cambia molto con un altro campione) e tendenza all'overfitting.
+Da noi: profondit\`a $4$, \code{min\_samples\_leaf}$=20$, usato come baseline interpretabile.
+
+\dom{Random Forest (bagging).} Molti alberi profondi, ognuno su un campione bootstrap e con un sottoinsieme casuale di feature a ogni split; si media. Riduce la \textbf{varianza}: gli errori indipendenti dei singoli alberi si compensano.
+\emph{Pro}: robusta, poche regolazioni, quasi non va in overfitting. \emph{Contro}: meno interpretabile; ogni albero \`e un cattivo stimatore di $p$.
+
+\dom{Gradient boosting.} Alberi \emph{superficiali} in sequenza: ognuno impara il gradiente negativo della loss (gli errori residui) e si somma con un peso piccolo $\nu$: $F_m=F_{m-1}+\nu h_m$. Riduce il \textbf{bias}.
+\emph{Pro}: di solito il pi\`u accurato su dati tabulari. \emph{Contro}: sequenziale, pi\`u sensibile a rumore e iperparametri, overfitting se troppi stadi.
+Da noi: $200$ stadi, profondit\`a $3$, $\nu=0.05$; \`e il riferimento perch\'e ha il miglior AUC in cross-validation ($0.866$).
+
+\dom{FFNN.} Strati di neuroni: $a^{(\ell)}=\varphi(W^{(\ell)}a^{(\ell-1)}+b^{(\ell)})$, ReLU nascosta e sigmoide in uscita; si addestra con Adam per backpropagation.
+\emph{Pro}: approssimatore universale, molto flessibile. \emph{Contro}: richiede scaler, pi\`u iperparametri (architettura, dropout, learning rate), meno stabile (dipende dall'inizializzazione).
+Da noi: $20\to32\to16\to1$, ReLU, dropout $0.2$, $1\,217$ parametri, spread sull'inizializzazione $0.854\pm0.005$.
+
+\dom{K-means.} Non \`e confrontabile con gli altri perch\'e non ha etichette: partiziona il piano di Dalitz in $K$ gruppi minimizzando la distanza dai centroidi.
+
+\subsection*{Confronto sinottico}
+\begin{center}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{2.6cm}p{2.0cm}p{2.3cm}p{2.5cm}p{2.5cm}p{2.1cm}}
+\toprule
+ & Logistica & Albero & Random Forest & Gradient boosting & FFNN \\
+\midrule
+Confine & lineare & rettangoli & rettangoli (medio) & rettangoli (somma) & curvo \\
+Bias & alto & medio & basso & molto basso & basso \\
+Varianza & bassa & \textbf{alta} & bassa (bagging) & media & media \\
+Interpretabilit\`a & \textbf{alta} & alta & media & bassa & bassa \\
+Scaler & s\`i & no & no & no & s\`i \\
+Pesi di classe & \code{class\_weight} & \code{class\_weight} & \code{class\_weight} & \code{sample\_weight} & \code{class\_weight} \\
+Parametri chiave & $C$ (penalit\`a) & profondit\`a, foglia minima & n.\ alberi, profondit\`a & stadi, $\nu$, profondit\`a & strati, dropout, lr \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Perch\'e i risultati vengono cos\`i}
+\begin{itemize}
+\item \textbf{$0.771\to0.824$}: dal confine lineare a uno non lineare l'AUC sale di $\sim0.05$; il segnale sta nelle interazioni tra feature (per esempio \code{IPChi2}, \code{B\_FlightDistance}).
+\item \textbf{$0.824\to0.860$}: la media di tanti alberi toglie la varianza dell'albero singolo ($\sim0.04$).
+\item \textbf{$0.860$, $0.864$, $0.857$}: differenze sotto l'incertezza di test ($0.012$): su dati tabulari con $\sim10^4$ esempi nessuna famiglia ha un vantaggio netto.
+\end{itemize}
+
+\subsection*{Come spiegarlo all'orale in tre frasi}
+\begin{enumerate}
+\item ``Ho confrontato modelli di complessit\`a crescente: lineare, albero singolo, ensemble di alberi e rete.''
+\item ``Il salto grande \`e dal lineare al non lineare e dall'albero singolo agli ensemble; tra RF, GBM e FFNN le differenze sono dentro l'incertezza di test.''
+\item ``Ho scelto il GBM in base all'AUC in cross-validation, senza usare il test, e ho tenuto logistica e albero come baseline interpretabili.''
+\end{enumerate}
+
+\clearpage
+%==============================================================
+\section{Riepilogo trasversale}
+%==============================================================
+\subsection*{Che cosa NON abbiamo fatto (e perch\'e)}
+\begin{center}
+\begin{tabular}{p{5.2cm}p{9.2cm}}
+\toprule
+Argomento & Motivo \\
+\midrule
+alberi di regressione & problema di classificazione \\
+potatura a complessit\`a di costo & albero singolo solo baseline; profondit\`a a priori \\
+AdaBoost, XGBoost & GBM sufficiente; differenze sotto l'incertezza del test \\
+PCA come riduzione & servono $15/20$ componenti \\
+selezione di feature con Lasso & L1 non azzera nessun coefficiente \\
+batch normalization, annealing, augmentation & rete piccola, dati tabulari \\
+SMOTE, over/undersampling & pesi di classe + ricalibrazione \\
+regressione con varianza, quantile, Bayes by backprop, VAE & uscita gi\`a probabilistica; MC dropout e ensemble bastano \\
+CNN, RNN, GNN, autoencoder (L14--17), unfolding (L19), OmniFold (L20) & non applicabili; l'unfolding compare come limite (``$\Araw$ \`e quella piegata'') \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Oltre il programma (richiede riferimento o ragione)}
+CWoLa (Metodiev, Nachman, Thaler), calibrazione isotonica (Zadrozny--Elkan), Brier score, silhouette (Rousseeuw), ARI (Hubert--Arabie), $\sigma_B$ per campioni annidati (Barlow), test di permutazione sul Dalitz, studio ``high-background'' con identificazione pi\`u larga.
+
+\subsection*{I numeri da ricordare}
+\begin{itemize}
+\item Campione: $19\,731$ candidati nella finestra $[5100,5600]$ MeV; etichette deboli $15\,130/1\,940$; $20$ feature; split $10\,242/3\,414/3\,414$; $388$ background-like nel test.
+\item AUC di test: $0.771$ (logistica), $0.824$ (albero), $0.860$ (RF), $0.864$ (GBM), $0.857$ (FFNN); incertezza $0.012$.
+\item GBM: gap train--test $0.018\to0.084$ (20 $\to$ 300 stadi); plateau $\sim0.865$ da $\sim150$ stadi.
+\item PCA: $15/20$ componenti per il $90\%$; L1/L2: $0.7686$; nessun coefficiente azzerato.
+\item Soglia $0.5$: $88\%/28\%$ (test), $92\%/36\%$ (campione); $\Araw$: $-0.0451\pm0.0087$ (bayes), $-0.0447\pm0.0086$ (freq), $-0.0446\pm0.0080$ (conteggio), contro $-0.0443$, $-0.0441$, $-0.0432$.
+\item K-means $K=8$: $\chi^2=46.4/7$; cluster pi\`u significativo $A=-0.127\pm0.017$ ($S=-5.1$); $K=3$: silhouette $0.46$.
+\item Incertezza media: RF $0.178$; MC dropout $0.095$; deep ensemble $0.050$.
+\end{itemize}
+
+\subsection*{Una frase per ogni ruolo (per l'orale)}
+\begin{itemize}
+\item \textbf{Classificazione}: ``Usiamo un classificatore con etichette deboli per costruire una selezione e verificare che la misura di $\Araw$ non ne dipenda; non predice la carica.''
+\item \textbf{Clustering}: ``Il K-means d\`a una partizione adattiva del piano di Dalitz, confrontata con la griglia fissa $8\times8$: stesso quadro.''
+\item \textbf{Incertezza}: ``Tre stimatori danno scale diverse perch\'e misurano fonti diverse; la parte epistemica cala con i dati.''
+\item \textbf{Il limite}: ``Il ML non sostituisce i fit: \`e una verifica di robustezza e un test di sculpting, e non pu\`o togliere il fondo mal identificato sotto il picco.''
+\end{itemize}
+
+\end{document}

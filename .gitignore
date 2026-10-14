@@ -12,3 +12,8 @@ __pycache__/
 # data of the project (CERN Open Data, 1 GB): downloaded separately, see README
 Code_general/Report/data/
 *.root
+
+# course material: large data files and the merged slides (redundant) are not tracked
+Statistics_course/**/*.npz
+Statistics_course/**/*.npy
+Statistics_course/00_Reference/All_slides_merged.pdf
