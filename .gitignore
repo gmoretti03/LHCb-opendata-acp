@@ -1,9 +1,12 @@
 opendata-project/
 lhc_anomaly_detection/
+<<<<<<< HEAD
 
 # large regeneratable cached artifacts (rerun the notebook to recreate)
 Code_general/*/results/*.npz
 
+=======
+>>>>>>> freq
 # OS / editor junk
 .DS_Store
 .ipynb_checkpoints/
