@@ -1,0 +1,14 @@
+{
+ "load_data": 6.34,
+ "bayes_fit_nominal_1000_steps": 26.94,
+ "bayes_fit_nominal_3000_steps": 73.22,
+ "bayes_fit_2000cand_1000_steps": 6.89,
+ "freq_split": 0.0,
+ "freq_fit_joint": 1.04,
+ "freq_wilks": 0.13,
+ "freq_gof": 0.0,
+ "freq_fit_bootstrap_replica": 0.77,
+ "rf_200_trees_fit": 1.74,
+ "gbm_300_stages_fit": 10.03,
+ "ffnn_3layer_40_epochs": 2.3
+}
