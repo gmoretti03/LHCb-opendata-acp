@@ -1,0 +1,469 @@
+\documentclass[10.5pt,a4paper]{article}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{fontspec}
+\usepackage{amsmath,amssymb,booktabs,xcolor,needspace,enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\setlist{itemsep=2pt,topsep=2pt,leftmargin=1.4em}
+\newcommand{\Araw}{A_{\mathrm{raw}}}
+\newcommand{\orale}[1]{\par\medskip\noindent\fbox{\parbox{0.95\linewidth}{\textbf{Per l'orale.} #1}}\par}
+\newcommand{\conc}[1]{\clearpage\section{#1}}
+\title{\textbf{Concetti del report e dei notebook, spiegati}\\[2pt]\large Raw asymmetry in $B^\pm\to K^\pm K^+K^-$: $\sigma_B$, momento, adeguatezza del modello, $Z=\sqrt q$, binning, permutazioni, Brier, silhouette}
+\author{Giacomo Moretti -- appunti di studio}
+\date{Ottobre 2026}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section*{Come leggere questo documento}
+Nove concetti incontrati nel report e nei notebook (\texttt{Code\_general/Report/}), seguiti da tre figure dell'appendice sul
+machine learning (Fig.~XXXVII, XXXVIII e XLII, con la numerazione dell'appendice nella versione compilata). Per ciascuno: l'idea,
+come si calcola, i numeri del progetto, i limiti e la frase per l'orale. I numeri sono quelli del report; dove il notebook usa pochi
+toy, l'errore statistico è dichiarato.
+
+\conc{La $\sigma$ di Barlow ($\sigma_B$)}
+\subsection*{Il problema}
+Quando una variante dell'analisi cambia il \emph{campione} (per esempio \texttt{ProbK}$>0.6$ invece di $>0.5$) il campione della
+variante è un sottoinsieme del nominale. Il risultato si sposta di $\Delta=A^{\rm var}-A^{\rm nom}$, ma una parte
+di $\Delta$ è solo una fluttuazione statistica (meno candidati, stima diversa). Serve sapere quanto ci si aspetta che $\Delta$
+fluttui per pura statistica.
+
+\subsection*{Definizione}
+\[
+\sigma_B=\sqrt{\left|\sigma_{\rm var}^2-\sigma_{\rm nom}^2\right|}
+\]
+con $\sigma_{\rm nom}$ e $\sigma_{\rm var}$ le incertezze statistiche dei due fit (Hesse, o deviazione standard del posterior).
+
+\subsection*{Perché non la somma in quadratura}
+I due campioni non sono indipendenti. Lo stimatore del campione completo è quello a varianza minima; per qualunque altro stimatore
+$\hat A'$ dello stesso parametro $\mathrm{Cov}(\hat A,\hat A')=\mathrm{Var}(\hat A)$ (altrimenti si potrebbero combinare e fare meglio
+del minimo). Quindi
+\[
+\mathrm{Var}(\hat A'-\hat A)=\sigma'^2+\sigma^2-2\sigma^2=\sigma'^2-\sigma^2 .
+\]
+
+\subsection*{Come si usa (regola di combinazione)}
+\begin{itemize}
+\item Varianti che \textbf{cambiano il campione} (finestra, preselezione): contribuisce solo se $|\Delta|>\sigma_B$.
+\item Varianti che cambiano solo il \textbf{modello} sugli stessi dati (fondo, segnale): non c'è fluttuazione statistica attesa, conta tutto lo
+spostamento, salvo che i dati rifiutino la variante ($\Delta\chi^2>25$).
+\item In ogni gruppo si prende il massimo $|\Delta|$ tra le varianti che contano; i gruppi (indipendenti) si sommano in quadratura.
+\end{itemize}
+
+\subsection*{Numeri}
+\begin{center}\begin{tabular}{lccl}\toprule
+Variante & $\Delta$ & $\sigma_B$ & Esito\\\midrule
+\texttt{ProbK}$>0.4$ & $-0.0032$ & $0.0037$ & non conta\\
+\texttt{ProbK}$>0.6$ & $+0.0058$ & $0.0050$ & \textbf{conta} ($\sim1.2\,\sigma_B$), domina la sistematica\\
+finestra da $5150$ & $-0.0005$ & $0.0036$ & non conta (Hesse di quel fit poco accurato)\\\bottomrule
+\end{tabular}\end{center}
+Verifica con bootstrap su campioni annidati: $\mathrm{sd}(\text{shift})/\mathrm{mediana}(\sigma_B)\simeq1.00$ (run lunga, 200 repliche).
+
+\subsection*{Limiti}
+$\sigma_B$ è la differenza di due numeri quasi uguali, quindi sensibile a piccole differenze tra metodi; una variante vicina alla soglia può
+essere classificata diversamente senza cambiare il risultato. Non fa parte del corso (nei notebook è etichettato \texttt{[EXTRA]});
+riferimento: R.~Barlow, \emph{Systematic errors: facts and fictions}, hep-ex/0207026.
+\orale{Per campioni annidati la fluttuazione attesa tra due stime è $\sqrt{\sigma^2_{\rm sub}-\sigma^2_{\rm full}}$; uno spostamento
+più piccolo non è una sistematica, uno più grande sì.}
+
+\conc{Il check dei terzili di momento}
+\subsection*{Cosa verifica}
+Le asimmetrie strumentali (rivelazione, produzione) dipendono dalla cinematica: l'efficienza per $K^+$ e $K^-$ cambia con l'impulso,
+l'asimmetria di produzione con $p_T$ e rapidità. Un'asimmetria fisica del decadimento non ha motivo di dipendere così dal
+momento del $B$. Domanda: $\Araw$ cambia al variare del momento del $B$?
+
+\subsection*{Come si fa}
+Si calcolano $p_T$ e $p$ del $B$ (somma dei tre impulsi), si divide il campione in tre terzi con lo stesso numero di candidati
+(6\,577 ciascuno), prima in $p_T$ poi in $p$; in ogni terzo si rifà il fit nominale (12 parametri) e si confronta $A$ con il valore
+globale $-0.0441\pm0.0085$.
+
+\subsection*{Risultato}
+\begin{center}\begin{tabular}{lccc}\toprule
+ & terzo 1 & terzo 2 & terzo 3\\\midrule
+$p_T$ & $-0.056\pm0.017$ & $-0.036\pm0.014$ & $-0.045\pm0.013$\\
+$p$   & $-0.039\pm0.014$ & $-0.048\pm0.015$ & $-0.048\pm0.015$\\\bottomrule
+\end{tabular}\end{center}
+Tutti compatibili con il globale entro $1\sigma$; il $\chi^2$ rispetto a un valore costante è, come ordine di grandezza, $\sim0.9$
+per $p_T$ e $\sim0.2$ per $p$ con 2 gradi di libertà: nessuna dipendenza.
+
+\subsection*{Limiti}
+Un offset \emph{costante} (per esempio una asimmetria di rivelazione uguale a tutti i momenti) non si vede: serve un canale di
+controllo o le correzioni $A_P$, $A_D$ dell'analisi pubblicata. Ogni terzo ha $\sim6\,600$ candidati, quindi una dipendenza debole
+resta nascosta.
+\orale{Ho diviso in terzi di $p_T$ e di $p$ del $B$, rifatto il fit in ciascuno e verificato che $\Araw$ sia compatibile con il valore
+globale; non c'è una tendenza, ma il test non esclude un offset costante.}
+
+\conc{Adeguatezza del modello: $\chi^2/\mathrm{ndof}$, Crystal Ball e posterior predictive check}
+Frase del report: \emph{il modello non raggiunge $\chi^2/\mathrm{ndof}\approx1$ (164.1/88) perché le code del segnale sono più pesanti di
+una gaussiana, ma $\Araw$ cambia di $-0.0002$ con un segnale Crystal Ball; il check predittivo riproduce l'asimmetria in fette di
+massa ($p_B=0.67$) e mette la differenza dei $\chi^2$ delle due cariche ai margini delle repliche ($p_B=0.08$).}
+
+\subsection*{1. $\chi^2/\mathrm{ndof}=164.1/88$}
+Il $\chi^2$ confronta, in bin da 10 MeV, i conteggi osservati con quelli del modello fittato. Ci sono $2\times50$ bin meno 12 parametri:
+88 gradi di libertà. Con un modello giusto ci aspettiamo $\sim1$; qui $\sim1.9$ con $p\sim10^{-6}$: il modello non è una
+descrizione perfetta.
+
+\subsection*{2. Perché}
+La gaussiana è troppo ``magra'' sui fianchi: il segnale vero ha una coda verso le masse basse. I pull mostrano struttura proprio
+sui fianchi del picco.
+
+\subsection*{3. Perché non conta}
+Con una Crystal Ball (nucleo gaussiano più coda a potenza) il $\chi^2$ scende a 131.0/86 e $\Araw$ cambia di $-0.0002$, un centesimo
+dell'incertezza statistica. Lo spostamento tra segnale e fondo è praticamente uguale per $B^+$ e $B^-$; l'asimmetria, rapporto, ne è
+quasi insensibile.
+
+\subsection*{4. Posterior predictive check}
+Si estrae un valore dei parametri dal posterior, si simula un intero dataset (replica), si calcola una statistica sui dati e sulla
+replica; $p_B$ è la frazione di repliche con statistica $\ge$ quella osservata. Non è un $p$-value frequentista: valori lontani da 0
+e da 1 sono buoni.
+\begin{itemize}
+\item \textbf{Asimmetria in fette di 50 MeV} ($p_B=0.67$): statistica non ottimizzata dal fit; il modello predice come l'asimmetria
+varia lungo la massa e i dati la seguono.
+\item \textbf{$\chi^2(B^+)-\chi^2(B^-)$} ($p_B=0.08$): ai margini; lieve indizio che un segno sia fittato peggio, non significativo.
+\end{itemize}
+\orale{Il modello sbaglia un po' la forma del picco (code non gaussiane), ma l'asimmetria non dipende dalla forma: con la Crystal Ball
+cambia di 0.0002 e il check predittivo mostra che l'asimmetria nelle fette di massa è riprodotta.}
+
+\conc{$Z=\sqrt q$ e non \texttt{norm.ppf(1-p)}}
+\subsection*{Il punto}
+Per il teorema di Wilks, sotto $H_0$ la statistica di verosimiglianza di profilo $q=-2\ln\lambda$ segue una $\chi^2_1$. Poiché una
+$\chi^2_1$ è la distribuzione del quadrato di una gaussiana standard, la significatività è $Z=\sqrt q$ senza passare dal $p$-value.
+
+\subsection*{Il legame con il $p$-value}
+$A$ può avere entrambi i segni: test a \emph{due code},
+\[
+p=P(\chi^2_1>q)=2\,[1-\Phi(\sqrt q)]\quad\Rightarrow\quad\sqrt q=\Phi^{-1}\!\left(1-\tfrac p2\right).
+\]
+\begin{center}\begin{tabular}{lc}\toprule
+Conversione ($q(0)=27.0$, $p=2.05\times10^{-7}$) & Risultato\\\midrule
+$\sqrt q$ & $5.20\sigma$\\
+\texttt{norm.isf(p/2)} (due code) & $5.20\sigma$\\
+\texttt{norm.isf(p)} (una coda) & $5.07\sigma$\\\bottomrule
+\end{tabular}\end{center}
+Quindi \texttt{norm.ppf(1-p)} dà 5.07 perché conta una sola coda; con $p/2$ si ottiene 5.20. Torna anche con
+$|\hat A|/\sigma_A=0.0441/0.0085\approx5.2$.
+
+\subsection*{Dettaglio numerico}
+Per $Z$ grandi \texttt{norm.ppf(1-p)} perde precisione ($1-p$ arrotonda a 1): si usa \texttt{norm.isf(p/2)} oppure $\sqrt q$.
+
+\subsection*{Nota: ``$\chi^2_1$ è il quadrato di una gaussiana, sicuro?''}
+La definizione è esatta: se $Z\sim N(0,1)$ allora $Z^2\sim\chi^2_1$. Ma $q$ ha la distribuzione $\chi^2_1$ solo
+\emph{asintoticamente} (Wilks): è uguaglianza in distribuzione, non numerica. Come numero, $q(A_0)=((\hat A-A_0)/\sigma)^2$ vale
+se la verosimiglianza è esattamente parabolica. Per questo si verifica con toy ($q(0)$ con $A_{\rm true}=0$ contro $\chi^2_1$) e
+il segno di $A$ lo dà $\hat A$.
+\orale{$Z=\sqrt{q}$ perché $q\sim\chi^2_1$ per Wilks; equivale a \texttt{norm.isf(p/2)}, a due code. Con una coda si
+ottiene 5.07 invece di 5.20.}
+
+\conc{Goodness of fit e binning}
+\subsection*{Il problema}
+Il fit sui dati ha $\chi^2=160$ per 88 gradi di libertà ($p\sim5\times10^{-6}$). Ma il $p$-value vale solo se $\chi^2$ segue davvero
+la legge $\chi^2_{88}$, cosa non garantita per un $\chi^2$ binnato di un fit non binnato. Voglio sapere quanto $\chi^2$ viene
+\emph{quando il modello è vero}.
+
+\subsection*{Cosa si fa}
+\begin{enumerate}
+\item Si prende il modello adattato ai dati: tutti i parametri ($N_s,\mu,\sigma$, fondi) e $A=-0.0441$.
+\item Si generano molti dataset finti da questo modello (nel report 1000): stesso numero di eventi; il modello è vero per costruzione.
+\item Si rifitta ciascuno con la stessa procedura dei dati.
+\item Si calcola il $\chi^2$ con due binning: 10 MeV (88 gdl) e 2.5 MeV (388 gdl).
+\item Si confronta la distribuzione dei toy con la legge teorica e con il valore dei dati.
+\end{enumerate}
+\textbf{I toy non sono generati con asimmetria zero}: usano $A_{\rm true}=-0.0441$ (il fit) solo perché usano il modello adattato intero.
+Il valore di $A$ non influenza questo test: il $\chi^2$ misura la forma in massa, non la differenza tra i segni.
+
+\subsection*{Risultato}
+\begin{center}\begin{tabular}{lccc}\toprule
+Binning & $\chi^2$ dei dati & $p$ & Significato\\\midrule
+10 MeV (88 gdl) & 160 & $5\times10^{-6}$ & $5.4\sigma$\\
+2.5 MeV (388 gdl) & -- & $0.03$ & $2.0\sigma$\\\bottomrule
+\end{tabular}\end{center}
+I $\chi^2$ dei toy hanno media $\approx$ numero di gdl: il $p$-value è affidabile. Il disaccordo dei dati si vede di
+\emph{più} con bin larghi (somma su più eventi) e si diluisce con bin piccoli (pochi eventi per bin).
+
+\subsection*{Cosa causa il misfit}
+Non è principalmente il fondo: i residui sono sui fianchi del picco; con la Crystal Ball il $\chi^2$ scende da 164 a 131, mentre con
+una sola esponenziale peggiora molto (298/92), quindi il fondo a due esponenziali è già adeguato. È la forma del segnale
+(code più pesanti di una gaussiana). Non influenza $\Araw$: $-0.0002$ con la Crystal Ball.
+\orale{Il modello non riproduce perfettamente la forma del picco; il disaccordo si vede con bin da 10 MeV e si diluisce con bin da
+2.5 MeV per la poca statistica per bin. Non influenza $\Araw$.}
+
+\conc{Distribuzione della statistica di omogeneità sotto permutazione delle cariche}
+\subsection*{La statistica}
+Nella griglia $8\times8$ del piano di Dalitz, ogni bin $i$ ha asimmetria locale $A_i$ e significatività
+$S_i=(A_i-A_{\rm glob})/\sigma(A_i)$. La statistica di omogeneità è
+\[
+\chi^2=\sum_iS_i^2,\qquad 31\ \text{gradi di libertà (32 bin popolati }-1).
+\]
+Sui dati vale $80.8$. Ipotesi nulla: asimmetria \emph{uniforme}, la stessa $A_{\rm glob}$ ovunque.
+
+\subsection*{Il test di permutazione}
+\begin{enumerate}
+\item Si prendono i candidati veri con le loro posizioni nel piano di Dalitz.
+\item Si mescolano a caso le etichette di carica tra i candidati: la distribuzione in Dalitz e l'asimmetria globale restano uguali,
+ma ogni struttura locale è distrutta.
+\item Si ricalcola $\chi^2=\sum S_i^2$ sul campione mescolato; si ripete 2000 volte.
+\end{enumerate}
+
+\subsection*{Cosa si legge}
+\begin{itemize}
+\item I $\chi^2$ mescolati hanno media $\sim31.5$ e sd $\sim8.4$: la legge $\chi^2_{31}$ (media 31, sd 7.9). La statistica è calibrata.
+\item Il valore osservato $80.8$ sta oltre tutte le 2000 permutazioni (massimo $\sim70$): $p<1/2000=5\times10^{-4}$.
+\end{itemize}
+Se non ci fosse dipendenza dalla posizione, il valore osservato cadrebbe \emph{dentro} la distribuzione mescolata; invece sta
+lontanissimo, quindi l'asimmetria \textbf{non è uniforme}. Il test non dice \emph{dove} né \emph{perché} (lo mostrano mappe,
+$\phi(1020)$, regione della pubblicazione). Si usa invece della tabella del $\chi^2$ perché alcuni bin hanno pochi eventi e
+$\sigma(A_i)$ è stimata dai dati: la permutazione costruisce la distribuzione nulla direttamente dai dati.
+\orale{Se la carica non dipendesse dalla posizione, mescolarla non cambierebbe nulla. Lo faccio 2000 volte e il valore osservato
+cade fuori da tutte: $p<5\times10^{-4}$.}
+
+\conc{Il Brier score}
+\subsection*{Definizione}
+Errore quadratico medio tra la probabilità predetta e l'esito vero:
+\[
+\mathrm{BS}=\frac1N\sum_{i=1}^N(p_i-y_i)^2,\qquad y_i\in\{0,1\}.
+\]
+$p_i$ è la probabilità di ``signal-like'', $y_i$ l'etichetta vera.
+
+\subsection*{Come si legge}
+\begin{itemize}
+\item $0$ = perfetto; più basso è meglio.
+\item Un modello ``ignorante'' che dà sempre $\bar y$ ottiene $\bar y(1-\bar y)$: con classi $0.89/0.11$ circa $0.10$; con classi
+bilanciate $0.25$.
+\item È una \emph{proper scoring rule}: il minimo si raggiunge dicendo la probabilità vera.
+\end{itemize}
+
+\subsection*{Perché oltre all'AUC}
+L'\textbf{AUC} misura solo il \emph{ranking} (i signal-like hanno punteggio più alto dei background-like?) e non cambia se si
+moltiplicano i punteggi per $0.3$. Il \textbf{Brier} misura anche la \emph{calibrazione}: se il modello dice 70\%, il 70\% di quei
+candidati è davvero signal-like? I pesi di classe (\texttt{balanced}) spostano le probabilità: per il Random Forest il Brier raw è
+$0.122$ e dopo la ricalibrazione isotonica scende a $0.062$, con l'AUC invariata (la ricalibrazione è monotona).
+
+\subsection*{Decomposizione}
+\[
+\mathrm{BS}=\underbrace{\text{calibrazione}}_{\text{probabilità oneste?}}+\underbrace{\text{raffinatezza}}_{\text{quanto separa i casi}}
+-\underbrace{\text{incertezza dei dati}}_{\bar y(1-\bar y)}.
+\]
+La ricalibrazione abbassa solo il primo termine.
+\orale{L'AUC dice quanto bene ordino i candidati, il Brier quanto sono affidabili le probabilità. I pesi di classe lo peggiorano (0.122)
+e la ricalibrazione isotonica lo corregge (0.062) senza cambiare l'AUC.}
+
+\conc{Il silhouette}
+\subsection*{Definizione}
+Misura quanto sono separati i cluster ($K$-means) senza usare etichette. Per ogni punto $i$:
+$a(i)$ = distanza media dagli altri punti del suo cluster (coesione); $b(i)$ = distanza media dai punti del cluster più vicino a cui non
+appartiene (separazione).
+\[
+s(i)=\frac{b(i)-a(i)}{\max\{a(i),b(i)\}}\in[-1,1],
+\]
+e il silhouette del partizionamento è la media su tutti i punti.
+
+\subsection*{Come si legge}
+\begin{center}\begin{tabular}{ll}\toprule
+$s$ & Significato\\\midrule
+vicino a $+1$ & cluster ben separati\\
+$\sim0$ & il punto sta sul confine tra due cluster\\
+negativo & probabilmente nel cluster sbagliato\\\bottomrule
+\end{tabular}\end{center}
+
+\subsection*{A cosa serve nel progetto}
+\begin{itemize}
+\item Serve a scegliere $K$: l'\emph{inerzia} (somma dei quadrati delle distanze dai centroidi) scende sempre con $K$ e non ha
+minimo; il silhouette invece ha un massimo. Sul piano di Dalitz il massimo è a $K=3$ (calcolato su un sottocampione di 4000 punti:
+è $O(N^2)$).
+\item Ho usato $K=8$ \emph{fissato in anticipo}, per confrontare con la griglia $8\times8$ e per non scegliere $K$ guardando
+l'asimmetria. Non è l'ottimo del silhouette, e nel report lo dico.
+\end{itemize}
+
+\subsection*{Limiti}
+Il silhouette tende a preferire pochi cluster compatti e convessi; non dice se i cluster hanno un significato fisico, solo geometrico.
+\orale{Per ogni punto confronto la distanza media dal suo cluster con quella dal cluster vicino; la media va da $-1$ a $+1$. L'ho
+calcolato per scegliere $K$, ma ho fissato $K=8$ a priori per confrontare con la griglia fissa: qui è un controllo, non il
+criterio di scelta.}
+
+
+\conc{FIG.~XXXVII: il diagramma di affidabilità del Random Forest}
+\subsection*{Il problema}
+Il classificatore dà un punteggio $s\in[0,1]$. Si può leggerlo come una probabilità solo se tra i candidati con punteggio $\approx p$ una
+frazione $p$ è davvero signal-like. Il \emph{reliability diagram} verifica questa proprietà; il Brier score la riassume in un numero.
+
+\subsection*{Come è costruita}
+\begin{enumerate}
+\item Il Random Forest (\texttt{balanced}, 200 alberi) dà un punteggio ``raw'' a ogni candidato del campione di \emph{test}.
+\item \textbf{Curva grigia (raw)}: i punteggi sono divisi in 10 bin di probabilità predetta; in ciascuno si calcola la frazione osservata
+di candidati signal-like (\texttt{calibration\_curve}). Barre d'errore binomiali $\sqrt{p(1-p)/n}$, $n$ = candidati del bin.
+La diagonale è la calibrazione perfetta.
+\item \textbf{Curva dorata (isotonic)}: ricalibrazione isotonica (\texttt{CalibratedClassifierCV}, 5 fold, funzione monotona
+punteggio $\to$ probabilità, appresa sul training) applicata al test, poi stessa curva a 10 bin.
+\item \textbf{Brier} per ciascuna versione sul test: $0.122$ (raw), $0.062$ (isotonic).
+\item \textbf{Pannello in basso}: istogrammi del punteggio raw per le due classi, scala logaritmica.
+\end{enumerate}
+
+\subsection*{Come si legge}
+\begin{itemize}
+\item Curva grigia \textbf{sopra} la diagonale: il punteggio \emph{sottostima} la probabilità; per esempio dove il modello dice $0.45$ circa
+l'$88\%$ è davvero signal-like.
+\item Perché: i pesi \texttt{balanced} danno al segnale peso $\sim0.56$ e al fondo $\sim4.4$; il modello vede classi bilanciate e restituisce
+\[\tilde p=\frac{w_s\,p}{w_s\,p+w_b(1-p)}\]
+invece di $p$. Con $w_s/w_b\approx0.13$, $\tilde p=0.45$ corrisponde a $p\approx0.87$.
+\item Curva dorata vicina alla diagonale: probabilità ``oneste''. L'AUC non cambia (la mappa è monotona), cambia solo il Brier.
+\item Istogrammi: i signal-like si accumulano a punteggi alti, i background-like a punteggi bassi; i bin a bassa probabilità hanno pochi
+candidati, quindi barre d'errore grandi.
+\item La curva isotonica è a gradini perché la regressione isotonica è costante a tratti: non è un difetto.
+\end{itemize}
+\orale{Il punteggio raw è sbilanciato dai pesi di classe; la ricalibrazione isotonica lo corregge (Brier $0.122\to0.062$) senza
+cambiare l'ordinamento, quindi l'AUC resta la stessa.}
+
+\conc{FIG.~XXXVIII: l'incertezza del punteggio}
+\subsection*{Il problema}
+Un punteggio da solo non dice quanto è affidabile: due candidati con $s=0.5$ possono avere ``$0.5\pm0.01$'' oppure ``$0.5\pm0.3$''.
+La figura chiede quanto è incerto il punteggio e da cosa dipende.
+
+\subsection*{Teoria: due tipi di incertezza}
+\begin{itemize}
+\item \textbf{Aleatoria}: dovuta ai dati, irriducibile; le due classi si sovrappongono nelle variabili usate, quindi nemmeno il
+modello migliore può dire di più.
+\item \textbf{Epistemica}: dovuta al modello, addestrato su un campione finito; \emph{diminuisce con più dati}.
+\end{itemize}
+Tre stimatori basati sulla variabilità tra più modelli:
+\begin{center}\small\begin{tabular}{p{2.6cm}p{6.4cm}p{5.2cm}}\toprule
+Stimatore & Come si ottiene & Cosa misura\\\midrule
+RF trees & scarto standard delle predizioni dei 300 alberi & variabilità del bagging\\
+MC dropout & FFNN con dropout attivo in predizione, 300 passate & varianza di un'approssimazione bayesiana\\
+Deep ensemble & 10 FFNN con semi diversi & varianza da inizializzazione e ottimizzazione\\\bottomrule
+\end{tabular}\end{center}
+Misurano sorgenti diverse: i valori assoluti non sono confrontabili.
+
+\subsection*{Come si legge}
+\begin{itemize}
+\item \textbf{(a)} Spread degli alberi contro punteggio medio, per classe (banda 16--84\%). Forma a \emph{campana}: poco spread agli
+estremi (alberi concordi), massimo a $s\approx0.4$--$0.5$. In parte è una proprietà matematica: per valori in $[0,1]$ con media $s$
+lo scarto non supera $\sqrt{s(1-s)}$. Le due classi cadono sulla stessa curva: l'incertezza dipende dal punteggio, non dal tipo di
+candidato.
+\item \textbf{(b)} Distribuzione dell'incertezza per candidato: ensemble il più stretto (media $\sim0.05$), dropout intermedio
+($\sim0.095$), alberi il più largo ($\sim0.18$).
+\item \textbf{(c)} Spread degli alberi contro la dimensione del training ($\approx2\,500$, $5\,100$, $10\,200$ candidati): scende da
+$\sim0.22$ a $\sim0.18$ per entrambe le classi.
+\end{itemize}
+
+\subsection*{Cosa dice e limiti}
+\begin{itemize}
+\item (c) è il test che separa i due tipi: lo spread diminuisce con i dati, quindi una parte è epistemica; ciò che resta a punteggi
+intermedi è la sovrapposizione delle classi (aleatoria).
+\item Lo spread degli alberi \textbf{non è una barra d'errore calibrata}: dice dove il modello è instabile, non una probabilità con
+copertura nota. La forma a campana è quasi obbligata; l'informazione nuova sta in (c). La parte aleatoria è dedotta per differenza.
+\end{itemize}
+
+\subsection*{Come si misura lo spread degli alberi}
+\textbf{Un candidato è una riga} della tabella dei dati: le 20 variabili usate dal classificatore (la massa non c'è). In \texttt{X\_test}
+(forma $N\times20$) ogni riga è un candidato; in \texttt{tree\_preds} (forma $300\times N$) ogni colonna è un candidato e ogni riga un albero.
+
+Per ogni candidato:
+\begin{enumerate}
+\item ciascuno dei 300 alberi (addestrati su campioni bootstrap e sottoinsiemi casuali di variabili) lo fa cadere in \emph{una} foglia e
+restituisce un numero: la frazione (pesata) di signal-like in quella foglia, un valore in $[0,1]$ e non un voto 0/1;
+\item si calcolano media e deviazione standard (\texttt{ddof=0}) di quei 300 numeri \emph{sugli alberi}: la media è il punteggio del
+forest, la deviazione standard è lo spread.
+\end{enumerate}
+Non sono media e deviazione \emph{delle foglie di un albero}: conta solo la foglia dove cade quel candidato. Esempio con 5 alberi:
+valori $0.90,0.80,0.95,0.70,0.85$ $\to$ punteggio $0.84$, spread $0.087$.
+\begin{center}\begin{minipage}{0.92\linewidth}\footnotesize
+\begin{verbatim}
+tree_preds = np.stack([t.predict_proba(X_test)[:, 1] for t in rf.estimators_])  # (300, N)
+unc_rf     = tree_preds.std(axis=0)     # spread per candidato
+mean_score = tree_preds.mean(axis=0)    # punteggio del forest
+\end{verbatim}
+\end{minipage}\end{center}
+Attenzione: è la variabilità di un \emph{singolo albero}. L'errore sulla media dei 300 alberi sarebbe $\text{spread}/\sqrt{300}$,
+circa 17 volte più piccolo, ma non è quello che si disegna.
+
+\subsection*{Come si costruiscono i tre pannelli}
+Si parte dagli array del notebook: \texttt{tree\_preds}, \texttt{unc\_rf}, \texttt{unc\_mc} (MC dropout, 300 passate con
+\texttt{training=True}), \texttt{unc\_de} (deviazione standard tra 10 reti), \texttt{y\_test} (etichette deboli).
+\begin{itemize}
+\item \textbf{(a)}: i candidati di ciascuna classe si raggruppano in 10 bin di punteggio medio; in ogni bin con almeno 20
+candidati si traccia la mediana dello spread e la banda 16--84\% (\texttt{np.percentile}); due curve, una per classe.
+\item \textbf{(b)}: istogrammi normalizzati (\texttt{density=True}) di \texttt{unc\_rf}, \texttt{unc\_mc}, \texttt{unc\_de} sugli stessi bin
+(0--0.35).
+\item \textbf{(c)}: si \emph{riaddestra} il forest con il 25\%, 50\% e 100\% del training, si ricalcola lo spread sul test e se ne fa
+la media su tutti i candidati e separatamente per classe.
+\end{itemize}
+\begin{center}\begin{minipage}{0.92\linewidth}\footnotesize
+\begin{verbatim}
+for frac in (0.25, 0.5, 1.0):
+    idx  = np.random.choice(len(y_train), int(frac*len(y_train)), replace=False)
+    rf_f = RandomForestClassifier(n_estimators=100, max_depth=8, min_samples_leaf=20,
+                                  class_weight="balanced").fit(X_train[idx], y_train[idx])
+    sp   = np.stack([t.predict_proba(X_test)[:, 1] for t in rf_f.estimators_]).std(axis=0)
+    rows.append((len(idx), sp.mean(), sp[y_test==0].mean(), sp[y_test==1].mean()))
+\end{verbatim}
+\end{minipage}\end{center}
+Il notebook \texttt{08} disegna una versione semplificata (scatter per (a), istogrammi per (b), i numeri di (c) solo stampati); la
+figura a tre pannelli del report viene dall'analisi completa.
+
+\subsection*{Come sono distribuiti i punti}
+Nello scatter (circa $3\,400$ candidati, uno per punto) la nuvola segue la campana ma la \emph{densità non è uniforme}:
+\begin{itemize}
+\item si addensa a punteggio alto ($0.7$--$0.9$), dove lo spread è piccolo ($0.1$--$0.2$): lì cade quasi tutto il campione, perché circa
+l'$88\%$ dei candidati con etichetta è signal-like;
+\item a punteggi bassi ($0$--$0.3$) ci sono pochi punti (i background-like, $\sim12\%$);
+\item nel mezzo ($0.3$--$0.6$) i punti sono radi, quindi le bande 16--84\% di (a) sono più larghe.
+\end{itemize}
+Conseguenza: lo spread \emph{medio} del forest ($\sim0.18$) è dominato dai candidati ad alto punteggio, non da quelli a punteggio
+intermedio dove lo spread è massimo; la ``incertezza media'' non descrive la parte del campione dove il classificatore è meno sicuro.
+Le tre distribuzioni in (b) hanno forme diverse (ensemble stretto a $\sim0.03$, dropout con picco a $\sim0.07$ e una coda, forest
+ampia fra $0.1$ e $0.3$), a conferma che misurano cose diverse.
+
+\orale{L'incertezza del punteggio ha una parte epistemica, che cala con più dati (pannello c), e una aleatoria, la sovrapposizione
+delle classi, massima per punteggi intermedi. I tre stimatori misurano cose diverse.}
+
+\conc{FIG.~XLII: il campione ad alto fondo}
+\subsection*{Il problema}
+Nel campione nominale il fondo sotto il picco è poco ($\sim4\%$ nella finestra di segnale) e il taglio ML non migliora
+$\sigma(\Araw)$. Dove potrebbe aiutare davvero? In un campione con molto più fondo.
+
+\subsection*{Cosa si è fatto}
+\begin{enumerate}
+\item Campione più largo: \texttt{ProbK}$>0.3$ (33\,328 candidati; il nominale ne ha 19\,731 con $>0.5$).
+\item Due modi di ripulirlo, confrontati \emph{a parità di efficienza sul segnale}: PID più stretto (\texttt{ProbK}$>0.3\dots0.8$,
+curva blu) oppure taglio sul punteggio del GBM riaddestrato su questo campione (soglie $0\dots0.9$, curva oro).
+\item Per ogni selezione: fit nominale frequentista $\to$ $\Araw$, $\sigma(A)$, $N_s$.
+\item Efficienza $=N_s/N_s(\texttt{ProbK}>0.3)$: è \emph{relativa} al campione di partenza, che per costruzione ha efficienza $1$. La linea
+punteggiata è la selezione nominale.
+\end{enumerate}
+\begin{center}\small\begin{tabular}{p{1.9cm}p{6.8cm}p{5.3cm}}\toprule
+Curva & Taglio & Efficienza\\\midrule
+PID (blu) & \texttt{ProbK}$>0.3$ (campione di partenza); $>0.4$; $0.5$ (nominale); $0.6$; $0.7$; $0.8$ & $1.00$; $0.86$; $0.68$; $0.50$; $0.32$; $0.18$\\
+ML (oro) & punteggio $>0$ (nessun taglio); $>0.3$; $0.5$; $0.7$; $0.8$; $0.9$ & $1.00$; $0.98$; $0.93$; $0.78$; $0.59$; $0.21$\\\bottomrule
+\end{tabular}\end{center}
+A efficienza $1$ non c'è alcun taglio in più: le due curve coincidono (stesso campione, stesso fit).
+
+\subsection*{Come si legge}
+\begin{itemize}
+\item \textbf{(a)} $\sigma(\Araw)$ contro efficienza: cresce al diminuire dell'efficienza (meno eventi). A efficienza alta ($>0.55$) la
+curva oro sta sotto la blu di circa $0.0003$--$0.0005$ ($3$--$6\%$); a efficienza media il PID è pari o un po' meglio; l'incrocio
+non è un risultato (sei punti per curva, collegati da rette).
+\item \textbf{(b)} $\Araw$ contro efficienza: tutti i punti sono compatibili entro le barre, ma c'è una struttura: il PID stretto riporta
+$A$ verso il valore nominale ($\sim-0.044$); il taglio ML resta a $\sim-0.055$, il valore del campione largo, fino a efficienza $\sim0.8$.
+\end{itemize}
+
+\subsection*{Cosa dice e limiti}
+\begin{enumerate}
+\item Anche con molto più fondo il guadagno del ML sul PID in precisione è modesto.
+\item Allargare \texttt{ProbK} sposta $A$ (decadimenti mal identificati non descritti dal modello di massa): il PID li toglie, il taglio ML
+\emph{no}, perché il classificatore è addestrato a separare ``sotto il picco'' da ``bande laterali'' (combinatorio) e non conosce
+quei decadimenti. Coerente con il report.
+\end{enumerate}
+I campioni sono annidati: i punti sono correlati e le differenze vanno lette come tendenza. La struttura in (b) è compatibile con le
+barre d'errore: è un indizio, non una significatività.
+\orale{Anche con molto più fondo il taglio ML migliora $\sigma(A)$ solo di qualche percento rispetto al PID e non rimuove i decadimenti
+mal identificati, perché le etichette deboli vengono dalla massa.}
+
+\clearpage
+\section*{Il filo comune}
+\begin{itemize}
+\item \textbf{Distribuzioni nulle}: Wilks ($Z=\sqrt q$), toy e permutazioni servono tutti a dire cosa mi aspetto se l'ipotesi è vera.
+\item \textbf{Cosa non va bene}: il modello è imperfetto sulla forma del picco, ma $\Araw$ no.
+\item \textbf{Metriche}: l'AUC ordina, il Brier calibra, il silhouette separa i cluster.
+\item \textbf{Incertezze}: aleatoria (irriducibile) ed epistemica (cala con i dati); lo spread tra modelli non è una barra d'errore calibrata.
+\end{itemize}
+\end{document}
