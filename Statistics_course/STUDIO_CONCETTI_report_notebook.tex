@@ -156,6 +156,20 @@ il segno di $A$ lo dà $\hat A$.
 \orale{$Z=\sqrt{q}$ perché $q\sim\chi^2_1$ per Wilks; equivale a \texttt{norm.isf(p/2)}, a due code. Con una coda si
 ottiene 5.07 invece di 5.20.}
 
+\subsection*{Perché il conteggio dà $6.1\sigma$ e il fit $5.2\sigma$}
+Il test binomiale esatto di $N^-=N^+$ su tutti i $19\,731$ candidati ($N^-\approx10\,292$, $N^+\approx9\,439$) ha
+$A_{\mathrm{count}}=-0.0432\pm0.0071$, quindi $|A|\sqrt N\approx6.1$. Il fit ha $\hat A=-0.0441\pm0.0085$, cioè $5.2\sigma$. I due non sono in
+tensione perché rispondono a domande diverse:
+\begin{itemize}
+\item il \textbf{conteggio} testa l'asimmetria di segnale \emph{e} fondo insieme, senza la massa; non paga il costo di separare il fondo,
+e per questo ha l'errore più piccolo ($0.0071$);
+\item il \textbf{fit} testa l'asimmetria del \emph{solo segnale}, con quella del fondo come parametro libero, e per questo ha l'errore più grande
+($0.0085$): i $5.2\sigma$ sono il numero che si riferisce al segnale.
+\end{itemize}
+I valori centrali sono vicini ($-0.0432$ e $-0.0441$) perché l'asimmetria del fondo, $A_b\approx-0.04$, è simile a quella del segnale.
+\orale{Il $6.1\sigma$ è del conteggio su tutti i candidati e non paga la separazione del fondo; il numero da citare per il segnale è il
+$5.2\sigma$ del fit. Non sono in tensione: misurano due quantità diverse con valori centrali quasi uguali.}
+
 \conc{Goodness of fit e binning}
 \subsection*{Il problema}
 Il fit sui dati ha $\chi^2=160$ per 88 gradi di libertà ($p\sim5\times10^{-6}$). Ma il $p$-value vale solo se $\chi^2$ segue davvero

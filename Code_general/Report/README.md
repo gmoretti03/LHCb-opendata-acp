@@ -18,8 +18,8 @@ the parts that go beyond the techniques of the course as **[EXTRA]**.
 | `05_Bayesian_fit` | priors, MCMC (`emcee`), convergence, credible/HPD intervals, Bayes factors, prior dependence | Bayesian analysis |
 | `06_Bayesian_systematics_and_checks` | Bayesian variants, coverage of the credible interval, posterior predictive check, polarities, comparison with the profile likelihood | Systematics, Validation, Discussion |
 | `07_Bayesian_low_statistics` | credible against confidence intervals at 50–2000 candidates, asymptotic behaviour | Discussion |
-| `08_ML_classifiers` | weak labels, six classifiers, Ridge/Lasso, bias–variance, calibration, uncertainty, hyperparameters | Machine learning |
-| `09_ML_measurement` | effect of an ML selection on A_raw (three methods), sculpting test, K-means on the Dalitz plane, high-background sample | Machine learning |
+| `08_ML_classifiers` | weak labels, six classifiers, Ridge/Lasso, bias–variance, calibration, uncertainty, hyperparameters, ROC and significance improvement | Machine learning |
+| `09_ML_measurement` | effect of an ML selection on A_raw (three methods, score > 0.5 and > 0.73), sculpting test, K-means on the Dalitz plane, high-background sample | Machine learning |
 
 Section numbers inside the frequentist notebooks (01–04) and the Bayesian ones (05–07) follow the whole analysis of each
 method, so §5 of `02_…` comes after §4 of `01_…`.

@@ -57,8 +57,8 @@ the techniques of the course as **[EXTRA]**. See `Code_general/Report/README.md`
 | `05_Bayesian_fit` | priors, MCMC (`emcee`), convergence, credible/HPD intervals, Bayes factors, prior dependence | 4 min |
 | `06_Bayesian_systematics_and_checks` | Bayesian variants, coverage, posterior predictive check, polarities, comparison with the profile | 14 min |
 | `07_Bayesian_low_statistics` | credible against confidence intervals at 50–2000 candidates, asymptotic behaviour | 2 min |
-| `08_ML_classifiers` | weak labels, six classifiers, Ridge/Lasso, bias–variance, calibration, uncertainty, hyperparameters | 9 min |
-| `09_ML_measurement` | effect of the ML selection on A_raw, sculpting test, K-means on the Dalitz plane, high-background sample | 5 min |
+| `08_ML_classifiers` | weak labels, six classifiers, Ridge/Lasso, bias–variance, calibration, uncertainty, hyperparameters, ROC and significance improvement | 9 min |
+| `09_ML_measurement` | effect of the ML selection on A_raw (score > 0.5 and at the maximum of the significance improvement, 0.73), sculpting test, K-means on the Dalitz plane, high-background sample | 5 min |
 
 ## Complete analysis: `Code_general/Analysis/`
 
