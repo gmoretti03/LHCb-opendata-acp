@@ -1,0 +1,36 @@
+\section{Introduction}
+\label{sec:intro}
+The observable of this work is the raw charge asymmetry of the signal yields of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ decays,
+\begin{equation}
+\Araw=\frac{N(B^-)-N(B^+)}{N(B^-)+N(B^+)} ,
+\label{eq:araw}
+\end{equation}
+which in three-body charmless $B$ decays can be studied globally and locally over the Dalitz plane~\cite{lhcb_cpv_prd2023,lhcb_cpv_paper}. It differs from the $CP$ asymmetry $\ACP$ by the production asymmetry $A_P$ of $B^\pm$ in $pp$ collisions and by the detection asymmetry $A_D$ of the final state~\cite{lhcb_cpv_prd2023},
+\begin{equation}
+\ACP\approx\Araw-A_P-A_D .
+\label{eq:acp}
+\end{equation}
+Neither correction is applied here, so $\Araw$ is \emph{not} a measurement of $\ACP$; the corrections of the published analysis are discussed in Sec.~\ref{sec:comparison_published}.
+We use the LHCb Open Data record for this decay~\cite{opendata_record,opendata_notebook}, a subset of the 2011 data on which the first evidence of an inclusive $CP$ asymmetry was published~\cite{lhcb_cpv_2013}, to ask: \emph{to what extent do Frequentist likelihood fits and Bayesian inference produce consistent, well-controlled estimates of $\Araw$?} The aim is a methodological comparison of the two frameworks on the same data and on the same likelihood, so that any difference comes from the inference and not from the model. Secs.~\ref{sec:data}--\ref{sec:model} describe the data and the common model, Secs.~\ref{sec:frequentist}--\ref{sec:bayesian} the two fits, and Sec.~\ref{sec:validation} the validation of the estimator and of the intervals, Sec.~\ref{sec:ml_body} the machine-learning analysis, Sec.~\ref{sec:dalitz} the Dalitz plane, Sec.~\ref{sec:syst} the systematic study and the result, and Sec.~\ref{sec:comparison} the comparison. The main results are in Table~\ref{tab:summary}.
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{llcccc}
+\toprule
+Method & Sample & $\Araw$ & Statistical & Systematic & Section \\
+\midrule
+Counting (no fit) & fit window, $19{,}731$ & $-0.0432$ & $0.0071$ & -- & \ref{sec:data_exploration} \\
+Frequentist fit & fit window, $19{,}731$ & $-0.0441$ & $0.0085$ & $0.0072$ & \ref{sec:frequentist}, \ref{sec:syst} \\
+Bayesian fit & fit window, $19{,}731$ & $-0.0443$ & $0.0085$ & $0.0070$ & \ref{sec:bayesian}, \ref{sec:syst} \\
+Bayesian fit, $D^0$ veto & $18{,}744$ & $-0.0496$ & $0.0088$ & -- & \apponly{sec:bayes_checks} \\
+Bayesian fit, ML selection & score $>0.5$, $15{,}709$ & $-0.0451$ & $0.0087$ & -- & \ref{sec:ml_stability_body} \\
+Frequentist fit, ML selection & score $>0.5$, $15{,}709$ & $-0.0447$ & $0.0086$ & -- & \ref{sec:ml_stability_body} \\
+Bayesian fit, Dalitz region of Ref.~\cite{lhcb_cpv_2013} & $2146$ & $-0.234$ & $0.025$ & -- & \ref{sec:dalitz} \\
+\midrule
+Published analysis (same data)~\cite{lhcb_cpv_2013} & different selection and model & $-0.060$ & $0.007$ & -- & -- \\
+\bottomrule
+\end{tabular}
+\caption{Summary of the raw asymmetry $\Araw$ (not corrected for production and detection asymmetries). The Bayesian value is the posterior median and its standard deviation; the systematic uncertainty is given only for the nominal fits (Sec.~\ref{sec:syst}). The published $\Araw$ comes from a different selection and a model with additional background components, so it is not directly comparable with the first rows.}
+\label{tab:summary}
+\end{table*}
+

@@ -587,6 +587,14 @@ if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex') and not
             return f'The symbols used in the text are listed in Table~\\ref{{{l}}}.\n\n' + m.group(0)
         return f'The result is shown in {kind}~\\ref{{{l}}}.\n\n' + m.group(0)
     ap = re.sub(r'\\begin\{(figure\*?|table\*?)\}.*?\\end\{\1\}', _cite, ap, flags=re.S)
+    # the cut at the maximum of the significance improvement: one sentence after the table of the three methods
+    _t3 = 'The result is shown in Table~\\ref{tab:three_methods}.'
+    _s3 = (' The tighter cut at the maximum of the significance improvement (score $>0.73$, $\\varepsilon_S=0.66$, $\\varepsilon_B=0.13$, '
+           'Fig.~\\ref{fig:ml_roc}b) gives shifts of $+0.004$ to $+0.005$, $0.9$ times their expected spread, and $A\\neq0$ is still $4.1\\sigma$; '
+           'this cut is not an optimum for the measurement, since $\\varepsilon_S/\\sqrt{\\varepsilon_B}$ holds for a signal small against the background, '
+           'while here the precision follows $S/\\sqrt{S+B}$ and worsens from $0.0085$ to $0.0097$.')
+    assert ap.count(_t3) == 1, 'three-methods sentence not found'
+    ap = ap.replace(_t3, _t3 + _s3)
     dense = ('\\appendix\n\\makeatletter\\renewcommand\\subsection{\\@startsection{subsection}{2}{\\z@}'
              '{1.1ex plus .3ex minus .2ex}{-0.6em}{\\normalfont\\bfseries}}\\makeatother\n')
     if '\\renewcommand\\subsection{' not in ap:
@@ -597,4 +605,32 @@ if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex') and not
         if os.path.exists(src):
             os.makedirs(os.path.dirname(f'{CUT}/{u}'), exist_ok=True)
             shutil.copy(src, f'{CUT}/{u}')
+    # the cut keeps its own final text for the sections that differ from the short (see cut_final/README.txt)
+    _FINAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cut_final')
+    for _f in sorted(os.listdir(_FINAL)):
+        if _f.endswith('.tex'):
+            shutil.copy(os.path.join(_FINAL, _f), f'{CUT}/main.tex' if _f == 'main.tex' else f'{CUT}/sections/{_f}')
     print('report_cut: body of the short + appendix')
+
+# ---- the short body is the cut body (cut_final/) -- the pointers to the appendices stay in the text but print nothing here
+_FINAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cut_final')
+_BODY = ('introduction', 'data', 'model', 'frequentist', 'bayesian', 'systematics', 'validation', 'dalitz', 'ml', 'conclusions')
+if os.path.isdir(_FINAL):
+    for _n in _BODY:
+        _src = os.path.join(_FINAL, _n + '.tex')
+        if os.path.exists(_src):
+            shutil.copy(_src, f'{OUT}/sections/{_n}.tex')
+    _m = open(OUT + '/main.tex').read()
+    _old = '\\newcommand{\\apponly}[1]{--}'
+    if '\\appfig' not in _m and _old in _m:
+        _m = _m.replace(_old, _old + '\\newcommand{\\appfig}[2]{}\\newcommand{\\appfigs}[4]{}\\newcommand{\\apprefsf}[3]{}', 1)
+        open(OUT + '/main.tex', 'w').write(_m)
+    # figures that the cut body uses and the short did not have (e.g. the PID scan of the systematics section)
+    _txt = ''.join(open(f'{OUT}/sections/{n}.tex').read() for n in _BODY)
+    for _f in set(re.findall(r'\\includegraphics(?:\[[^\]]*\])?\{(figures/[^}]+)\}', _txt)):
+        if not os.path.exists(f'{OUT}/{_f}'):
+            for _d in (CUT, os.path.abspath(os.path.join(BUILD, '..'))):
+                if os.path.exists(f'{_d}/{_f}'):
+                    shutil.copy(f'{_d}/{_f}', f'{OUT}/{_f}'); print('short: figure added', _f); break
+    print('report_short: body aligned to the cut (cut_final)')
+

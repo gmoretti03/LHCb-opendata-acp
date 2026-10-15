@@ -53,12 +53,12 @@ FFNN                      & --                & $0.857 \pm 0.012$ & $0.134$ \\
 
 The three non-linear ensembles and the FFNN improve the AUC by $\sim$0.09 over the linear models and by $\sim$0.04 over the single tree (Fig.~\ref{fig:ml_roc}), while their mutual differences ($\leq0.007$) are smaller than the test-set uncertainty ($0.012$). The FFNN training is reproducible (fixed seeds, deterministic operations); its dependence on the random initialization, measured by retraining it with ten seeds, is $0.854\pm0.005$ in test AUC.
 
-\begin{figure}[h]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/ml_nominal_roc.pdf}
-\caption{ROC curves on the test set, with the test AUC of each model in the legend (Table~\ref{tab:ml_models}); the reference model is drawn thicker, and the two logistic regressions overlap. The circle marks the cut on the reference score used in Sec.~\ref{sec:ml_stability}.}
+\includegraphics[width=0.95\textwidth]{figures/ml_nominal_roc.pdf}
+\caption{Test-set performance of the classifiers: (a) ROC curves, with the test AUC of each model in the legend (Table~\ref{tab:ml_models}); (b) significance improvement $\varepsilon_S/\sqrt{\varepsilon_B}$ of a cut on the score as a function of the signal-like efficiency, where $1$ is no selection and $\varepsilon_{S,B}$ are the fractions of signal-like and background-like candidates kept. The reference model is drawn thicker, and the two logistic regressions overlap. The circle marks the cut on the reference score used in Sec.~\ref{sec:ml_stability}.}
 \label{fig:ml_roc}
-\end{figure}
+\end{figure*}
 
 The two measures of the relevance of a feature available here -- the Random Forest importance (the decrease in Gini impurity $G=1-\sum_c p_c^2$, $p_c$ the class fractions in a node, produced by the splits on that feature) and the magnitude of the $L1$-regularized (Lasso~\cite{tibshirani_lasso}) logistic-regression coefficient of the standardized feature -- agree only partly (Fig.~\ref{fig:ml_features}; Spearman correlation of the two rankings $0.42$, $p=0.06$). The impact-parameter variables \texttt{IPChi2} dominate the Random Forest, while the Lasso coefficients are largest for \texttt{B\_FlightDistance}, \texttt{H3\_IPChi2}, \texttt{H2\_PZ} and \texttt{B\_VertexChi2}. The difference is expected: the Gini importance reflects the use of a feature in non-linear splits and interactions, and is shared among correlated features, while a linear coefficient measures the effect of a feature with the others held fixed. Both measures rank the two $B$-candidate variables among the top five (Random Forest 4th and 5th, Lasso 1st and 4th): they summarize in one number the displaced-vertex topology that the per-track variables encode only jointly.
 
@@ -152,27 +152,27 @@ The reference (gradient-boosting) score was applied to all candidates of the fit
 \label{fig:ml_threshold}
 \end{figure}
 
-Counting cannot reveal whether the selection deforms the mass spectrum. To test this, the selected sample (score $>0.5$, $15{,}709$ candidates) was refitted with the nominal mass model by both inference methods of this work, the Bayesian fit of Sec.~\ref{sec:bayesian} and the Frequentist maximum-likelihood fit of Sec.~\ref{sec:frequentist}, and the three estimates were compared with those of the full sample (Table~\ref{tab:three_methods}, Fig.~\ref{fig:ml_three}). The asymmetry is stable: all three shifts are within their expected nested-sample spread, and the significance of $A\neq0$ from the profile likelihood (Wilks' theorem~\cite{wilks}) is $5.2\sigma$ in both samples. The selection keeps $92\%$ of the fitted signal and $36\%$ of the background ($N_s=14{,}121$, $N_b=1590$), but this does not improve the precision on $\Araw$ ($0.0087$ against $0.0085$): the background under the peak is already small ($\approx$4\% in the signal window) and the fit separates it from the signal anyway.
+Counting cannot reveal whether the selection deforms the mass spectrum. To test this, the selected sample (score $>0.5$, $15{,}709$ candidates) was refitted with the nominal mass model by both inference methods of this work, the Bayesian fit of Sec.~\ref{sec:bayesian} and the Frequentist maximum-likelihood fit of Sec.~\ref{sec:frequentist}, and the three estimates were compared with those of the full sample (Table~\ref{tab:three_methods}, Fig.~\ref{fig:ml_three}). The asymmetry is stable: all three shifts are within their expected nested-sample spread, and the significance of $A\neq0$ from the profile likelihood (Wilks' theorem~\cite{wilks}) is $5.2\sigma$ in both samples. The same holds for the tighter cut at the maximum of the significance improvement (score $>0.73$, $\varepsilon_S=0.66$, $\varepsilon_B=0.13$, Fig.~\ref{fig:ml_roc}b): the three shifts, $+0.004$ to $+0.005$, are $0.9$ times their expected spread, and $A\neq0$ is still $4.1\sigma$. This cut is not an optimum for the measurement: the figure of merit $\varepsilon_S/\sqrt{\varepsilon_B}$ holds for a signal small against the background, while here the precision follows $S/\sqrt{S+B}$ and worsens from $0.0085$ to $0.0097$. The selection keeps $92\%$ of the fitted signal and $36\%$ of the background ($N_s=14{,}121$, $N_b=1590$), but this does not improve the precision on $\Araw$ ($0.0087$ against $0.0085$): the background under the peak is already small ($\approx$4\% in the signal window) and the fit separates it from the signal anyway.
 
 \begin{table*}[t]
 \centering
-\begin{tabular}{lccc}
+\begin{tabular}{lccccc}
 \toprule
-Method & Full sample & Score $>0.5$ & Shift (expected) \\
+Method & Full sample & Score $>0.5$ & Shift (expected) & Score $>0.73$ & Shift (expected) \\
 \midrule
-Bayesian fit    & $-0.0443\pm0.0085$ & $-0.0451\pm0.0087$ & $-0.0008\,(0.0018)$ \\
-Frequentist fit & $-0.0441\pm0.0085$ & $-0.0447\pm0.0086$ & $-0.0006\,(0.0012)$ \\
-Counting        & $-0.0432\pm0.0071$ & $-0.0446\pm0.0080$ & $-0.0014\,(0.0036)$ \\
+Bayesian fit    & $-0.0443\pm0.0085$ & $-0.0451\pm0.0087$ & $-0.0008\,(0.0018)$ & $-0.0404\pm0.0097$ & $+0.0039\,(0.0047)$ \\
+Frequentist fit & $-0.0441\pm0.0085$ & $-0.0447\pm0.0086$ & $-0.0006\,(0.0012)$ & $-0.0401\pm0.0097$ & $+0.0040\,(0.0048)$ \\
+Counting        & $-0.0432\pm0.0071$ & $-0.0446\pm0.0080$ & $-0.0014\,(0.0036)$ & $-0.0381\pm0.0093$ & $+0.0051\,(0.0059)$ \\
 \bottomrule
 \end{tabular}
-\caption{$\Araw$ on the full fit window ($19{,}731$ candidates) and after the cut on the gradient-boosting score ($15{,}709$), by the three methods. The expected shift is the statistical spread of a nested subsample, $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$. Counting includes the background.}
+\caption{$\Araw$ on the full fit window ($19{,}731$ candidates) and after the cuts on the gradient-boosting score at $0.5$ ($15{,}709$ candidates) and at $0.73$ ($11{,}658$), the maximum of the significance improvement of Fig.~\ref{fig:ml_roc}, by the three methods. The expected shift is the statistical spread of a nested subsample, $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$. Counting includes the background.}
 \label{tab:three_methods}
 \end{table*}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\columnwidth]{figures/short_ml_three.pdf}
-\caption{$\Araw$ from the Bayesian fit, the Frequentist fit and counting, for the full sample and the ML-selected one (Table~\ref{tab:three_methods}).}
+\caption{$\Araw$ from the Bayesian fit, the Frequentist fit and counting, for the full sample and the ML-selected ones, at a score cut of $0.5$ and at $0.73$, the maximum of the significance improvement (Table~\ref{tab:three_methods}).}
 \label{fig:ml_three}
 \end{figure}
 

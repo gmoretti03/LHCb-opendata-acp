@@ -38,7 +38,7 @@ Tutti i numeri sono quelli del report.
  \item \emph{clustering} (non supervisionato, K-means): guardare asimmetrie locali sul piano di Dalitz;
  \item \emph{incertezza} della predizione: confronto tra tre stimatori (spread della Random Forest, MC dropout, deep ensemble).
  \end{enumerate}
-\item \textbf{Il risultato}: un taglio $>0.5$ sul punteggio del gradient boosting tiene il $92\%$ del segnale e il $36\%$ del fondo e non cambia $\Araw$ oltre lo spread statistico atteso ($-0.0451\pm0.0087$ bayesiano, $-0.0447\pm0.0086$ frequentista, contro $-0.0443$ e $-0.0441$). Il ML non migliora la precisione perch\'e c'\`e poco fondo; non pu\`o rimuovere il fondo mal identificato sotto il picco.
+\item \textbf{Il risultato}: un taglio $>0.5$ sul punteggio del gradient boosting tiene il $92\%$ del segnale e il $36\%$ del fondo e non cambia $\Araw$ oltre lo spread statistico atteso ($-0.0451\pm0.0087$ bayesiano, $-0.0447\pm0.0086$ frequentista, contro $-0.0443$ e $-0.0441$); anche il taglio pi\`u stretto al massimo della significance improvement ($>0.73$, $11\,658$ candidati) lascia $\Araw$ entro $0.9$ volte lo spread atteso ($-0.0404\pm0.0097$ bayesiano, $-0.0401\pm0.0097$ frequentista). Il ML non migliora la precisione perch\'e c'\`e poco fondo; non pu\`o rimuovere il fondo mal identificato sotto il picco.
 \end{itemize}
 
 \begin{center}
@@ -270,8 +270,8 @@ FFNN (L12) & $32\!\to\!16$, ReLU, dropout 0.2 & -- & $0.857\pm0.012$ & $0.134$ \
 \item \textbf{Riferimento}: il GBM, scelto sull'AUC in cross-validation (non sul test). RF e FFNN sono indistinguibili entro l'incertezza del test ($0.012$; differenze reciproche $\le0.007$); i tre sono $\sim0.09$ sopra la logistica e $\sim0.04$ sopra l'albero singolo.
 \item \textbf{Albero singolo}: profondit\`a fissata a priori come baseline interpretabile, non potato; il guadagno di AUC del bagging/boosting ($0.04$) \`e il costo in varianza dell'albero singolo.
 \item \textbf{Bagging contro boosting}: RF (bagging, taglia la varianza) e GBM (boosting, taglia il bias) danno lo stesso AUC entro l'incertezza.
-\item \textbf{ROC/AUC}: incertezza di test per bootstrap ($2\,000$ ricampionamenti); punto di lavoro score $>0.5$: $88\%$ del signal-like e $28\%$ del background-like sul test; $92\%$ e $36\%$ sul campione completo.
-\item \textbf{Importanza}: Gini della RF contro $|$coefficiente$|$ Lasso: Spearman $\rho=0.42$ (concordano solo in parte). Le pi\`u utili: \code{IPChi2} dei tre adroni e le due variabili del $B$ (\code{B\_FlightDistance}, \code{B\_VertexChi2}) non usate nella preselezione, analogo del risultato ``le variabili di alto livello discriminano meglio'' dell'esercizio.
+\item \textbf{ROC/AUC}: incertezza di test per bootstrap ($2\,000$ ricampionamenti); punto di lavoro score $>0.5$: $88\%$ del signal-like e $28\%$ del background-like sul test; $92\%$ e $36\%$ sul campione completo. La figura della ROC ha un secondo pannello con la significance improvement $\varepsilon_S/\sqrt{\varepsilon_B}$ (extra, non nel corso): massimo $1.84$ a score $0.73$ per il GBM, $1.67$ a $0.5$; non \`e il taglio ottimo della misura, perch\'e qui il segnale domina e la precisione segue $S/\sqrt{S+B}$.
+\item \textbf{Importanza}: Gini della RF contro $|$coefficiente$|$ Lasso: Spearman $\rho=0.42$ ($p=0.06$, $20$ feature; la correlazione di Spearman \`e un extra, non nel corso: confronta due classifiche senza assumere la scala; concordano solo in parte). Le pi\`u utili: \code{IPChi2} dei tre adroni e le due variabili del $B$ (\code{B\_FlightDistance}, \code{B\_VertexChi2}) non usate nella preselezione, analogo del risultato ``le variabili di alto livello discriminano meglio'' dell'esercizio.
 \item \textbf{Ricerca di iperparametri} (oltre l'esercizio): RF $120$ configurazioni, GBM $100$ (griglia $5\times5\times4$), FFNN $168$; la CV \`e ripetuta. Miglioramento dell'AUC di test $\le0.005$, sotto l'incertezza ($0.012$): i default sono vicini all'ottimo; il massimo in CV \`e ottimistico (\emph{winner's curse}: $0.871$ contro $0.866$ e $0.868$ contro $0.865$).
 \item \textbf{Uso nella fisica}: il punteggio del GBM si applica a \emph{tutti} i candidati della finestra, non solo a quelli etichettati; tagli da $0.1$ a $0.9$; ricalcolo di $\Araw$ con conteggio e con i due fit. Lo spread atteso tra un campione annidato e il completo \`e $\sigma_B=\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$ (Barlow); lo shift resta entro $1.4\,\sigma_B$ su tutta la scansione: nessun bias rivelabile.
 \item \textbf{Sculpting (cambia la forma della massa?)}: s\`i, il $\chi^2$ del fit passa da $164/88$ a $253/88$ (bayesiano) dopo il taglio. Due ipotesi: il classificatore ricostruisce la massa dagli impulsi, oppure la selezione cambia la composizione del fondo. Il test: addestrare senza i nove componenti di impulso (AUC $0.860$) d\`a la stessa degradazione ($\chi^2=533/388$) $\Rightarrow$ \`e la composizione del fondo; l'efficienza del taglio vs massa lo conferma ($0.89$--$0.90$ al picco, $\approx0.70$ sotto $5150$ MeV, $0.06$--$0.13$ sopra $5375$ MeV).
@@ -288,7 +288,8 @@ alberi di regressione & non usati & il problema \`e di classificazione \\
 potatura a complessit\`a di costo & non usata & profondit\`a fissa e CV sugli iperparametri \\
 AdaBoost/XGBoost & GBM di scikit-learn (Friedman) & stessa famiglia; nessuna differenza attesa sotto $0.012$ \\
 subsample del boosting & non usato (default $1.0$) & -- \\
-confronto con Lasso & fatto, Spearman $0.42$ & stessa conclusione qualitativa \\
+confronto con Lasso & fatto, Spearman $0.42$ (extra) & stessa conclusione qualitativa \\
+significance improvement $\varepsilon_S/\sqrt{\varepsilon_B}$ & ROC + SIC, taglio al massimo ($0.73$) & extra: non nel corso; ha senso per un segnale piccolo, qui test di stabilit\`a \\
 \bottomrule
 \end{tabular}
 \end{center}

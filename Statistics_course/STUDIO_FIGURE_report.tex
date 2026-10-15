@@ -10,12 +10,13 @@
 \newcommand{\GeV}{\,\mathrm{GeV}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Var}{\mathrm{Var}}
-\newcommand{\fig}[2]{\begin{center}\includegraphics[width=\linewidth,height=#2\textheight,keepaspectratio]{../report_complete/figures/#1.pdf}\end{center}}
+\graphicspath{{../Docs/report_cut/figures/}{../Docs/report_build/figures/}{../Docs/report_extended/figures/}}
+\newcommand{\fig}[2]{\begin{center}\includegraphics[width=\linewidth,height=#2\textheight,keepaspectratio]{#1.pdf}\end{center}}
 \newcommand{\figh}[3]{\clearpage\needspace{0.6\textheight}\subsection*{#1}\addcontentsline{toc}{section}{#1}\fig{#2}{#3}}
 \newcommand{\sez}[1]{\par\Needspace{6\baselineskip}\medskip\noindent\textbf{\large #1}\par\nopagebreak\smallskip}
 \title{\textbf{Le figure del report, spiegate}\\[2pt]\large Frequentist and Bayesian Analysis of $B^\pm\to K^\pm K^+K^-$ at LHCb}
 \author{Marco Belotti, Giacomo Moretti -- appunti di studio}
-\date{Numerazione delle figure = quella di \texttt{report\_complete/main.pdf} (ottobre 2026)}
+\date{Numerazione delle figure = quella del report con appendice (\texttt{Docs/report\_cut/main.pdf}); $^{*}$ n.d.: figura non più nel report (ottobre 2026)}
 \begin{document}
 \maketitle
 \tableofcontents
@@ -71,7 +72,7 @@ Il contenuto di ogni bin è una variabile di Poisson, con fluttuazione relativa 
 \item \textbf{Forma.} Picco a $\approx5284\MeV$ di altezza $\approx900$ candidati per bin da $5\MeV$ su un fondo che scende da $\approx70$ per bin a $5100\MeV$ a $\approx7$ a $5600\MeV$: coerente con $N_b=4404$ distribuito su $100$ bin ($\approx44$ in media). Il rapporto segnale/fondo nella finestra $\pm2\sigma$ è circa $96\%$ di purezza.
 \item \textbf{Cariche.} Le due curve del pannello (a) hanno la stessa forma, quindi massa e risoluzione comuni sono plausibili. Con $A_{\rm count}=-0.0432$ il rapporto $N^-/N^+=(1+A)/(1-A)\approx0.92$: un $8\%$ di candidati in meno per $B^-$, cioè $\approx70$ candidati su $900$ al picco.
 \item \textbf{Perché non si vede a occhio.} In un bin la fluttuazione di Poisson è $\sqrt{900}\approx30$, il $3\%$: la differenza è $\approx2\sigma$ per bin. Sommando tutti i candidati il test binomiale esatto dà $6.1\sigma$; il fit, che usa la forma e separa il fondo, dà $5.2\sigma$ sull'asimmetria del \emph{segnale}. È la sommatoria dell'informazione su $\sim15$ bin del picco che rende la misura possibile.
-\item \textbf{Polarità.} Magnet down ha $\approx1.4$ volte il campione di up ($11\,636$ contro $8095$), con la stessa forma: i due campioni sono confrontabili e le misure per polarità (Fig.~XVII) sono indipendenti.
+\item \textbf{Polarità.} Magnet down ha $\approx1.4$ volte il campione di up ($11\,636$ contro $8095$), con la stessa forma: i due campioni sono confrontabili e le misure per polarità (Fig.~XXII) sono indipendenti.
 \end{enumerate}
 
 \sez{Limiti e orale}
@@ -79,11 +80,11 @@ Il contenuto di ogni bin è una variabile di Poisson, con fluttuazione relativa 
 \item La figura \emph{non prova} l'asimmetria: giustifica il modello e la finestra.
 \item \textbf{``Perché la finestra parte da $5100$ e non da $5000$?''} Sotto $5100\MeV$ il fondo parzialmente ricostruito cambia forma e il modello a due esponenziali non lo descrive; la finestra è variata nelle sistematiche (Tab.~II).
 \item \textbf{``Perché non si usa la massa del $B$ dalla simulazione?''} Perché $\mu$ è un parametro libero del fit: il valore fittato non viene imposto.
-\item Il picco non è esattamente gaussiano (Fig.~III): code più pesanti.
+\item Il picco non è esattamente gaussiano (Fig.~XX): code più pesanti.
 \end{itemize}
 
 % ======================================================================== II
-\figh{Fig.\ II --- Copertura degli intervalli di Wilks (Sez.\ IV~D, di Marco)}{frequentist_wilks_coverage}{0.30}
+\figh{Fig.\ IV --- Copertura degli intervalli di Wilks (Sez.\ IV~D, di Marco)}{frequentist_wilks_coverage}{0.30}
 \sez{Il problema}
 L'intervallo di confidenza frequentista al $68\%$ si ottiene tagliando il profilo di verosimiglianza a $q(A)\le1$. Quella ricetta si fonda su un teorema \emph{asintotico} (Wilks). Con $N\approx2\times10^4$ candidati e un modello a $12$ parametri vale davvero? Se non valesse, l'incertezza quotata sarebbe sbagliata. Bisogna verificarlo direttamente \emph{sui dati}.
 
@@ -126,13 +127,13 @@ dove $\hat{\hat\theta}(A_0)$ massimizza $L$ a $A=A_0$ (il \emph{profilo}) e $(\h
 \sez{Limiti e orale}
 \begin{itemize}
 \item Nel testo le $1000$ repliche sono bootstrap (ricampionamento dei dati), nel titolo del grafico ``toys'': vocabolario da uniformare (nota per Marco).
-\item Il bootstrap ricampiona i \emph{dati}, che contengono ciò che il modello non descrive (code del segnale); i toy bayesiani della Fig.~XVIII vengono dal \emph{modello} (test di chiusura). I due controlli non sono equivalenti: questo è più severo.
+\item Il bootstrap ricampiona i \emph{dati}, che contengono ciò che il modello non descrive (code del segnale); i toy bayesiani della Fig.~XXIII vengono dal \emph{modello} (test di chiusura). I due controlli non sono equivalenti: questo è più severo.
 \item \textbf{``Quando Wilks fallisce?''} Parametro al bordo (un yield vicino a $0$), pochi eventi, ipotesi non annidate, modello non identificabile sotto $H_0$. Qui $A\in(-1,1)$ è lontano dai bordi.
 \item \textbf{``Perché non usare direttamente la Hesse?''} Perché assume che $\ln L$ sia parabolica: il profilo (Minos) non lo assume; qui coincidono (Hesse $0.0085$, Minos $[-0.0526,-0.0356]$), e il confronto è parte del controllo.
 \end{itemize}
 
 % ======================================================================== III
-\figh{Fig.\ III --- Fit nominale ai due campioni di carica (Sez.\ V~C)}{bayes_nominal_mass_fit}{0.40}
+\figh{Fig.\ XX --- Fit nominale ai due campioni di carica (Sez.\ V~C)}{bayes_nominal_mass_fit}{0.40}
 \sez{Il problema}
 Le incertezze su $A$ valgono solo se il modello descrive i dati. Una dichiarazione di adeguatezza richiede di vedere il confronto modello--dati \emph{carica per carica}, perché un difetto presente in una sola carica potrebbe simulare un'asimmetria.
 
@@ -158,20 +159,20 @@ Il segnale gaussiano è un'approssimazione di una risposta del rivelatore che ha
 \item \textbf{Accordo globale.} Il modello segue i dati su due ordini di grandezza, dal fondo al picco, per entrambe le cariche.
 \item \textbf{Bontà numerica.} $\chi^2=95.4/50$ per $B^+$ ($1.9$ per bin) e $68.7/50$ per $B^-$ ($1.4$); totale $164.1/88=1.86$, ben oltre $1\pm0.15$. Il fit non è statisticamente perfetto.
 \item \textbf{Dove sbaglia.} Un raggruppamento di pull positivi ($\approx+3$) sul fianco sinistro del picco, $5220$--$5240\MeV$, in \emph{entrambe} le cariche: i dati eccedono il modello dove la gaussiana è più bassa della coda reale. Qualche pull a $\approx5170\MeV$ è negativo.
-\item \textbf{Carica per carica.} $B^+$ è peggio di $B^-$; la differenza $\chi^2(B^+)-\chi^2(B^-)=26.7$ è ripresa nella Fig.~XVI.
+\item \textbf{Carica per carica.} $B^+$ è peggio di $B^-$; la differenza $\chi^2(B^+)-\chi^2(B^-)=26.7$ è ripresa nella Fig.~XXI.
 \item \textbf{Conseguenza per $A$.} Con una Crystal Ball $\Araw$ cambia di $-0.0002$: l'asimmetria è determinata dall'\emph{altezza relativa} dei picchi di $B^+$ e $B^-$, non dalla forma delle code; il misfit è sulle code, comune alle due cariche.
 \end{enumerate}
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item Il $\chi^2$ binnato dipende dal binning (Fig.~XXIV): in bin da $2.5\MeV$ la stessa discrepanza dà $p=0.03$.
+\item Il $\chi^2$ binnato dipende dal binning (Fig.~XXVII): in bin da $2.5\MeV$ la stessa discrepanza dà $p=0.03$.
 \item Il fit \emph{unbinned} non minimizza questo $\chi^2$, quindi la statistica non è esattamente $\chi^2_{k-p}$: la distribuzione asintotica è compresa tra $\chi^2_{k-p}$ e $\chi^2_{k-1}$ (Chernoff--Lehmann).
-\item \textbf{``Se il modello non è perfetto, perché fidarsi di $\Araw$?''} Perché (i) $\Araw$ non dipende dalla forma delle code (shift $-0.0002$ con Crystal Ball), (ii) le varianti del fondo e della finestra sono nelle sistematiche, (iii) i toy di validazione dicono che stimatore e incertezze sono corretti \emph{se} il modello è giusto, e il PPC (Fig.~XV--XVI) mostra che la parte che conta per le cariche è riprodotta.
+\item \textbf{``Se il modello non è perfetto, perché fidarsi di $\Araw$?''} Perché (i) $\Araw$ non dipende dalla forma delle code (shift $-0.0002$ con Crystal Ball), (ii) le varianti del fondo e della finestra sono nelle sistematiche, (iii) i toy di validazione dicono che stimatore e incertezze sono corretti \emph{se} il modello è giusto, e il PPC (Fig.~XIX--XXI) mostra che la parte che conta per le cariche è riprodotta.
 \item \textbf{``Quale modello è migliore?''} Nessuno dei provati raggiunge $\chi^2/{\rm ndof}\approx1$ (il migliore, la Crystal Ball, dà $131.0/86$): è dichiarato come limitazione.
 \end{itemize}
 
 % ======================================================================== IV
-\figh{Fig.\ IV --- Posterior dei sei parametri fisici (corner plot, Sez.\ V~C)}{bayes_nominal_corner}{0.52}
+\figh{Fig.\ V --- Posterior dei sei parametri fisici (corner plot, Sez.\ V~C)}{bayes_nominal_corner}{0.52}
 \sez{Il problema}
 Il risultato bayesiano è una distribuzione di probabilità sui $12$ parametri. Come la si riassume, quanto è simmetrica, e quanto $A$ dipende dagli altri parametri? Quest'ultima domanda decide se profilare e marginalizzare danno lo stesso risultato.
 
@@ -200,18 +201,18 @@ Il risultato bayesiano è una distribuzione di probabilità sui $12$ parametri. 
 \item \textbf{Numeri.} $N_s=15\,328^{+132}_{-133}$ (incertezza $0.9\%$), $N_b=4404^{+83}_{-81}$ ($1.9\%$), $A=-0.0443\pm0.0085$ ($19\%$ del valore, cioè $5.2\sigma$), $A_b=-0.040^{+0.018}_{-0.017}$ ($2.3\sigma$), $\mu=5284.39\pm0.16\MeV$, $\sigma=18.00\pm0.14\MeV$ ($0.8\%$).
 \item \textbf{Forma.} Tutte le marginali sono simmetriche e unimodali: il posterior è quasi gaussiano, quindi mediana, moda e media coincidono entro $2\times10^{-4}$.
 \item \textbf{Correlazioni.} $A$ è quasi non correlato con gli altri; la correlazione maggiore è $-0.17$ con $A_b$. L'unica ellisse visibilmente inclinata è $N_s$--$N_b$ (il totale è fissato dai dati, le due componenti si compensano).
-\item \textbf{Conseguenza.} Posterior gaussiano e $A$ ortogonale ai nuisance $\Rightarrow$ marginalizzare (bayesiano) e profilare (frequentista) danno la stessa distribuzione, e Hesse, Minos e intervallo credibile coincidono (Fig.~IX).
+\item \textbf{Conseguenza.} Posterior gaussiano e $A$ ortogonale ai nuisance $\Rightarrow$ marginalizzare (bayesiano) e profilare (frequentista) danno la stessa distribuzione, e Hesse, Minos e intervallo credibile coincidono (Fig.~XIV).
 \end{enumerate}
 
 \sez{Limiti e orale}
 \begin{itemize}
 \item Sono mostrati $6$ dei $12$ parametri (gli altri sei, di forma del fondo, sono marginalizzati). La correlazione di $A$ con $A_b$ è l'unica non trascurabile: condizionare su $A_b=0$ sposta $A$ a $-0.0475$.
-\item \textbf{``Perché i contorni sono al $39\%$ e $86\%$ e non al $68\%$ e $95\%$?''} Perché in due dimensioni il contenuto di $1\sigma$ è $1-e^{-1/2}$; i livelli $68\%$ e $95\%$ si ottengono con raggi $1.51\sigma$ e $2.45\sigma$ (soglie $\chi^2_2$ di $2.30$ e $5.99$, Fig.~XXVII).
-\item $A_b$ è a $2.3$ deviazioni standard da zero, ma il Bayes factor lo \emph{favorisce} (Fig.~V, XIV): sono due domande diverse.
+\item \textbf{``Perché i contorni sono al $39\%$ e $86\%$ e non al $68\%$ e $95\%$?''} Perché in due dimensioni il contenuto di $1\sigma$ è $1-e^{-1/2}$; i livelli $68\%$ e $95\%$ si ottengono con raggi $1.51\sigma$ e $2.45\sigma$ (soglie $\chi^2_2$ di $2.30$ e $5.99$, Fig.~XXXI).
+\item $A_b$ è a $2.3$ deviazioni standard da zero, ma il Bayes factor lo \emph{favorisce} (Fig.~V$^{*}$, VI): sono due domande diverse.
 \end{itemize}
 
 % ======================================================================== V
-\figh{Fig.\ V --- Bayes factor contro l'ampiezza del prior (Sez.\ V~D)}{validation_bf_prior_width}{0.34}
+\figh{Fig.\ n.d.$^{*}$ --- Bayes factor contro l'ampiezza del prior (Sez.\ V~D)}{validation_bf_prior_width}{0.34}
 \sez{Il problema}
 Il $p$-value dice quanto è improbabile il dato sotto $H_0$. Il confronto bayesiano chiede una cosa diversa: quale ipotesi, $H_0$ ($A=0$) o $H_1$ ($A$ libero), il dato preferisca. La risposta bayesiana dipende dal prior: bisogna sapere \emph{quanto} dipende, perché un numero che cambia con un'arbitrarietà non è una conclusione.
 
@@ -247,14 +248,14 @@ Derivazione: $p(A=0\mid D)=\int p(D\mid A=0,\theta)\,\pi(A=0,\theta)\,d\theta/p(
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item Si usa l'approssimazione gaussiana perché a $5.2\sigma$ la catena non ha campioni a $A=0$ (Fig.~XIV).
+\item Si usa l'approssimazione gaussiana perché a $5.2\sigma$ la catena non ha campioni a $A=0$ (Fig.~VI).
 \item \textbf{``$p=2\times10^{-7}$ e $BF_{10}=9\times10^3$ sono la stessa cosa?''} No: il $p$-value è $P(\text{dati così estremi}\mid H_0)$, non la probabilità di $H_0$, e non dipende dal prior; il Bayes factor dipende dal prior e dà il rapporto tra le verosimiglianze marginali. Qui concordano nella conclusione, non nei numeri.
 \item \textbf{``Cos'è il paradosso di Lindley?''} Con un prior sempre più largo il Bayes factor favorisce $H_0$ \emph{qualunque} sia il dato: l'ipotesi con più volume di prior sprecato è penalizzata. Per questo si mostra la dipendenza da $W$.
 \item \textbf{``Perché prior uniforme?''} Non informativo e con effetto trascurabile sul posterior ($N\approx2\times10^4$); conta solo per il Bayes factor.
 \end{itemize}
 
 % ======================================================================== VI
-\figh{Fig.\ VI --- Potenza del test di $A=0$ (Sez.\ VII~A)}{validation_power}{0.34}
+\figh{Fig.\ n.d.$^{*}$ --- Potenza del test di $A=0$ (Sez.\ VII~A)}{validation_power}{0.34}
 \sez{Il problema}
 Un test che rigetta $A=0$ a $5.2\sigma$ è convincente solo se si conosce (i) la frequenza con cui rigetta a torto quando $A=0$ (\emph{taglia}), e (ii) la frequenza con cui rileva un effetto \emph{vero} (\emph{potenza}). Senza la prima il $p$-value non è interpretabile; senza la seconda non si sa che asimmetrie minime sarebbero risolte.
 
@@ -287,14 +288,14 @@ Per $A=0.02$ ($|A|/\sigma=2.35$): $\alpha=0.05$ ($z=1.96$) dà $\Phi(0.39)=0.65$
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item Il $5.2\sigma$ dei dati ($q=27$) è un'estrapolazione della coda $\chi^2_1$: con $293$ toy a $A=0$ si verifica solo fino al livello $3\sigma$ (Fig.~XXII).
+\item Il $5.2\sigma$ dei dati ($q=27$) è un'estrapolazione della coda $\chi^2_1$: con $293$ toy a $A=0$ si verifica solo fino al livello $3\sigma$ (Fig.~XXVI).
 \item \textbf{``Cosa vuol dire $5.2\sigma$?''} $Z=\sqrt{q}$ con $q=27$ (convenzione a due code, $5.06\sigma$ a una coda), $p=2\times10^{-7}$; è la significatività di un'asimmetria \emph{raw}, non di violazione di CP.
 \item \textbf{``Taglia e potenza si possono ottimizzare insieme?''} No: abbassare $\alpha$ riduce la potenza; il lemma di Neyman--Pearson dice quale test è il più potente a $\alpha$ fissato.
 \item \textbf{``Differenza tra potenza e significatività?''} La significatività riguarda un dato osservato sotto $H_0$; la potenza riguarda la probabilità di scoprire un'asimmetria \emph{ipotetica} prima di guardare i dati.
 \end{itemize}
 
 % ======================================================================== VII
-\figh{Fig.\ VII --- Mappe di Dalitz a griglia fissa $8\times8$ (Sez.\ VIII)}{bayes_nominal_dalitz_maps}{0.26}
+\figh{Fig.\ XI --- Mappe di Dalitz a griglia fissa $8\times8$ (Sez.\ VIII)}{bayes_nominal_dalitz_maps}{0.26}
 \sez{Il problema}
 L'asimmetria globale potrebbe essere la media di effetti di segno diverso concentrati in regioni cinematiche precise (la fisica delle risonanze lo suggerisce). Se così fosse, il valore globale ne nasconderebbe la struttura. Si vuole sapere se l'asimmetria è \emph{uniforme} sullo spazio delle fasi, con un test che non dipende dalla scelta della regione.
 
@@ -327,15 +328,15 @@ In un decadimento a tre corpi la cinematica ha due variabili indipendenti, p.~es
 \sez{Limiti e orale}
 \begin{itemize}
 \item Sono conteggi \emph{senza} sottrazione del fondo per pesi (sWeight) e senza correzione di rivelazione; le variazioni locali possono essere in parte strumentali, perché l'asimmetria di interazione $K^\pm$-materiale dipende dall'impulso, correlato con la posizione nel Dalitz.
-\item Il $\chi^2$ globale è un test frequentista per costruzione; la controparte bayesiana è presente solo nel fit della regione pubblicata (Fig.~VIII).
+\item Il $\chi^2$ globale è un test frequentista per costruzione; la controparte bayesiana è presente solo nel fit della regione pubblicata (Fig.~XXX).
 \item \textbf{``Perché una griglia $8\times8$?''} Fissata \emph{prima} di guardare le asimmetrie (compromesso tra risoluzione e statistica per bin); la robustezza a $6\times6$, $10\times10$, $12\times12$ è mostrata in App.~G.
 \item \textbf{``Perché non $\chi^2$ per ogni bin?''} Perché un test su $32$ bin soffre di look-elsewhere; il $\chi^2$ globale e il confronto con il valore globale lo evitano.
 \end{itemize}
 
 % ======================================================================== VIII
-\figh{Fig.\ VIII --- Piano di Dalitz ordinato e regione dell'analisi pubblicata (Sez.\ VIII)}{ml_nominal_dalitz_region}{0.30}
+\figh{Fig.\ XXX --- Piano di Dalitz ordinato e regione dell'analisi pubblicata (Sez.\ VIII)}{ml_nominal_dalitz_region}{0.30}
 \sez{Il problema}
-Il pattern trovato (Fig.~VII) è una scoperta dei nostri dati o riproduce un risultato noto? Per rispondere senza bias di selezione si usa una regione fissata \emph{a priori} dall'articolo, non scelta guardando i nostri dati.
+Il pattern trovato (Fig.~XI) è una scoperta dei nostri dati o riproduce un risultato noto? Per rispondere senza bias di selezione si usa una regione fissata \emph{a priori} dall'articolo, non scelta guardando i nostri dati.
 
 \sez{Teoria}
 Perché l'asimmetria sia \emph{locale}: l'ampiezza di decadimento è somma di contributi, $\mathcal A=\sum_ra_re^{i(\delta_r+\phi_r)}$, con fase \emph{forte} $\delta_r$ (uguale per $B^+$ e $B^-$) e fase \emph{debole} $\phi_r$ (cambia segno nel coniugato CP). Per due ampiezze di modulo relativo $r$ e differenze di fase $\Delta\delta$, $\Delta\phi$:
@@ -372,7 +373,7 @@ L'asimmetria di \emph{conteggio} mescola segnale e fondo: $A_{\rm count}=(N_sA+N
 \end{itemize}
 
 % ======================================================================== IX
-\figh{Fig.\ IX --- Profilo contro posterior; le due polarità (Sez.\ IX~A)}{validation_profile_polarity}{0.30}
+\figh{Fig.\ XIV --- Profilo contro posterior; le due polarità (Sez.\ IX~A)}{validation_profile_polarity}{0.30}
 \sez{Il problema}
 I due metodi eliminano i nuisance in modo diverso: il frequentista \emph{profila} (massimizza), il bayesiano \emph{marginalizza} (integra). Danno la stessa distribuzione per $A$? E l'asimmetria è coerente tra le due polarità del magnete, o è un artefatto dell'una?
 
@@ -406,13 +407,13 @@ Con $-0.0492\pm0.0111$ e $-0.0374\pm0.0131$ si ottiene $-0.0443\pm0.0085$, il va
 \sez{Limiti e orale}
 \begin{itemize}
 \item Il test copre la parte dell'asimmetria di rivelazione che cambia segno con la polarità, \emph{non} l'interazione $K^\pm$-materiale (indipendente dalla polarità).
-\item \textbf{``Profilo e marginale coincidono sempre?''} No: solo se la verosimiglianza è quasi gaussiana e il prior non informativo; con forti non-linearità o prior informativi differiscono (a bassa statistica, Fig.~XXVIII, restano comunque vicini).
+\item \textbf{``Profilo e marginale coincidono sempre?''} No: solo se la verosimiglianza è quasi gaussiana e il prior non informativo; con forti non-linearità o prior informativi differiscono (a bassa statistica, Fig.~XXXII, restano comunque vicini).
 \item \textbf{``Perché sommare i $q$?''} Perché le due verosimiglianze sono indipendenti e il log del prodotto è la somma; se il nuisance fosse condiviso servirebbe un fit congiunto, ed è quello tratteggiato.
 \item \textbf{``$0.7\sigma$ è compatibile?''} Sì: ci si aspetta di vedere differenze $>0.7\sigma$ nel $48\%$ dei casi se le polarità hanno lo stesso $A$.
 \end{itemize}
 
 % ======================================================================== X
-\figh{Fig.\ X --- Cintura di confidenza di Neyman (App.\ C.2)}{validation_neyman_belt}{0.40}
+\figh{Fig.\ XV --- Cintura di confidenza di Neyman (App.\ C.2)}{validation_neyman_belt}{0.40}
 \sez{Il problema}
 L'intervallo del profilo ($q\le1$) è una \emph{scorciatoia} giustificata da Wilks. Qual è la costruzione \emph{definitoria} dell'intervallo di confidenza, e porta allo stesso risultato? Se sì, la scorciatoia è giustificata \emph{senza} appellarsi a un teorema asintotico.
 
@@ -448,7 +449,7 @@ L'intervallo del profilo ($q\le1$) è una \emph{scorciatoia} giustificata da Wil
 
 % ======================================================================== XI
 
-\figh{Fig.\ XI --- $\Araw$ per terzili del momento del $B$ (App.\ C.2)}{momentum_terciles}{0.30}
+\figh{Fig.\ XVI --- $\Araw$ per terzili del momento del $B$ (App.\ C.2)}{momentum_terciles}{0.30}
 
 \sez{Il problema}
 L'asimmetria di rivelazione dei kaoni dipende dal loro impulso (le sezioni d'urto di $K^+$ e $K^-$ nel materiale cambiano con $p$), e l'asimmetria di produzione del $B$ dipende da $p_T$ e pseudorapidità. Se $\Araw$ fosse in parte strumentale o di produzione dovrebbe variare con il momento del $B$. Si misura in tre intervalli.
@@ -483,7 +484,7 @@ distribuito come $\chi^2$ con $k-1=2$ gradi di libertà sotto l'ipotesi di valor
 \end{itemize}
 
 
-\figh{Fig.\ XII --- Incertezze dei dodici parametri con tre metodi (App.\ C.3)}{uncertainties_12}{0.30}
+\figh{Fig.\ XVII --- Incertezze dei dodici parametri con tre metodi (App.\ C.3)}{uncertainties_12}{0.30}
 
 \sez{Il problema}
 L'incertezza di Hesse è un'approssimazione asintotica (parabola di $\ln L$ al minimo). Dà la stessa incertezza di due stime indipendenti, bootstrap sui dati e posterior, non solo per $A$ ma per \emph{tutti} i parametri, compresi i nuisance?
@@ -504,7 +505,7 @@ L'incertezza di Hesse è un'approssimazione asintotica (parabola di $\ln L$ al m
 \begin{enumerate}
 \item \textbf{Posterior.} Dentro il $10\%$ per tutti i parametri (rapporti $0.96$--$1.09$): coincide con Hesse, come atteso per un posterior quasi gaussiano.
 \item \textbf{Bootstrap per i parametri fisici.} $A$ ($0.997$), $A_b$ ($1.035$), $\mu$ ($1.00$), $\sigma$ ($1.07$): nella fascia.
-\item \textbf{Eccezioni.} $N_s$ ($0.55$) e $N_b$ ($0.88$): è l'effetto del totale fisso. Anche $\lambda_1^+$ ($0.74$): la pendenza ripida del fondo $B^+$ è il parametro peggio vincolato (cfr.~il trace plot, Fig.~XIII) e la sua verosimiglianza è non parabolica.
+\item \textbf{Eccezioni.} $N_s$ ($0.55$) e $N_b$ ($0.88$): è l'effetto del totale fisso. Anche $\lambda_1^+$ ($0.74$): la pendenza ripida del fondo $B^+$ è il parametro peggio vincolato (cfr.~il trace plot, Fig.~XVIII) e la sua verosimiglianza è non parabolica.
 \item \textbf{Conseguenza.} Per $A$ e per i parametri che contano le tre stime coincidono: l'incertezza di Hesse è affidabile.
 \end{enumerate}
 
@@ -515,7 +516,7 @@ L'incertezza di Hesse è un'approssimazione asintotica (parabola di $\ln L$ al m
 \item \textbf{``Perché il bootstrap dà $\sigma(N_s)=\sigma(N_b)$?''} Perché il totale è fisso, quindi si compensano esattamente.
 \end{itemize}
 
-\figh{Fig.\ XIII --- Tracce dei walker (App.\ D.5)}{bayes_nominal_trace}{0.52}
+\figh{Fig.\ XVIII --- Tracce dei walker (App.\ D.5)}{bayes_nominal_trace}{0.52}
 \sez{Il problema}
 Una catena MCMC campiona il posterior solo dopo essere \emph{convergita}. Se i walker partono da punti diversi ed arrivano alla stessa regione, e restano stazionari, la catena è affidabile. Bisogna \emph{vedere} che non è intrappolata vicino al punto di partenza né in una moda secondaria.
 
@@ -550,12 +551,12 @@ Una catena MCMC campiona il posterior solo dopo essere \emph{convergita}. Se i w
 \end{itemize}
 
 % ======================================================================== XII
-\figh{Fig.\ XIV --- Rapporto di Savage--Dickey (App.\ D.11)}{bayes_nominal_savage_dickey}{0.30}
+\figh{Fig.\ VI --- Rapporto di Savage--Dickey (App.\ D.11)}{bayes_nominal_savage_dickey}{0.30}
 \sez{Il problema}
-La Fig.~V mostra il Bayes factor in funzione del prior; qui si vede \emph{come} è costruito dai suoi due ingredienti: la densità posteriore e la densità del prior nel punto nullo. Permette anche di giudicare se l'approssimazione gaussiana in coda è ragionevole.
+La Fig.~V$^{*}$ mostra il Bayes factor in funzione del prior; qui si vede \emph{come} è costruito dai suoi due ingredienti: la densità posteriore e la densità del prior nel punto nullo. Permette anche di giudicare se l'approssimazione gaussiana in coda è ragionevole.
 
 \sez{Teoria}
-$BF_{01}=p(\theta=0\mid D)/\pi(\theta=0)$ (derivazione in Fig.~V). Il prior su $A$, $A_b$ è uniforme su $(-1,1)$ con densità $0.5$. La densità posteriore a $0$ va stimata in una \emph{coda}: a $5.2\sigma$ la probabilità oltre $0$ è $\sim2\times10^{-7}$, quindi in $6.7\times10^5$ campioni se ne attendono $\sim0.13$: la catena non contiene punti a $A=0$ e un istogramma o un kernel estimator non servono (rifletterebbero la banda del kernel). Si usa l'approssimazione gaussiana con media e deviazione standard della catena, giustificata dalla forma del posterior (Fig.~IV).
+$BF_{01}=p(\theta=0\mid D)/\pi(\theta=0)$ (derivazione in Fig.~V$^{*}$). Il prior su $A$, $A_b$ è uniforme su $(-1,1)$ con densità $0.5$. La densità posteriore a $0$ va stimata in una \emph{coda}: a $5.2\sigma$ la probabilità oltre $0$ è $\sim2\times10^{-7}$, quindi in $6.7\times10^5$ campioni se ne attendono $\sim0.13$: la catena non contiene punti a $A=0$ e un istogramma o un kernel estimator non servono (rifletterebbero la banda del kernel). Si usa l'approssimazione gaussiana con media e deviazione standard della catena, giustificata dalla forma del posterior (Fig.~V).
 
 \sez{Come si legge}
 \begin{enumerate}
@@ -579,11 +580,11 @@ $BF_{01}=p(\theta=0\mid D)/\pi(\theta=0)$ (derivazione in Fig.~V). Il prior su $
 \item La scala logaritmica ingigantisce le code: la gaussiana è accurata dove c'è massa, la sua coda a $5\sigma$ è un'estrapolazione (controllata solo dal fatto che la forma è gaussiana al centro).
 \item \textbf{``Perché non usare un kernel density estimator?''} Perché senza campioni nella coda restituisce solo la banda del kernel.
 \item \textbf{``Savage--Dickey vale sempre?''} Solo per ipotesi annidate con prior condizionali condivisi; altrimenti serve l'evidenza (bridge sampling o simili).
-\item \textbf{``Sensibilità al prior?''} $BF\propto W$; vedi Fig.~V.
+\item \textbf{``Sensibilità al prior?''} $BF\propto W$; vedi Fig.~V$^{*}$.
 \end{itemize}
 
 % ======================================================================== XIII
-\figh{Fig.\ XV --- Posterior predictive check (App.\ D.13)}{bayes_nominal_ppc}{0.22}
+\figh{Fig.\ XIX --- Posterior predictive check (App.\ D.13)}{bayes_nominal_ppc}{0.22}
 \sez{Il problema}
 Il $\chi^2$ calcolato alle mediane a posteriori usa un solo valore dei parametri e ignora l'incertezza su di essi. Come si valuta l'adeguatezza del modello \emph{tenendone conto}, e con statistiche mirate a caratteristiche specifiche dei dati?
 
@@ -612,16 +613,16 @@ In pratica: per $j=1,\dots,1000$ si estrae $\theta_j$ dalla catena, si genera $y
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item (b) \emph{non è informativo}: $A$ è un parametro fittato, quindi le repliche sono centrate sul dato per costruzione. Per questo la Fig.~XVI usa statistiche non fittate.
+\item (b) \emph{non è informativo}: $A$ è un parametro fittato, quindi le repliche sono centrate sul dato per costruzione. Per questo la Fig.~XXI usa statistiche non fittate.
 \item \textbf{``Differenza tra $p_B$ e il $p$-value classico?''} $p_B$ marginalizza sul posterior dei parametri (i parametri sono incerti), il $p$-value classico fissa $\theta$ (ipotesi nulla). $p_B$ non è uniforme sotto il modello corretto; è conservativo.
 \item \textbf{``Perché il PPC e non solo il $\chi^2$?''} Perché testa specifiche caratteristiche (asimmetria nelle bande) con l'incertezza dei parametri.
 \item Il $\chi^2$ in (a) è calcolato \emph{con i parametri della replica}, non alle mediane: per questo $\approx104$ e non $\approx88$.
 \end{itemize}
 
 % ======================================================================== XIV
-\figh{Fig.\ XVI --- PPC con statistiche non fittate dal modello (App.\ D.14)}{validation_ppc_unfitted}{0.22}
+\figh{Fig.\ XXI --- PPC con statistiche non fittate dal modello (App.\ D.14)}{validation_ppc_unfitted}{0.22}
 \sez{Il problema}
-Un controllo ha potere solo se testa qualcosa che il fit \emph{non} ha già aggiustato. La Fig.~XV (b) è banale perché $A$ è fittato. Quali statistiche sono \emph{predette} dal modello senza essere adattate, e che dicono delle cariche?
+Un controllo ha potere solo se testa qualcosa che il fit \emph{non} ha già aggiustato. La Fig.~XIX (b) è banale perché $A$ è fittato. Quali statistiche sono \emph{predette} dal modello senza essere adattate, e che dicono delle cariche?
 
 \sez{Teoria}
 In una fetta di massa $m$ l'asimmetria di conteggio è la media pesata con la frazione locale di segnale:
@@ -655,7 +656,7 @@ Poiché il fondo di ciascuna carica ha una forma propria ($\lambda^\pm$, $f_\pm$
 \end{itemize}
 
 % ======================================================================== XV
-\figh{Fig.\ XVII --- Posterior di $\Araw$ per polarità (App.\ D.15)}{bayes_nominal_magnet}{0.33}
+\figh{Fig.\ XXII --- Posterior di $\Araw$ per polarità (App.\ D.15)}{bayes_nominal_magnet}{0.33}
 \sez{Il problema}
 L'asimmetria potrebbe essere un artefatto di una sola polarità del magnete (effetto strumentale destra--sinistra). Si misura separatamente e si guarda se le due misure concordano.
 
@@ -687,7 +688,7 @@ L'asimmetria potrebbe essere un artefatto di una sola polarità del magnete (eff
 \end{itemize}
 
 % ======================================================================== XVI
-\figh{Fig.\ XVIII --- Copertura del posterior su toy MC (App.\ D.16)}{bayes_nominal_toys}{0.30}
+\figh{Fig.\ XXIII --- Copertura del posterior su toy MC (App.\ D.16)}{bayes_nominal_toys}{0.30}
 \sez{Il problema}
 L'intervallo credibile è una probabilità sul parametro, \emph{non} ha copertura garantita. Con prior piatti e $N\approx2\times10^4$ la ha in pratica? Se sì, è legittimo confrontarlo con quello frequentista.
 
@@ -711,7 +712,7 @@ L'intervallo credibile è una probabilità sul parametro, \emph{non} ha copertur
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item È un test di \emph{chiusura} (dati generati dal modello), diverso dal bootstrap sui dati della Fig.~II: testa la procedura, non il modello.
+\item È un test di \emph{chiusura} (dati generati dal modello), diverso dal bootstrap sui dati della Fig.~IV: testa la procedura, non il modello.
 \item La legenda dice ``pseudo-datasets'': il report usa ``toy MC''.
 \item $200$ toy bastano solo per controlli a $\sim3\%$; con $1000$ (come il frequentista) l'errore scenderebbe a $1.5\%$.
 \item \textbf{``Perché una catena di $12\,000$ passi per toy e non $25\,000$?''} Per limitare il tempo di calcolo ($200$ fit); $\tau\approx150$ passi, quindi $12\,000$ sono $\sim80\tau$, sopra la soglia di $50$.
@@ -719,14 +720,14 @@ L'intervallo credibile è una probabilità sul parametro, \emph{non} ha copertur
 
 
 % ======================================================================== NEW syst_variants
-\figh{Fig.\ XIX --- Spostamenti di tutte le varianti (App.\ E.5)}{syst_variants}{0.50}
+\figh{Fig.\ XIII --- Spostamenti di tutte le varianti (App.\ E.5)}{syst_variants}{0.50}
 \sez{Il problema}
 La Tab.~II dà tredici spostamenti per due metodi: ventisei numeri, più le incertezze attese. Servono due cose che la tabella mostra male: (i) i due metodi danno gli stessi spostamenti \emph{variante per variante}; (ii) quale gruppo domina, e quanto di ogni spostamento è compatibile con una fluttuazione statistica.
 
 \sez{Teoria}
 Lo studio delle sistematiche cambia una scelta alla volta rispetto al nominale e misura lo spostamento $\Delta=A^{\rm var}_{\rm raw}-A^{\rm nom}_{\rm raw}$. Le regole sono quattro.
 \begin{enumerate}
-\item \textbf{Varianti che cambiano il campione} (finestra, preselezione): il campione variato è contenuto nel nominale, quindi parte di $\Delta$ è una fluttuazione statistica di dimensione attesa $\sigma_B=\sqrt{|\sigma_{\rm var}^2-\sigma_{\rm nom}^2|}$ (Fig.~XXI). La variante contribuisce solo se $|\Delta|>\sigma_B$.
+\item \textbf{Varianti che cambiano il campione} (finestra, preselezione): il campione variato è contenuto nel nominale, quindi parte di $\Delta$ è una fluttuazione statistica di dimensione attesa $\sigma_B=\sqrt{|\sigma_{\rm var}^2-\sigma_{\rm nom}^2|}$ (Fig.~XXIV). La variante contribuisce solo se $|\Delta|>\sigma_B$.
 \item \textbf{Varianti sullo stesso campione} (fondo, segnale): non c'è fluttuazione statistica da sottrarre, si usa $\Delta$ intero.
 \item \textbf{Varianti rifiutate dai dati} ($\Delta\chi^2>25$ sugli stessi dati): escluse; è il caso dell'esponenziale singola ($\Delta\chi^2=134$).
 \item \textbf{Combinazione:} per gruppo (finestra, fondo, segnale, preselezione) si prende il massimo contributo; i gruppi si sommano in quadratura.
@@ -754,7 +755,7 @@ Il raggruppamento riflette che varianti dello stesso gruppo sono \emph{alternati
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item La sistematica dominante (preselezione) è anche la più compatibile con una fluttuazione: l'incertezza sistematica è \emph{conservativa}. La Fig.~XX lo mostra con la scansione.
+\item La sistematica dominante (preselezione) è anche la più compatibile con una fluttuazione: l'incertezza sistematica è \emph{conservativa}. La Fig.~XII lo mostra con la scansione.
 \item \textbf{``Perché il massimo per gruppo e non la somma?''} Le varianti di un gruppo sono alternative per la stessa scelta; sommarle conterebbe più volte lo stesso effetto.
 \item \textbf{``Perché in quadratura?''} Gruppi diversi sono scelte indipendenti: le incertezze indipendenti si sommano in quadratura.
 \item \textbf{``Come si distingue sistematico da statistico?''} Con $\sigma_B$ per i campioni annidati; per le varianti sullo stesso campione ogni spostamento è per definizione sistematico (il campione è identico).
@@ -762,7 +763,7 @@ Il raggruppamento riflette che varianti dello stesso gruppo sono \emph{alternati
 \end{itemize}
 
 % ======================================================================== NEW syst_pid_scan
-\figh{Fig.\ XX --- Scansione dei tagli di identificazione (App.\ E.6)}{syst_pid_scan}{0.30}
+\figh{Fig.\ XII --- Scansione dei tagli di identificazione (App.\ E.6)}{syst_pid_scan}{0.30}
 \sez{Il problema}
 La preselezione domina la sistematica con una sola variante ($\mathtt{ProbK}>0.6$, $+0.0058$). Quel valore è un effetto vero del taglio o una fluttuazione statistica del sottocampione? Una singola variante non lo dice: serve guardare l'andamento \emph{lungo il taglio}.
 
@@ -796,7 +797,7 @@ Ci sono due comportamenti attesi. (i) Se lo spostamento è una \emph{fluttuazion
 \end{itemize}
 
 % ======================================================================== XVII
-\figh{Fig.\ XXI --- Validazione della regola per campioni annidati (App.\ E.8)}{validation_barlow}{0.28}
+\figh{Fig.\ XXIV --- Validazione della regola per campioni annidati (App.\ E.8)}{validation_barlow}{0.28}
 \sez{Il problema}
 Una variante di selezione (es.\ $\mathtt{ProbK}>0.6$) \emph{rimuove} candidati e sposta $\hat A$. Quanto di questo spostamento è un \emph{effetto sistematico} del modello e quanto è una fluttuazione statistica del sottocampione? Senza distinguerli, ogni variante conterebbe come sistematica e si sovrastimerebbe l'incertezza.
 
@@ -832,7 +833,7 @@ Una variante conta solo se $|\Delta|>\sigma_B$ (Barlow). Si applica ai cambi di 
 \end{itemize}
 
 % ======================================================================== XVIII
-\figh{Fig.\ XXII --- Validità del teorema di Wilks (App.\ F)}{validation_null_wilks}{0.28}
+\figh{Fig.\ XXVI --- Validità del teorema di Wilks (App.\ F)}{validation_null_wilks}{0.28}
 \sez{Il problema}
 Il $p$-value $2\times10^{-7}$ dipende dall'assunzione $q(0)\sim\chi^2_1$ fino a $q=27$. Si può verificare questa assunzione, e fin dove?
 
@@ -867,7 +868,7 @@ Il $p$-value $2\times10^{-7}$ dipende dall'assunzione $q(0)\sim\chi^2_1$ fino a 
 \end{itemize}
 
 % ======================================================================== XIX
-\figh{Fig.\ XXIII --- Iniezione di asimmetrie: bias, efficienza, potenza (App.\ F)}{validation_injection_power}{0.26}
+\figh{Fig.\ VII --- Iniezione di asimmetrie: bias, efficienza, potenza (App.\ F)}{validation_injection_power}{0.26}
 \sez{Il problema}
 Lo stimatore $\hat A$ è corretto, e l'incertezza di Hesse è quella vera, \emph{per ogni} valore dell'asimmetria iniettata, non solo per quello trovato nei dati? Se il bias dipendesse da $A$, il risultato sarebbe difficile da fidare.
 
@@ -879,7 +880,7 @@ Lo stimatore $\hat A$ è corretto, e l'incertezza di Hesse è quella vera, \emph
 \item Asse $x$ comune: $A_{\rm true}$ iniettato ($-0.1,-0.0441,-0.02,0,+0.05$).
 \item \textbf{(a)} $y=\langle\hat A\rangle-A_{\rm true}$ con errore standard: i punti devono stare su $0$ (linea punteggiata).
 \item \textbf{(b)} $y$ = due rapporti: $\mathrm{sd}(\hat A)/\langle\sigma_{\rm Hesse}\rangle$ (quadrati) e deviazione standard dei pull (cerchi): devono stare su $1$.
-\item \textbf{(c)} Probabilità di rigettare $A=0$ con $q>3.84$ e $q>9$: la stessa informazione della Fig.~VI.
+\item \textbf{(c)} Probabilità di rigettare $A=0$ con $q>3.84$ e $q>9$: la stessa informazione della Fig.~VI$^{*}$.
 \item Cosa guardare: andamenti sistematici con $A_{\rm true}$ (una deriva indicherebbe un bias dipendente dal valore).
 \end{enumerate}
 
@@ -887,7 +888,7 @@ Lo stimatore $\hat A$ è corretto, e l'incertezza di Hesse è quella vera, \emph
 \begin{enumerate}
 \item \textbf{(a) Bias.} Al più $0.0008$ in valore assoluto ($1.6$ errori standard), tra $\approx-0.0008$ ($A_{\rm true}=-0.02$) e $+0.0002$ ($A_{\rm true}=0$): nessuna dipendenza sistematica, i punti scattano attorno a zero.
 \item \textbf{(b) Efficienza.} Rapporti tra $0.94$ e $1.05$: la dispersione reale dello stimatore coincide (entro $6\%$) con l'incertezza di Hesse; la larghezza dei pull ha lo stesso andamento.
-\item \textbf{(c)} Potenza vedi Fig.~VI.
+\item \textbf{(c)} Potenza vedi Fig.~VI$^{*}$.
 \item \textbf{Conseguenza.} Lo stimatore ML è non polarizzato e raggiunge il limite di Cramér--Rao a questa statistica, e l'incertezza di Hesse ($0.0085$) è l'incertezza statistica corretta a ogni $A$ iniettato.
 \end{enumerate}
 
@@ -899,7 +900,7 @@ Lo stimatore $\hat A$ è corretto, e l'incertezza di Hesse è quella vera, \emph
 \end{itemize}
 
 % ======================================================================== XX
-\figh{Fig.\ XXIV --- $\chi^2$ binnato e binning (App.\ F)}{validation_gof_toys}{0.30}
+\figh{Fig.\ XXVII --- $\chi^2$ binnato e binning (App.\ F)}{validation_gof_toys}{0.30}
 \sez{Il problema}
 Il $p$-value del $\chi^2$ è $5\times10^{-6}$ in bin da $10\MeV$ e $0.03$ in bin da $2.5\MeV$ per \emph{lo stesso} fit. È una proprietà del modello o del test? Senza saperlo non si può dire se ``il modello è inadeguato'' sia una conclusione robusta.
 
@@ -929,15 +930,15 @@ Il \emph{potere} del test dipende dal binning: una discrepanza su scala $\Delta 
 \begin{itemize}
 \item ``Il modello non è adeguato'' e ``il modello è accettabile'' sono entrambi sostenibili a seconda del binning; lo stesso vale per il Bayes factor con la larghezza del prior.
 \item \textbf{``Qual è il binning giusto?''} Non esiste; si sceglie in anticipo (qui $10\MeV$, comparabile con la risoluzione $\sigma=18\MeV$) e si riportano più scelte.
-\item \textbf{``Alternative al $\chi^2$ binnato?''} Test unbinned (Kolmogorov--Smirnov, Anderson--Darling) o il PPC (Fig.~XV).
-\item \textbf{``Perché $\chi^2/{\rm ndof}=1.86$ non invalida $\Araw$?''} Perché il misfit è sulle code, comuni alle due cariche (Fig.~III) e $\Araw$ è insensibile alla loro forma.
+\item \textbf{``Alternative al $\chi^2$ binnato?''} Test unbinned (Kolmogorov--Smirnov, Anderson--Darling) o il PPC (Fig.~XIX).
+\item \textbf{``Perché $\chi^2/{\rm ndof}=1.86$ non invalida $\Araw$?''} Perché il misfit è sulle code, comuni alle due cariche (Fig.~XX) e $\Araw$ è insensibile alla loro forma.
 \end{itemize}
 
 
 % ======================================================================== NEW dalitz_perm
-\figh{Fig.\ XXV --- Test di permutazione delle cariche nel Dalitz (App.\ G.4)}{dalitz_permutation}{0.34}
+\figh{Fig.\ XXVIII --- Test di permutazione delle cariche nel Dalitz (App.\ G.4)}{dalitz_permutation}{0.34}
 \sez{Il problema}
-Il test di omogeneità $\chi^2=\sum_iS_i^2=80.8$ per $31$ gradi di libertà (Fig.~VII) assume che ogni $S_i$ sia gaussiano standard. Quella assunzione vale per bin con $\ge20$ candidati ma non è esatta. Esiste una verifica \emph{senza} assunzioni distribuzionali?
+Il test di omogeneità $\chi^2=\sum_iS_i^2=80.8$ per $31$ gradi di libertà (Fig.~XI) assume che ogni $S_i$ sia gaussiano standard. Quella assunzione vale per bin con $\ge20$ candidati ma non è esatta. Esiste una verifica \emph{senza} assunzioni distribuzionali?
 
 \sez{Teoria}
 \emph{Test di permutazione.} Si costruisce la distribuzione della statistica sotto l'ipotesi nulla ``l'asimmetria è uniforme'' riassegnando a caso le cariche $q_i$ ai candidati, mantenendo fissi la posizione nel Dalitz di ciascuno (e quindi l'occupazione dei bin) e il numero totale di $B^+$ e $B^-$. Sotto $H_0$ la carica è \emph{scambiabile} tra candidati, quindi ogni permutazione è un'estrazione equiprobabile dalla distribuzione nulla. Si ripete $n_{\rm perm}$ volte e il $p$-value è
@@ -971,7 +972,7 @@ con il minimo risolvibile $1/(1+n_{\rm perm})\approx5\times10^{-4}$ per $2000$ p
 
 % ======================================================================== XXI
 
-\figh{Fig.\ XXVI --- Asimmetria nella banda del $\phi(1020)$ e nei bin significativi (App.\ G.5)}{dalitz_phi_band}{0.30}
+\figh{Fig.\ XXIX --- Asimmetria nella banda del $\phi(1020)$ e nei bin significativi (App.\ G.5)}{dalitz_phi_band}{0.30}
 
 \sez{Il problema}
 Il corpo afferma che l'asimmetria negativa a basso $m^2_{\rm lo}$ \emph{non} è prodotta dal $\phi(1020)$, la risonanza stretta a $m^2_{\rm lo}\approx1.04\GeV^2$ che sta proprio accanto alla regione. La verifica è una selezione: si isolano i candidati del $\phi$ e si misura l'asimmetria con e senza.
@@ -1003,7 +1004,7 @@ L'asimmetria di conteggio in un insieme di $n$ candidati è $A=(N^--N^+)/n$ con 
 \item \textbf{``Perché non hai fittato anche la banda del $\phi$?''} Con $1964$ candidati il fit è possibile; il conteggio basta a mostrare l'assenza dell'effetto.
 \end{itemize}
 
-\figh{Fig.\ XXVII --- Regioni di confidenza e credibili in $(A,A_b)$ (App.\ H.4)}{validation_region_Ab}{0.40}
+\figh{Fig.\ XXXI --- Regioni di confidenza e credibili in $(A,A_b)$ (App.\ H.4)}{validation_region_Ab}{0.40}
 \sez{Il problema}
 Finora il confronto freq/Bayes è stato in una dimensione. Per due parametri d'interesse insieme, $A$ e $A_b$ (le due asimmetrie, di segnale e di fondo), i due metodi danno ancora le stesse regioni? E dove sta $A_b=0$ rispetto al risultato?
 
@@ -1039,7 +1040,7 @@ Attenzione: la \emph{proiezione} su $A$ della regione bidimensionale al $68\%$ �
 \end{itemize}
 
 % ======================================================================== XXII
-\figh{Fig.\ XXVIII --- I due metodi a bassa statistica (App.\ H.11)}{bayes_nominal_lowstat}{0.30}
+\figh{Fig.\ XXXII --- I due metodi a bassa statistica (App.\ H.11)}{bayes_nominal_lowstat}{0.30}
 \sez{Il problema}
 Con $N\approx2\times10^4$ i due metodi coincidono per costruzione (Bernstein--von Mises). Esiste un regime, di pochi eventi, in cui divergono? Cercarlo mostra \emph{dove} è la vera differenza tra i due approcci.
 
@@ -1077,13 +1078,13 @@ Nelle figure seguenti i modelli sono addestrati con \emph{weak labels}: segnale 
 
 % ======================================================================== XXIII
 
-\figh{Fig.\ XXIX --- Weak labels sullo spettro di massa (App.\ I.4)}{ml_weak_labels}{0.34}
+\figh{Fig.\ VIII --- Weak labels sullo spettro di massa (App.\ I.4)}{ml_weak_labels}{0.34}
 
 \sez{Il problema}
 Il classificatore ML non ha etichette vere. Come si definisce, e su quali candidati è addestrato? La figura mostra le regioni di massa da cui vengono le etichette.
 
 \sez{Teoria}
-\emph{Weak supervision / CWoLa.} Si dispone di due campioni \emph{misti} con frazioni di segnale diverse: la finestra di picco (alta frazione di segnale) e le bande laterali (bassa). Un classificatore che separa i due campioni è monotòno nel rapporto di verosimiglianza S/B (Fig.~XXX), purché le feature non portino informazione sulla massa e il fondo nelle bande sia rappresentativo di quello sotto il picco. Le etichette sono per definizione \emph{rumorose} (il picco contiene $\approx4\%$ di fondo, le bande qualche componente non combinatoria).
+\emph{Weak supervision / CWoLa.} Si dispone di due campioni \emph{misti} con frazioni di segnale diverse: la finestra di picco (alta frazione di segnale) e le bande laterali (bassa). Un classificatore che separa i due campioni è monotòno nel rapporto di verosimiglianza S/B (Fig.~XXXIII), purché le feature non portino informazione sulla massa e il fondo nelle bande sia rappresentativo di quello sotto il picco. Le etichette sono per definizione \emph{rumorose} (il picco contiene $\approx4\%$ di fondo, le bande qualche componente non combinatoria).
 
 La zona $5100$--$5150\MeV$ è esclusa dalla classe di fondo perché lì sale il fondo parzialmente ricostruito, che ha cinematica diversa da quella del combinatorio sotto il picco: includerla violerebbe la condizione di rappresentatività.
 
@@ -1099,17 +1100,17 @@ La zona $5100$--$5150\MeV$ è esclusa dalla classe di fondo perché lì sale il 
 \begin{enumerate}
 \item \textbf{Sbilanciamento.} $1940$ background-like contro $15\,130$ signal-like (rapporto $0.128$): da qui i pesi di classe $4.40$ e $0.56$.
 \item \textbf{Lacuna.} L'intervallo $2$--$4\sigma$ non è etichettato per ridurre la contaminazione tra le classi.
-\item \textbf{Conseguenza.} Il classificatore impara a distinguere \emph{picco} da \emph{bande}; il suo valore come discriminante S/B dipende dalle due condizioni sopra, verificate in Fig.~XXXIV (no sculpting) e discusse in Fig.~XLI (fondo piccato non separabile).
+\item \textbf{Conseguenza.} Il classificatore impara a distinguere \emph{picco} da \emph{bande}; il suo valore come discriminante S/B dipende dalle due condizioni sopra, verificate in Fig.~XXXVII (no sculpting) e discusse in Fig.~XLII (fondo piccato non separabile).
 \end{enumerate}
 
 \sez{Limiti e orale}
 \begin{itemize}
 \item Le etichette dipendono da $\mu,\sigma$ del fit bayesiano: sono propagate come costanti.
 \item \textbf{``Perché non si usa la simulazione per le etichette?''} Il record contiene solo una simulazione phase-space del segnale senza fondo; per il fondo servono i dati.
-\item \textbf{``Cosa succede ai $B$ parzialmente ricostruiti?''} Stanno sotto $5150\MeV$ (esclusi dalle etichette) ma il classificatore li promuove comunque (Fig.~XL).
+\item \textbf{``Cosa succede ai $B$ parzialmente ricostruiti?''} Stanno sotto $5150\MeV$ (esclusi dalle etichette) ma il classificatore li promuove comunque (Fig.~XLI).
 \end{itemize}
 
-\figh{Fig.\ XXX --- Curve ROC (App.\ I.5)}{ml_nominal_roc}{0.38}
+\figh{Fig.\ XXXIII --- Curve ROC (App.\ I.5)}{ml_nominal_roc}{0.38}
 \sez{Il problema}
 Sono stati addestrati sei classificatori, da lineari ad ensemble e reti. Quale separa meglio le due regioni di massa, e la differenza è reale o dentro la fluttuazione del campione di test? Serve per scegliere il riferimento senza usare il test.
 
@@ -1122,14 +1123,15 @@ Per Neyman--Pearson, il test più potente a efficienza data è il rapporto di ve
 \[
 \frac{p(M_1\mid x)}{p(M_2\mid x)}\propto\frac{f_1p_s(x)+(1-f_1)p_b(x)}{f_2p_s(x)+(1-f_2)p_b(x)},
 \]
-una funzione \emph{monotòna} di $p_s/p_b$: perciò ha la stessa ROC del discriminante S/B ottimo, a patto che $p_s$ e $p_b$ non dipendano dal campione (le feature non devono contenere la massa, Fig.~XL).
+una funzione \emph{monotòna} di $p_s/p_b$: perciò ha la stessa ROC del discriminante S/B ottimo, a patto che $p_s$ e $p_b$ non dipendano dal campione (le feature non devono contenere la massa, Fig.~XLI).
 
 \emph{Modelli:} regressione logistica (confine lineare); albero (partizioni ortogonali, profondità $4$); Random Forest (\emph{bagging} di $300$ alberi, ognuno su bootstrap e su sottoinsiemi di feature: riduce la varianza); gradient boosting (alberi poco profondi aggiunti in sequenza lungo il gradiente della loss: riduce il bias); FFNN (due strati nascosti $32$, $16$, ReLU, dropout, Adam).
 
 \sez{Come si legge}
 \begin{enumerate}
 \item Asse $x$: efficienza sul background-like (false positive rate), da $0$ a $1$; asse $y$: efficienza sul signal-like (true positive rate).
-\item Ogni curva è un modello (colori in legenda con l'AUC); la diagonale tratteggiata è il classificatore casuale; il cerchio nero è il taglio $0.5$ del gradient boosting.
+\item \textbf{Pannello (a), ROC.} Ogni curva è un modello (colori in legenda con l'AUC); la diagonale tratteggiata è il classificatore casuale; il cerchio bianco è il taglio $0.5$ del gradient boosting.
+\item \textbf{Pannello (b), significance improvement.} Stessi modelli e stesso cerchio, ma l'asse $y$ è $\mathrm{SIC}=\varepsilon_S/\sqrt{\varepsilon_B}$, il fattore per cui un taglio moltiplica $S/\sqrt B$, in funzione di $\varepsilon_S$; la linea tratteggiata a $1$ è nessun taglio. Si disegna per $\varepsilon_B\ge10^{-3}$ (sotto sopravvivono troppo pochi candidati).
 \item Più la curva sale verso l'angolo in alto a sinistra, meglio: alta efficienza sul segnale a bassa efficienza sul fondo.
 \item Cosa guardare: (i) la posizione relativa delle curve; (ii) dove si sovrappongono; (iii) il punto di lavoro (cerchio).
 \end{enumerate}
@@ -1140,6 +1142,7 @@ una funzione \emph{monotòna} di $p_s/p_b$: perciò ha la stessa ROC del discrim
 \item \textbf{Salto lineare $\to$ non lineare.} $+0.09$ di AUC: il confine tra le due regioni non è lineare nelle feature.
 \item \textbf{Fra i non lineari.} Differenze $\le0.007$, sotto l'incertezza del test ($0.012$, bootstrap): non sono distinguibili. L'albero singolo è $0.04$ sotto: il \emph{bagging/boosting} riduce la varianza.
 \item \textbf{Punto di lavoro.} Il cerchio a score $0.5$: tiene l'$88\%$ dei signal-like e il $28\%$ dei background-like.
+\item \textbf{Significance improvement.} Il massimo della SIC è $\sim1.8$ per ensemble e rete (GBM $1.84$ a score $0.73$, $\varepsilon_S=0.66$, $\varepsilon_B=0.13$), $\sim1.4$ per i lineari e $\sim1.6$ per l'albero; a $0.5$ è $1.67$. Non è il taglio ottimo della misura: qui il segnale domina e la precisione segue $S/\sqrt{S+B}$, che a $0.5$ vale $0.98$ del campione intero (a $0.9$ solo $0.40$). Il taglio a $0.73$ è usato come test di stabilità più severo (Fig.~X).
 \item \textbf{Conseguenza.} Il gradient boosting è il riferimento perché migliore in cross-validation ($0.866$ contro $0.863$ della RF), non sul test, per non usare il test per nessuna scelta.
 \end{enumerate}
 
@@ -1152,7 +1155,7 @@ una funzione \emph{monotòna} di $p_s/p_b$: perciò ha la stessa ROC del discrim
 \end{itemize}
 
 % ======================================================================== XXIV
-\figh{Fig.\ XXXI --- Importanza delle feature (App.\ I.5)}{ml_nominal_features}{0.50}
+\figh{Fig.\ XXXIV --- Importanza delle feature (App.\ I.5)}{ml_nominal_features}{0.50}
 \sez{Il problema}
 Il classificatore usa informazione fisica sensata (la topologia del decadimento: vertice spostato) o scorciatoie, in particolare la massa, che invaliderebbero il suo uso come selezione per l'asimmetria? Si guarda cosa pesa di più.
 
@@ -1184,14 +1187,14 @@ Il classificatore usa informazione fisica sensata (la topologia del decadimento:
 \sez{Limiti e orale}
 \begin{itemize}
 \item L'importanza non è causalità: riflette l'uso nel modello, e con feature correlate la RF la ripartisce arbitrariamente.
-\item La prova diretta che il modello non scolpisce la massa è la Fig.~XL (riaddestramento senza impulsi).
+\item La prova diretta che il modello non scolpisce la massa è la Fig.~XLI (riaddestramento senza impulsi).
 \item \textbf{``Perché due misure di importanza?''} Perché rispondono a domande diverse (uso in split non lineari contro effetto marginale lineare); l'accordo parziale è informativo.
 \item \textbf{``Cosa fa la penalità $L_1$ che $L_2$ non fa?''} Annulla coefficienti (selezione); $L_2$ li riduce senza annullarli. Qui l'ottimo di $L_1$ non annulla nessun coefficiente (non c'è feature irrilevante).
 \end{itemize}
 
 % ======================================================================== XXV
 
-\figh{Fig.\ XXXII --- Scansione della regolarizzazione (App.\ I.6)}{ml_regularization}{0.34}
+\figh{Fig.\ XXXV --- Scansione della regolarizzazione (App.\ I.6)}{ml_regularization}{0.34}
 
 \sez{Il problema}
 La regressione logistica è il modello lineare di riferimento. Quanta regolarizzazione serve, e il confine lineare soffre di varianza (overfitting) o di bias? La scansione di $C$ lo dice.
@@ -1211,7 +1214,7 @@ Nella regressione logistica regolarizzata si minimizza $\mathcal L(w)+\alpha\,R(
 \item \textbf{Nessuna sovra-regolarizzazione necessaria.} Entrambe le curve salgono e si appiattiscono a $\approx0.769$: l'ottimo $L_1$ a $C=0.12$ e $L_2$ a $C=9.2$ danno la stessa AUC ($0.7686$).
 \item \textbf{$L_2$ è piatta.} Dal regime più fortemente regolarizzato ($C=10^{-3}$, AUC $\approx0.76$) fino a $C=100$ la differenza è $\sim0.01$: i coefficienti ridotti contano ancora.
 \item \textbf{$L_1$ crolla a forte regolarizzazione.} A $C\lesssim3\times10^{-3}$ perde fino a $\sim0.2$ di AUC ($\approx0.55$ a $C=10^{-3}$): i coefficienti vengono azzerati e il modello perde informazione.
-\item \textbf{Conseguenza.} L'ottimo $L_1$ non azzera nessun coefficiente: il modello lineare non ha overfitting, il suo limite è il confine lineare (bias), non la varianza. Per questo il salto ai modelli non lineari ($+0.09$ di AUC, Fig.~XXX) è un guadagno di capacità, non di regolarizzazione.
+\item \textbf{Conseguenza.} L'ottimo $L_1$ non azzera nessun coefficiente: il modello lineare non ha overfitting, il suo limite è il confine lineare (bias), non la varianza. Per questo il salto ai modelli non lineari ($+0.09$ di AUC, Fig.~XXXIII) è un guadagno di capacità, non di regolarizzazione.
 \end{enumerate}
 
 \sez{Limiti e orale}
@@ -1221,7 +1224,7 @@ Nella regressione logistica regolarizzata si minimizza $\mathcal L(w)+\alpha\,R(
 \item \textbf{``Quando serve il Lasso?''} Con molte feature irrilevanti: qui nessun coefficiente è azzerato all'ottimo.
 \end{itemize}
 
-\figh{Fig.\ XXXIII --- Bias--varianza del gradient boosting (App.\ I.6)}{ml_nominal_bias_variance}{0.30}
+\figh{Fig.\ XXXVI --- Bias--varianza del gradient boosting (App.\ I.6)}{ml_nominal_bias_variance}{0.30}
 \sez{Il problema}
 Quanta complessità è giusta? Un modello troppo semplice sottostima la struttura (bias); uno troppo complesso adatta le fluttuazioni del training (varianza) e generalizza male. Si guarda come cambiano le prestazioni al crescere della complessità, per il modello di riferimento.
 
@@ -1258,7 +1261,7 @@ Quanta complessità è giusta? Un modello troppo semplice sottostima la struttur
 \end{itemize}
 
 % ======================================================================== XXVI
-\figh{Fig.\ XXXIV --- Calibrazione (App.\ I.6)}{ml_nominal_calibration}{0.42}
+\figh{Fig.\ XXXVII --- Calibrazione (App.\ I.6)}{ml_nominal_calibration}{0.42}
 \sez{Il problema}
 L'AUC dipende solo dall'\emph{ordinamento} degli score. Se si volesse leggere lo score come una \emph{probabilità} (per pesare i candidati, per esempio) quella probabilità è corretta? E se no, si può correggere senza perdere nulla?
 
@@ -1299,7 +1302,7 @@ cioè le \emph{odds} sono scalate per $w_s/w_b$ ($=0.56/4.40\approx0.13$): il mo
 \end{itemize}
 
 % ======================================================================== XXVII
-\figh{Fig.\ XXXV --- Incertezza per candidato (App.\ I.7)}{ml_nominal_uncertainty}{0.28}
+\figh{Fig.\ XXXVIII --- Incertezza per candidato (App.\ I.7)}{ml_nominal_uncertainty}{0.28}
 \sez{Il problema}
 Lo score è un numero. Quanto ci si può fidare di \emph{quel} numero per \emph{quel} candidato? Come si dà un'incertezza a una predizione di un classificatore, e da cosa è fatta?
 
@@ -1345,7 +1348,7 @@ Il MC dropout (Gal e Ghahramani) è un'approssimazione variazionale di un poster
 
 % ======================================================================== XXVIII
 
-\figh{Fig.\ XXXVI --- Inerzia e silhouette contro $K$ (App.\ I.8)}{ml_kmeans_selection}{0.30}
+\figh{Fig.\ XXXIX --- Inerzia e silhouette contro $K$ (App.\ I.8)}{ml_kmeans_selection}{0.30}
 
 \sez{Il problema}
 $K$-means richiede $K$ fissato in anticipo. Come si sceglie, e perché nel report si usa $K=8$ mentre il silhouette ha il massimo a $K=3$?
@@ -1375,16 +1378,16 @@ $K$-means richiede $K$ fissato in anticipo. Come si sceglie, e perché nel repor
 \item \textbf{``Cos'è il gomito?''} Il punto oltre il quale aggiungere cluster riduce poco l'inerzia; qui non c'è.
 \end{itemize}
 
-\figh{Fig.\ XXXVII --- $K$-means sul piano di Dalitz (App.\ I.8)}{ml_nominal_kmeans}{0.40}
+\figh{Fig.\ IX --- $K$-means sul piano di Dalitz (App.\ I.8)}{ml_nominal_kmeans}{0.40}
 \sez{Il problema}
-La griglia $8\times8$ (Fig.~VII) è arbitraria e i suoi bin hanno statistica molto diversa. Una partizione \emph{adattiva}, determinata dalla densità dei dati, ritrova la stessa struttura? Se sì, il pattern non dipende dalla scelta della griglia.
+La griglia $8\times8$ (Fig.~XI) è arbitraria e i suoi bin hanno statistica molto diversa. Una partizione \emph{adattiva}, determinata dalla densità dei dati, ritrova la stessa struttura? Se sì, il pattern non dipende dalla scelta della griglia.
 
 \sez{Teoria}
 \emph{$K$-means} (non supervisionato): partiziona i punti $x_i$ in $K$ cluster $C_k$ minimizzando l'inerzia $W=\sum_k\sum_{i\in C_k}\|x_i-\bar x_k\|^2$. Algoritmo di Lloyd: assegna ogni punto al centroide più vicino, ricalcola i centroidi, ripeti fino alla convergenza (a un minimo \emph{locale}). Le celle sono di Voronoi (confini rettilinei, visibili nella figura); $K$ va fissato in anticipo; le variabili vanno standardizzate.
 
 \emph{Silhouette:} $s_i=(b_i-a_i)/\max(a_i,b_i)$, con $a_i$ distanza media dagli altri punti del cluster e $b_i$ dal cluster più vicino; media in $[-1,1]$. \emph{Adjusted Rand Index} (ARI): accordo tra due partizioni (stabilità); $1$ = identiche.
 
-Poiché il clustering usa solo $(m^2_{\rm lo},m^2_{\rm hi})$ e \emph{non la carica}, i confini non sono scelti guardando l'asimmetria: nessun bias di selezione. L'asimmetria del cluster è $A_k=(N_k^--N_k^+)/N_k$ con $S_k=(A_k-A_{\rm glob})/\sigma(A_k)$ come in Fig.~VII.
+Poiché il clustering usa solo $(m^2_{\rm lo},m^2_{\rm hi})$ e \emph{non la carica}, i confini non sono scelti guardando l'asimmetria: nessun bias di selezione. L'asimmetria del cluster è $A_k=(N_k^--N_k^+)/N_k$ con $S_k=(A_k-A_{\rm glob})/\sigma(A_k)$ come in Fig.~XI.
 
 \sez{Come si legge}
 \begin{enumerate}
@@ -1412,14 +1415,14 @@ Poiché il clustering usa solo $(m^2_{\rm lo},m^2_{\rm hi})$ e \emph{non la cari
 \end{itemize}
 
 % ======================================================================== XXIX
-\figh{Fig.\ XXXVIII --- Soglia sullo score (App.\ I.9)}{ml_nominal_threshold}{0.28}
+\figh{Fig.\ XL --- Soglia sullo score (App.\ I.9)}{ml_nominal_threshold}{0.28}
 \sez{Il problema}
 Un taglio sul classificatore può modificare l'asimmetria di carica: se la sua efficienza è diversa per $B^+$ e $B^-$ introduce un bias, e l'ML non sarebbe un controllo ma una fonte di artefatto. Lo fa, al variare della soglia?
 
 \sez{Teoria}
 Se la selezione ha efficienze $\varepsilon^\pm$ per le due cariche, $A_{\rm sel}=\frac{\varepsilon^-N^--\varepsilon^+N^+}{\varepsilon^-N^-+\varepsilon^+N^+}$, che differisce da $A$ solo se $\varepsilon^-\neq\varepsilon^+$. Il classificatore usa feature che non includono la carica, ma impulsi e PID possono correlarsi con essa: va verificato.
 
-Il campione selezionato è contenuto nel completo (\emph{annidato}), quindi la fluttuazione attesa della differenza è $\sqrt{\sigma^2_{\rm sub}-\sigma^2_{\rm full}}$ (Fig.~XXI), non l'errore del singolo punto. Per la conta, $\sigma(A_{\rm count})=\sqrt{(1-A^2)/N}$.
+Il campione selezionato è contenuto nel completo (\emph{annidato}), quindi la fluttuazione attesa della differenza è $\sqrt{\sigma^2_{\rm sub}-\sigma^2_{\rm full}}$ (Fig.~XXIV), non l'errore del singolo punto. Per la conta, $\sigma(A_{\rm count})=\sqrt{(1-A^2)/N}$.
 
 \sez{Come si legge}
 \begin{enumerate}
@@ -1440,14 +1443,14 @@ Il campione selezionato è contenuto nel completo (\emph{annidato}), quindi la f
 
 \sez{Limiti e orale}
 \begin{itemize}
-\item È il conteggio, che include il fondo: la verifica sul fit è nella Fig.~XXXIX.
+\item È il conteggio, che include il fondo: la verifica sul fit è nella Fig.~X.
 \item \textbf{``Perché non l'errore del singolo punto?''} Perché i campioni sono contenuti l'uno nell'altro: la differenza ha varianza $\sigma^2_{\rm sub}-\sigma^2_{\rm full}$, non la somma.
 \item \textbf{``Cosa vorrebbe dire una deriva?''} Un'efficienza carica-dipendente: il classificatore userebbe informazione correlata con la carica (impulsi, per via dell'asimmetria di rivelazione).
 \item Con $9$ soglie correlate, un punto a $1.4\times$ la banda non è significativo.
 \end{itemize}
 
 % ======================================================================== XXX
-\figh{Fig.\ XXXIX --- Tre metodi, campione completo contro selezionato (App.\ I.9)}{ml_nominal_three_methods}{0.30}
+\figh{Fig.\ X --- Tre metodi, campione completo contro selezionato (App.\ I.9)}{ml_nominal_three_methods}{0.30}
 \sez{Il problema}
 Il taglio ML cambia il risultato \emph{con tutti e tre} i modi di stimare $\Araw$, ciascuno con i suoi assunti? Se uno solo cambiasse, il segnale sarebbe un artefatto del metodo.
 
@@ -1457,7 +1460,7 @@ Tre stimatori: (i)~fit bayesiano (mediana a posteriori); (ii)~fit frequentista (
 \sez{Come si legge}
 \begin{enumerate}
 \item Asse $x$: $\Araw$ (da $-0.052$ a $-0.036$); tre righe, una per metodo (Bayesiano in alto, frequentista, conteggio).
-\item In ogni riga: punto nero con barra = campione completo ($19\,731$); punto oro = campione con score $>0.5$ ($15\,709$).
+\item In ogni riga: punto nero con barra = campione completo ($19\,731$); quadrato oro = campione con score $>0.5$ ($15\,709$); rombo viola = campione con score $>0.73$, il massimo della significance improvement ($11\,658$). A destra, lo spostamento rispetto al campione completo e, tra parentesi, lo spread atteso.
 \item La banda grigia verticale è $\pm1\sigma$ del bayesiano sul campione completo; la linea punteggiata il valore centrale.
 \item Cosa guardare: il punto oro cade dentro la banda? Le barre oro e nere si sovrappongono?
 \end{enumerate}
@@ -1467,8 +1470,9 @@ Tre stimatori: (i)~fit bayesiano (mediana a posteriori); (ii)~fit frequentista (
 \item \textbf{Bayes:} $-0.0443\pm0.0085\to-0.0451\pm0.0087$ (spostamento $-0.0008$; atteso $0.0018$).
 \item \textbf{Frequentista:} $-0.0441\pm0.0085\to-0.0447\pm0.0086$ ($-0.0006$; atteso $0.0012$).
 \item \textbf{Conteggio:} $-0.0432\pm0.0071\to-0.0446\pm0.0080$ ($-0.0014$; atteso $0.0036$).
-\item \textbf{Significatività.} $5.2\sigma$ in entrambi i campioni (profilo di verosimiglianza).
-\item \textbf{Precisione.} Invariata ($0.0087$ contro $0.0085$): il fondo sotto il picco è già piccolo ($\approx4\%$ nella finestra $\pm2\sigma$); il taglio tiene il $92\%$ del segnale ($N_s=14\,121$) e il $36\%$ del fondo ($N_b=1590$).
+\item \textbf{Taglio più stretto ($0.73$).} Bayes $-0.0404\pm0.0097$ ($+0.0039$; atteso $0.0047$), frequentista $-0.0401\pm0.0097$ ($+0.0040$; atteso $0.0048$), conteggio $-0.0381\pm0.0093$ ($+0.0051$; atteso $0.0059$): gli spostamenti sono $0.9$ volte lo spread atteso.
+\item \textbf{Significatività.} $5.2\sigma$ in entrambi i campioni (profilo di verosimiglianza); $4.1\sigma$ a $0.73$, per la statistica minore.
+\item \textbf{Precisione.} Invariata a $0.5$ ($0.0087$ contro $0.0085$; a $0.73$ peggiora a $0.0097$): il fondo sotto il picco è già piccolo ($\approx4\%$ nella finestra $\pm2\sigma$); il taglio tiene il $92\%$ del segnale ($N_s=14\,121$) e il $36\%$ del fondo ($N_b=1590$).
 \item \textbf{Conseguenza.} Tre metodi con assunzioni diverse danno lo stesso risultato sul campione ML-selezionato: $\Araw$ non è un artefatto della selezione o del metodo.
 \end{enumerate}
 
@@ -1481,7 +1485,7 @@ Tre stimatori: (i)~fit bayesiano (mediana a posteriori); (ii)~fit frequentista (
 \end{itemize}
 
 % ======================================================================== XXXI
-\figh{Fig.\ XL --- Massa dopo il taglio ML (App.\ I.9)}{ml_nominal_mass_after_cut}{0.28}
+\figh{Fig.\ XLI --- Massa dopo il taglio ML (App.\ I.9)}{ml_nominal_mass_after_cut}{0.28}
 \sez{Il problema}
 Il conteggio e i fit non dicono se il classificatore \emph{deforma lo spettro di massa}. Lo deforma, e perché? Se il modello avesse imparato la massa dagli impulsi, un taglio sullo score creerebbe un picco finto (``sculpting'') e la selezione sarebbe invalida per qualunque misura basata sulla massa.
 
@@ -1517,7 +1521,7 @@ Il conteggio e i fit non dicono se il classificatore \emph{deforma lo spettro di
 \end{itemize}
 
 % ======================================================================== XXXII
-\figh{Fig.\ XLI --- Campione ad alto fondo (App.\ I.9)}{ml_nominal_high_background}{0.30}
+\figh{Fig.\ XLII --- Campione ad alto fondo (App.\ I.9)}{ml_nominal_high_background}{0.30}
 \sez{Il problema}
 Nel campione nominale c'è poco fondo, quindi il ML non può migliorare. Dove il fondo è maggiore (identificazione più larga), il classificatore migliora la precisione e rimuove il bias dal fondo mal identificato meglio del taglio sul PID?
 
@@ -1553,7 +1557,7 @@ Nel campione nominale c'è poco fondo, quindi il ML non può migliorare. Dove il
 \end{itemize}
 
 
-\figh{Fig.\ XLII --- Ricerca dell'architettura della FFNN (App.\ I.10)}{ml_ffnn_search}{0.34}
+\figh{Fig.\ XLIII --- Ricerca dell'architettura della FFNN (App.\ I.10)}{ml_ffnn_search}{0.34}
 
 \sez{Il problema}
 La rete ha iperparametri (architettura, dropout, learning rate). I default sono vicini all'ottimo? E quanto conta l'architettura rispetto agli altri?
@@ -1586,10 +1590,10 @@ La ricerca è una \emph{griglia} di $168$ configurazioni ($7$ architetture $\tim
 \clearpage
 \section*{Incongruenze tra figure e testo da sistemare}
 \begin{enumerate}
-\item \textbf{Fig.\ II} (Marco): il titolo del grafico dice ``toys'', il testo dice repliche bootstrap. Già nella nota per Marco.
-\item \textbf{Fig.\ XVIII e XXII}: legende e assi dicono ``pseudo-datasets'', il report usa ``toy MC''.
-\item \textbf{Fig.\ XXI}: la normale è centrata a zero mentre l'istogramma è centrato sullo spostamento dei dati; la didascalia dovrebbe dire che si guarda la larghezza.
-\item \textbf{Fig.\ XXIII(c)} ripete la Fig.\ VI: è voluto (la VI è nel corpo), ma va dichiarato.
-\item \textbf{App.\ C.3} (testo): afferma accordo ``entro il $10\%$ per tutti i parametri di forma; per $\lambda_1^+$ il bootstrap differisce del $26\%$ (Fig.\ XII).
+\item \textbf{Fig.\ IV} (Marco): il titolo del grafico dice ``toys'', il testo dice repliche bootstrap. Già nella nota per Marco.
+\item \textbf{Fig.\ XXIII e XXVI}: legende e assi dicono ``pseudo-datasets'', il report usa ``toy MC''.
+\item \textbf{Fig.\ XXIV}: la normale è centrata a zero mentre l'istogramma è centrato sullo spostamento dei dati; la didascalia dovrebbe dire che si guarda la larghezza.
+\item \textbf{Fig.\ VII(c)} ripete la Fig.\ VI$^{*}$: è voluto (la VI è nel corpo), ma va dichiarato.
+\item \textbf{App.\ C.3} (testo): afferma accordo ``entro il $10\%$ per tutti i parametri di forma; per $\lambda_1^+$ il bootstrap differisce del $26\%$ (Fig.\ XVII).
 \end{enumerate}
 \end{document}

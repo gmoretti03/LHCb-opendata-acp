@@ -249,25 +249,29 @@ for i_ in range(len(el) - 1):
 save(fig, "short_dalitz_maps.pdf")
 
 # ---------------------------------------------------------------- A_raw with the three methods, before and after the ML selection
-rows3 = (("Bayesian fit", C["bayes"], (-0.0443, 0.0085), (-0.0451, 0.0087), (-0.0008, 0.0018)),
-         ("Frequentist fit", C["freq"], (-0.0441, 0.0085), (-0.0447, 0.0086), (-0.0006, 0.0012)),
-         ("Counting", C["count"], (-0.0432, 0.0071), (-0.0446, 0.0080), (-0.0014, 0.0036)))
-fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.0))
+# (score > 0.5 and the tighter cut at the maximum of the significance improvement, score > 0.73; values of maxsic_selected.json)
+rows3 = (("Bayesian fit", C["bayes"], (-0.0443, 0.0085), (-0.0451, 0.0087), (-0.0008, 0.0018), (-0.0404, 0.0097), (0.0039, 0.0047)),
+         ("Frequentist fit", C["freq"], (-0.0441, 0.0085), (-0.0447, 0.0086), (-0.0006, 0.0012), (-0.0401, 0.0097), (0.0040, 0.0048)),
+         ("Counting", C["count"], (-0.0432, 0.0071), (-0.0446, 0.0080), (-0.0014, 0.0036), (-0.0381, 0.0093), (0.0051, 0.0059)))
+fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.4))
 ax.axvspan(-0.0443 - 0.0085, -0.0443 + 0.0085, color=C["bayes"], alpha=0.08, lw=0)
 ax.axvline(-0.0443, color=C["bayes"], lw=0.9, ls=":")
-for k, (lab, col, full, sel, sh) in enumerate(rows3):
+for k, (lab, col, full, sel, sh, sel2, sh2) in enumerate(rows3):
     y = 2 - k
-    ax.errorbar(full[0], y + 0.14, xerr=full[1], fmt="o", color=col, ms=8, capsize=0, lw=2.4, mec="white", zorder=3)
-    ax.errorbar(sel[0], y - 0.14, xerr=sel[1], fmt="s", color=col, mfc="white", mec=col, mew=2.0, ms=8, capsize=0, lw=2.0, zorder=3)
-    ax.text(0.985, (y + 0.0) , rf"${sh[0]:+.4f}$ ($\pm{sh[1]:.4f}$)", transform=ax.get_yaxis_transform(), ha="right", va="center", fontsize=10.5)
+    ax.errorbar(full[0], y + 0.24, xerr=full[1], fmt="o", color=col, ms=8, capsize=0, lw=2.4, mec="white", zorder=3)
+    ax.errorbar(sel[0], y, xerr=sel[1], fmt="s", color=col, mfc="white", mec=col, mew=2.0, ms=8, capsize=0, lw=2.0, zorder=3)
+    ax.errorbar(sel2[0], y - 0.24, xerr=sel2[1], fmt="D", color=col, mfc=col, alpha=0.55, mec=col, mew=1.5, ms=7, capsize=0, lw=2.0, zorder=3)
+    ax.text(0.985, y, rf"${sh[0]:+.4f}$ ($\pm{sh[1]:.4f}$)", transform=ax.get_yaxis_transform(), ha="right", va="center", fontsize=10)
+    ax.text(0.985, y - 0.24, rf"${sh2[0]:+.4f}$ ($\pm{sh2[1]:.4f}$)", transform=ax.get_yaxis_transform(), ha="right", va="center", fontsize=10, color="0.35")
 ax.set_yticks([2, 1, 0]); ax.set_yticklabels([r[0] for r in rows3]); ax.set_ylim(-0.7, 2.7)
-ax.set_xlim(-0.0655, -0.0215)
+ax.set_xlim(-0.0655, -0.0035)
 ax.set_xticks([-0.06, -0.05, -0.04, -0.03]); ax.set_xticklabels(["-0.06", "-0.05", "-0.04", "-0.03"])
 ax.set_xlabel(r"$A_{\mathrm{raw}}$")
 ax.text(0.985, 1.02, "shift (expected spread)", transform=ax.transAxes, ha="right", va="bottom", fontsize=10.5, color="0.35")
 ax.legend(handles=[Line2D([], [], marker="o", color="0.3", lw=2, ms=8, mec="white", label=r"Full window ($19{,}731$)"),
-                   Line2D([], [], marker="s", color="0.3", lw=2, ms=8, mfc="white", mew=2, label=r"Score $>0.5$ ($15{,}709$)")],
-          loc="lower center", bbox_to_anchor=(0.5, -0.30), ncol=2, fontsize=10.5, handlelength=1.6, columnspacing=1.2)
+                   Line2D([], [], marker="s", color="0.3", lw=2, ms=8, mfc="white", mew=2, label=r"Score $>0.5$ ($15{,}709$)"),
+                   Line2D([], [], marker="D", color="0.3", lw=2, ms=7, alpha=0.55, label=r"Score $>0.73$ ($11{,}658$)")],
+          loc="lower center", bbox_to_anchor=(0.5, -0.36), ncol=2, fontsize=10, handlelength=1.6, columnspacing=1.2)
 ax.spines["left"].set_visible(False); ax.tick_params(axis="y", length=0)
 save(fig, "short_ml_three.pdf")
 

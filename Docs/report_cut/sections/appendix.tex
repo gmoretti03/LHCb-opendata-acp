@@ -16,7 +16,8 @@
 \emph{In short: the kaon-identification requirement on the three tracks is by far the most selective.}
 The result is shown in Table~\ref{tab:cutflow}.
 
-\begin{table}[h]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lrrrr}
 \toprule
@@ -31,9 +32,10 @@ Mass window $[5100,5600]\,\MeV$ & -- & $19{,}731$ & $11{,}636$ & $8095$ \\
 \end{tabular}}
 \caption{Number of candidates passing each requirement alone and after the cumulative selection, in the order of the table, and by magnet polarity. The kaon-identification requirement on the three tracks is by far the most selective.}
 \label{tab:cutflow}
-\end{table}
+\end{figure*}
 
 \subsection{Candidates Sharing a Track}
+\label{app:shared_track}
 \emph{In short: only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate, a negligible effect, and all are kept.}
 
 \subsection{Charge Combinations}
@@ -48,6 +50,7 @@ Mass window $[5100,5600]\,\MeV$ & -- & $19{,}731$ & $11{,}636$ & $8095$ \\
 \label{app:model}
 \emph{In short: the extended likelihood and its relation to a mixture, the label switching of the two background slopes, and the six-parameter model that preceded the nominal one.}
 \subsection{Extended Likelihood}
+\label{app:likelihood}
 \emph{In short: with a Poisson total number of candidates the likelihood is $e^{-(N_s+N_b)}\prod_i[N_s S+N_b B]$ up to a constant, which constrains the yields and $A$ together.}
 
 \subsection{Extended Likelihood versus a Mixture with Fixed Total}
@@ -74,15 +77,16 @@ Mass window $[5100,5600]\,\MeV$ & -- & $19{,}731$ & $11{,}636$ & $8095$ \\
 \emph{In short: inverting the test of $A_{\mathrm{true}}$ with toy-MC experiments gives the same interval as the likelihood ratio, and $\Araw$ does not depend on the momentum of the $B$.}
 The result is shown in Figure~\ref{fig:checks_belt}.
 
-\begin{figure}[h]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/validation_neyman_belt.pdf}
+\includegraphics[width=0.5\textwidth]{figures/validation_neyman_belt.pdf}
 \caption{Confidence belt of $\hat A$ from toy-MC experiments (central $68\%$ and $95\%$ ranges) as a function of $A_{\mathrm{true}}$; the vertical line is the observed $\hat A$ and the dashed lines the resulting $68\%$ interval.}
 \label{fig:checks_belt}
-\end{figure}
+\end{figure*}
 The result is shown in Table~\ref{tab:checks_momentum}.
 
-\begin{table}[h]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \begin{tabular}{lccc}
 \toprule
@@ -98,10 +102,10 @@ $p$, 3 & $110.1$--$288.5$ & $6577$ & $-0.0478\pm0.0153$ \\
 \end{tabular}
 \caption{$\Araw$ (joint frequentist fit) in terciles of the transverse momentum and of the momentum of the $B$ candidate.}
 \label{tab:checks_momentum}
-\end{table}
+\end{figure*}
 The result is shown in Figure~\ref{fig:momentum_terciles}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/momentum_terciles.pdf}
 \caption{$\Araw$ (joint frequentist fit) in terciles of (a) the transverse momentum and (b) the momentum of the $B$ candidate, with the global value and its $\pm1\sigma$ band; each bin has $6577$ candidates.}
@@ -113,7 +117,8 @@ The result is shown in Figure~\ref{fig:momentum_terciles}.
 \emph{In short: the inverse of the Fisher information (Hesse), the bootstrap of the data and the posterior give the same standard deviations for $A$, $A_b$, $\mu$ and $\sigma$; the bootstrap differs for the two yields, because it keeps the total number of candidates fixed, and for the steep slope $\lambda_1^+$, which is weakly constrained.}
 The result is shown in Table~\ref{tab:checks_covariance}.
 
-\begin{table}[h]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \begin{tabular}{lccc}
 \toprule
@@ -135,10 +140,10 @@ $f_-$ & $0.039$ & $0.036$ & $0.037$ \\
 \end{tabular}
 \caption{Standard deviation of the parameters of the nominal fit from the Hesse matrix, from the bootstrap of the data and from the posterior.}
 \label{tab:checks_covariance}
-\end{table}
+\end{figure*}
 The result is shown in Figure~\ref{fig:uncertainties_12}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/uncertainties_12.pdf}
 \caption{Standard deviation of the twelve parameters of the nominal fit from the bootstrap of the data ($300$ replicas) and from the posterior, divided by the Hesse uncertainty; the band is $\pm10\%$.}
@@ -148,8 +153,6 @@ The result is shown in Figure~\ref{fig:uncertainties_12}.
 \subsection{Starting Values and Weakly Constrained Parameters}
 \label{sec:checks_multistart}
 \emph{In short: $29$ of $30$ fits from random starting points reach the same minimum; the steep-background fraction is the weakly constrained direction, as the long chain of the Bayesian fit already showed.}
-
-\FloatBarrier
 
 \section{Bayesian Analysis}
 \label{app:ext_bayes}
@@ -172,12 +175,6 @@ The result is shown in Figure~\ref{fig:uncertainties_12}.
 \emph{In short: walkers started over the whole prior box converge to the same mode.}
 The result is shown in Figure~\ref{fig:bayes_trace}.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_trace.pdf}
-\caption{Trace plot of the nominal fit with the 32 walkers initialized uniformly over the prior box (one grey line per walker, every 10th step; colored: median over the walkers), for $A$, $N_s$, $\sigma$ and the steep-background fraction $f_+$. Left: first 3000 steps, full range; right: whole chain, zoomed on the posterior. The first half of the chain (dotted line) is discarded as burn-in.}
-\label{fig:bayes_trace}
-\end{figure*}
 
 \subsection{Posterior of the Raw Asymmetry}
 \emph{In short: $\Araw=-0.0443$ with $68\%$ and $95\%$ intervals $[-0.0528,-0.0358]$ and $[-0.0608,-0.0276]$; the posterior is Gaussian, so equal-tailed and highest-density intervals coincide and its mode is the maximum-likelihood estimate.}
@@ -187,22 +184,6 @@ The result is shown in Figure~\ref{fig:bayes_trace}.
 \emph{In short: for $A$ and $A_b$ the two kinds of $68\%$ interval coincide; they differ for the skewed parameters, whose highest-posterior-density interval is shifted towards the mode.}
 The result is shown in Table~\ref{tab:checks_hpd}.
 
-\begin{table}[h]
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lcccc}
-\toprule
-Parameter & median & equal-tailed & HPD & skewness \\
-\midrule
-$A$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $[-0.0525,-0.0355]$ & $+0.01$ \\
-$A_b$ & $-0.0400$ & $[-0.0575,-0.0224]$ & $[-0.0575,-0.0225]$ & $+0.01$ \\
-$f_+$ & $0.114$ & $[0.089,0.145]$ & $[0.084,0.138]$ & $+0.90$ \\
-$f_-$ & $0.209$ & $[0.174,0.248]$ & $[0.168,0.241]$ & $+0.33$ \\
-$\lambda_1^+$ [MeV$^{-1}$] & $0.0350$ & $[0.0281,0.0431]$ & $[0.0274,0.0423]$ & $+0.52$ \\
-\bottomrule
-\end{tabular}}
-\caption{Equal-tailed and highest-posterior-density $68\%$ intervals and skewness of the marginal posteriors.}
-\label{tab:checks_hpd}
-\end{table}
 
 \subsection{Savage--Dickey Ratio}
 \label{sec:appendix_sd}
@@ -223,6 +204,64 @@ $\lambda_1^+$ [MeV$^{-1}$] & $0.0350$ & $[0.0281,0.0431]$ & $[0.0274,0.0423]$ & 
 \emph{In short: no change of the prior on the nuisance parameters or of its parametrization moves $A$ by more than $0.0002$; the Bayes factor of $A=0$ scales with the prior width, and the evidence computed by direct integration agrees in order of magnitude with the Savage-Dickey ratio.}
 The result is shown in Table~\ref{tab:checks_prior}.
 
+
+\subsection{Model Adequacy: Goodness of Fit and Posterior Predictive Check}
+\label{sec:bayes_gof}
+\emph{In short: the model does not reach $\chi^2/\mathrm{ndof}\approx1$ ($164.1/88$), mainly because the signal tails are heavier than a Gaussian, but $\Araw$ changes by only $-0.0002$ with a Crystal Ball signal.}
+The result is shown in Table~\ref{tab:gof}.
+
+The result is shown in Figure~\ref{fig:bayes_ppc}.
+The result is shown in Figure~\ref{fig:bayes_fit}.
+
+
+\subsection{Posterior Predictive Check with Statistics Not Fitted by the Model}
+\label{sec:checks_ppc}
+\emph{In short: the asymmetry in slices of the mass, which the model predicts, is reproduced ($p_B=0.67$), and the difference between the $\chi^2$ of the two charges is at the edge of the replicas ($p_B=0.08$).}
+The result is shown in Figure~\ref{fig:checks_ppc}.
+
+\subsection{Robustness Checks: Polarity, Prior and Charm Vetoes}
+\label{sec:bayes_checks}
+\emph{In short: $\Araw$ agrees between the two magnet polarities ($0.7\sigma$) and does not depend on the prior; the $D^0$ veto moves it by $2.3$ times the expected statistical spread.}
+The result is shown in Figure~\ref{fig:bayes_magnet}.
+
+
+\subsection{Toy-MC Coverage Validation}
+\label{sec:bayes_toymc}
+\emph{In short: $200$ toy-MC experiments give coverage $0.65\pm0.03$ ($68\%$) and $0.93\pm0.02$ ($95\%$), consistent with nominal, with unbiased estimates and pulls of width $1.04$.}
+The result is shown in Figure~\ref{fig:bayes_toys}.
+
+
+\subsection{Metropolis-Hastings Sampler and Published Likelihood}
+\label{sec:checks_mh}
+\emph{In short: an own Metropolis-Hastings sampler reproduces the posterior of the ensemble sampler, and the profile likelihood is given in a table, so that the result can be combined with others.}
+The result is shown in Table~\ref{tab:checks_qa}.
+
+\FloatBarrier
+% ---- figures and tables of this appendix, in the order in which they are cited ----
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/bayes_nominal_trace.pdf}
+\caption{Trace plot of the nominal fit with the 32 walkers initialized uniformly over the prior box (one grey line per walker, every 10th step; colored: median over the walkers), for $A$, $N_s$, $\sigma$ and the steep-background fraction $f_+$. Left: first 3000 steps, full range; right: whole chain, zoomed on the posterior. The first half of the chain (dotted line) is discarded as burn-in.}
+\label{fig:bayes_trace}
+\end{figure*}
+
+\begin{table}[h]
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lcccc}
+\toprule
+Parameter & median & equal-tailed & HPD & skewness \\
+\midrule
+$A$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $[-0.0525,-0.0355]$ & $+0.01$ \\
+$A_b$ & $-0.0400$ & $[-0.0575,-0.0224]$ & $[-0.0575,-0.0225]$ & $+0.01$ \\
+$f_+$ & $0.114$ & $[0.089,0.145]$ & $[0.084,0.138]$ & $+0.90$ \\
+$f_-$ & $0.209$ & $[0.174,0.248]$ & $[0.168,0.241]$ & $+0.33$ \\
+$\lambda_1^+$ [MeV$^{-1}$] & $0.0350$ & $[0.0281,0.0431]$ & $[0.0274,0.0423]$ & $+0.52$ \\
+\bottomrule
+\end{tabular}}
+\caption{Equal-tailed and highest-posterior-density $68\%$ intervals and skewness of the marginal posteriors.}
+\label{tab:checks_hpd}
+\end{table}
+
 \begin{table}[h]
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lccc}
@@ -241,11 +280,6 @@ Flat in $(N_s^\pm)$ and $(N_b^\pm)$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $19993$ 
 \label{tab:checks_prior}
 \end{table}
 
-\subsection{Model Adequacy: Goodness of Fit and Posterior Predictive Check}
-\label{sec:bayes_gof}
-\emph{In short: the model does not reach $\chi^2/\mathrm{ndof}\approx1$ ($164.1/88$), mainly because the signal tails are heavier than a Gaussian, but $\Araw$ changes by only $-0.0002$ with a Crystal Ball signal.}
-The result is shown in Table~\ref{tab:gof}.
-
 \begin{table}[!t]
 \centering
 \begin{tabular}{lccc}
@@ -263,64 +297,41 @@ Single exponential & $-0.0480$ & $297.7/92$ & $2\times10^{-23}$ \\
 \caption{$\Araw$ (posterior median) and goodness of fit of the nominal model (Gaussian signal, double exponential per charge) and of the alternative signal and background models, same data and window.}
 \label{tab:gof}
 \end{table}
-The result is shown in Figure~\ref{fig:bayes_ppc}.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/bayes_nominal_ppc.pdf}
+\includegraphics[width=0.7\textwidth]{figures/bayes_nominal_ppc.pdf}
 \caption{Posterior predictive check: distributions of three discrepancies over $1000$ datasets replicated from posterior draws, compared with the observed values. (a) binned $\chi^2$; (b) and (c) counting asymmetry of the fit window and of the sidebands.}
 \label{fig:bayes_ppc}
 \end{figure*}
 
-The result is shown in Figure~\ref{fig:bayes_fit}.
-
-\begin{figure*}[!t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/bayes_nominal_mass_fit.pdf}
+\includegraphics[width=0.7\textwidth]{figures/bayes_nominal_mass_fit.pdf}
 \caption{Mass distributions of (a) $B^+$ and (b) $B^-$ candidates with the nominal model (posterior medians, logarithmic scale): total, signal and background components. Bottom: pulls, $(\text{obs}-\text{exp})/\sqrt{\text{exp}}$.}
 \label{fig:bayes_fit}
 \end{figure*}
 
-\subsection{Posterior Predictive Check with Statistics Not Fitted by the Model}
-\label{sec:checks_ppc}
-\emph{In short: the asymmetry in slices of the mass, which the model predicts, is reproduced ($p_B=0.67$), and the difference between the $\chi^2$ of the two charges is at the edge of the replicas ($p_B=0.08$).}
-The result is shown in Figure~\ref{fig:checks_ppc}.
-
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/validation_ppc_unfitted.pdf}
+\includegraphics[width=0.7\textwidth]{figures/validation_ppc_unfitted.pdf}
 \caption{(a) Counting asymmetry in slices of $50\,\MeV$ of the mass, data and model. (b) Distribution of $T=\sum_s(A_s-\bar A_s)^2/\sigma_s^2$ over $1000$ replicas and observed value. (c) The same for $\chi^2(B^+)-\chi^2(B^-)$.}
 \label{fig:checks_ppc}
 \end{figure*}
 
-\subsection{Robustness Checks: Polarity, Prior and Charm Vetoes}
-\label{sec:bayes_checks}
-\emph{In short: $\Araw$ agrees between the two magnet polarities ($0.7\sigma$) and does not depend on the prior; the $D^0$ veto moves it by $2.3$ times the expected statistical spread.}
-The result is shown in Figure~\ref{fig:bayes_magnet}.
-
-\begin{figure}[h]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/bayes_nominal_magnet.pdf}
+\includegraphics[width=0.5\textwidth]{figures/bayes_nominal_magnet.pdf}
 \caption{Posterior of $\Araw$ for the magnet-down, magnet-up and combined samples.}
 \label{fig:bayes_magnet}
-\end{figure}
+\end{figure*}
 
-\subsection{Toy-MC Coverage Validation}
-\label{sec:bayes_toymc}
-\emph{In short: $200$ toy-MC experiments give coverage $0.65\pm0.03$ ($68\%$) and $0.93\pm0.02$ ($95\%$), consistent with nominal, with unbiased estimates and pulls of width $1.04$.}
-The result is shown in Figure~\ref{fig:bayes_toys}.
-
-\begin{figure}[h]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/bayes_nominal_toys.pdf}
+\includegraphics[width=0.7\textwidth]{figures/bayes_nominal_toys.pdf}
 \caption{Toy-MC validation, 200 toy-MC datasets. (a) Pulls $(\hat A-A_{\mathrm{true}})/\sigma(\hat A)$, with $\hat A$ and $\sigma(\hat A)$ the posterior median and standard deviation of each replica, compared with a standard normal. (b) Fraction of replicas whose 68\% and 95\% credible intervals contain the injected value, with binomial uncertainties, and the nominal coverage.}
 \label{fig:bayes_toys}
-\end{figure}
-
-\subsection{Metropolis-Hastings Sampler and Published Likelihood}
-\label{sec:checks_mh}
-\emph{In short: an own Metropolis-Hastings sampler reproduces the posterior of the ensemble sampler, and the profile likelihood is given in a table, so that the result can be combined with others.}
-The result is shown in Table~\ref{tab:checks_qa}.
+\end{figure*}
 
 \begin{table}[h]
 \centering
@@ -344,7 +355,8 @@ $q(A)$ & $17.9$ & $9.3$ & $3.5$ & $0.5$ & $0.2$ & $2.8$ & $8.1$ & $16.1$ & $27.0
 \emph{In short: the Bayesian and frequentist results of every variant and cross-check side by side.}
 The result is shown in Table~\ref{tab:bayes_all}.
 
-\begin{table*}[t]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \begin{tabular}{lrccc|c}
 \toprule
@@ -377,11 +389,12 @@ $D^0$, $J/\psi$, $\chi_{c0}$ vetoes & $16367$ & $-0.0423$ & $[-0.0516,-0.0329]$ 
 \end{tabular}
 \caption{All fits of the nominal model and of its variants: number of candidates, Bayesian posterior median and 68\% credible interval of $\Araw$, binned goodness of fit ($10\,\MeV$ bins), and frequentist estimate with its Hesse uncertainty (Sec.~\ref{sec:frequentist}; fitted on the same candidates; the cross-checks of the Bayesian fits that have no frequentist counterpart in this work are marked --). $^\dagger$ Uncertainty scaled from the number of events, since the Hesse matrix of that fit is not accurate. Every fit uses 32 walkers and $25{,}000$ steps.}
 \label{tab:bayes_all}
-\end{table*}
+\end{figure*}
 
 The result is shown in Table~\ref{tab:syst}.
 
-\begin{table}[t]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \small
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{llcc}
@@ -414,7 +427,7 @@ Preselection & $\texttt{ProbK}>0.4$ & $-0.0032$ ($0.0038$) & $-0.0032$ ($0.0037$
 \end{tabular}}
 \caption{Systematic study common to the Bayesian and frequentist fits: shift $\Delta$ of $\Araw$ for each variant and, in parentheses and for the variants that change the sample, the expected statistical spread $\sigma_B$ of the shift. The largest contributing shift of each group is its uncertainty (italics); the groups are added in quadrature. The single exponential is rejected by the data and excluded. For the window $[5150,5600]$ the frequentist uncertainty is scaled from the number of events, since the Hesse matrix of that fit is not accurate.}
 \label{tab:syst}
-\end{table}
+\end{figure*}
 
 \subsection{List of the Variants}
 \emph{In short: thirteen variants of the nominal choices, in four groups (window, background, signal, preselection), fitted by both methods on exactly the same candidates.}
@@ -423,22 +436,12 @@ Preselection & $\texttt{ProbK}>0.4$ & $-0.0032$ ($0.0038$) & $-0.0032$ ($0.0037$
 \emph{In short: a variant that changes the sample counts only if its shift exceeds $\sigma_B$; variants rejected by the data are excluded, the largest shift of each group is its uncertainty, and the groups are added in quadrature.}
 
 \subsection{Results and Particle-Identification Scan}
+\label{app:syst_results}
 \emph{In short: the total systematic uncertainties are $0.0070$ (Bayesian) and $0.0072$ (frequentist), dominated by the preselection through the single variant $\texttt{ProbK}>0.6$ ($+0.0058$, $1.2\,\sigma_B$).}
 
 \subsection{Shifts of All Variants}
 \label{app:syst_variants}
 \emph{In short: the shifts of the Bayesian and frequentist fits coincide variant by variant; the preselection group dominates, and the single exponential, rejected by the data, is drawn open.}
-
-\subsection{Scan of the Particle-Identification Cuts}
-\emph{In short: on the tight side the shift scatters around zero within $1.3\,\sigma_B$ and the pion requirement is flat; loosening $\texttt{ProbK}$ moves $\Araw$ monotonically, which supports the nominal requirement.}
-The result is shown in Figure~\ref{fig:syst_pid_scan}.
-
-\begin{figure*}[!t]
-\centering
-\includegraphics[width=0.85\textwidth]{figures/short_pid_scan.pdf}
-\caption{Shift of $\Araw$ (frequentist fit) as a function of (a) the $\mathtt{ProbK}$ lower cut and (b) the $\mathtt{ProbPi}$ upper cut, in steps of $0.05$, with the expected statistical spread of the nested sample ($\pm\sigma_B$ dark, $\pm2\sigma_B$ light; zero at the nominal cut, dash-dotted line). On the tight side of $\mathtt{ProbK}$ the points scatter around zero without trend and the pion requirement is flat; loosening $\mathtt{ProbK}$ moves $\Araw$ monotonically.}
-\label{fig:syst_pid_scan}
-\end{figure*}
 
 \subsection{Sensitivity of $\sigma_B$ to Differences between the Methods}
 \emph{In short: $\sigma_B$ is the difference of two nearly equal uncertainties and is sensitive to small differences between the methods; a variant at the threshold can be classified differently without changing the result.}
@@ -448,7 +451,7 @@ The result is shown in Figure~\ref{fig:syst_pid_scan}.
 \emph{In short: the spread of the shift of $\hat A$ between a sample and its tighter-identification subsample is the one given by the quadrature difference of the uncertainties.}
 The result is shown in Figure~\ref{fig:checks_barlow}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/validation_barlow.pdf}
 \caption{Shift of $\hat A$ between the nominal sample and a tighter selection, divided by the median $\sigma_B$, in $300$ bootstrap replicas of the data: (a) $\texttt{ProbK}>0.6$, (b) $\texttt{ProbPi}<0.4$, and standard normal distribution.}
@@ -458,17 +461,17 @@ The result is shown in Figure~\ref{fig:checks_barlow}.
 \subsection{Stability Scans of the Frequentist Fit: Numbers}
 \label{sec:freq_stab_numbers}
 \emph{In short: the largest shifts are $0.0048$ over the grid of window edges and $0.0126$ over the grid of the two PID cuts, whose samples are smaller (mean uncertainty $0.0112$); the signal region moves $\Araw$ by $6\times10^{-5}$.}
-
-\FloatBarrier
-
 The result is shown in Figure~\ref{fig:freq_stability}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/freq_stability.pdf}
 \caption{Stability of the fitted $\Araw$ over the three grids: (a) lower and upper edge of the fit window (only fits with a valid minimum and an accurate covariance are shown); (b) lower and upper edge of the signal region; (c) lower cut on \texttt{ProbK} and upper cut on \texttt{ProbPi}. The colour is the shift with respect to the nominal fit (star), in units of $10^{-3}$ for (a) and (c) and $10^{-5}$ for (b); the statistical uncertainty of the nominal fit is $8.5\times10^{-3}$.}
 \label{fig:freq_stability}
 \end{figure*}
+
+
+\FloatBarrier
 
 \section{Validation of the Estimator and of the Intervals}
 \label{app:ext_valid}
@@ -478,6 +481,7 @@ The result is shown in Figure~\ref{fig:freq_stability}.
 \emph{In short: toy experiments are generated from the fitted model (Poisson yields, masses by the transformation method) and fitted with the nominal procedure: $1000$ at the fitted value and $300$ at each of four other values of $A$.}
 
 \subsection{Bias, Efficiency and Coverage}
+\label{app:bias_cov}
 \emph{In short: the bias is at most $0.0008$, the spread equals the Hesse uncertainty within $6\%$, and the coverage at the fitted value is $0.696\pm0.015$ and $0.954\pm0.007$.}
 
 \subsection{Asymptotic Behavior of the Estimator}
@@ -485,7 +489,8 @@ The result is shown in Figure~\ref{fig:freq_stability}.
 \emph{In short: with the number of candidates the bias tends to zero, the spread scales as $N^{-1/2}$ and the distribution of $\hat A$ becomes Gaussian, as the central limit theorem and the asymptotic properties of the maximum-likelihood estimate predict.}
 The result is shown in Table~\ref{tab:checks_scaling}.
 
-\begin{table}[h]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{rcccccc}
 \toprule
@@ -499,7 +504,7 @@ $2000$ & $+0.0009$ & $0.0225$ & $1.01$ & $-0.20$ & $-0.20$ & $0.32$ \\
 \end{tabular}}
 \caption{Distribution of the maximum-likelihood estimate of $A$ in $300$ toy-MC datasets of $N$ candidates (six-parameter model of Sec.~\ref{sec:bayes_minimal}).}
 \label{tab:checks_scaling}
-\end{table}
+\end{figure*}
 
 \subsection{Size and Power of the Test of $A=0$}
 \label{sec:validation_power}
@@ -525,8 +530,6 @@ The result is shown in Figure~\ref{fig:validation_gof}.
 \label{fig:validation_gof}
 \end{figure*}
 
-\FloatBarrier
-
 \section{Local Asymmetry in the Dalitz Plane}
 \label{app:ext_dalitz}
 \emph{In short: the local deviations and their robustness, the null tests of the procedure, the region of the published analysis and the split by magnet polarity.}
@@ -534,6 +537,7 @@ The result is shown in Figure~\ref{fig:validation_gof}.
 \emph{In short: two bins have $|S_i|>3$ ($-3.7$ and $-3.0$) and the global homogeneity test gives $\chi^2=80.8$ for $31$ degrees of freedom ($p=3\times10^{-6}$), also in the signal window alone.}
 
 \subsection{Homogeneity Test: Signal Window, Vetoes, Grids and Magnet Split}
+\label{app:dalitz_homog}
 \emph{In short: the homogeneity test holds in the signal window, with the charm vetoes and for other grids, and the structure is the same in the two magnet polarities ($\chi^2=23.0$ for $29$ bins).}
 
 \subsection{Null Tests of the Local-Asymmetry Procedure}
@@ -545,12 +549,12 @@ The result is shown in Figure~\ref{fig:validation_gof}.
 \emph{In short: shuffling the charges reproduces the $\chi^2$ distribution of a uniform asymmetry, and the observed value lies far beyond all $2000$ permutations.}
 The result is shown in Figure~\ref{fig:dalitz_perm}.
 
-\begin{figure}[t]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/dalitz_permutation.pdf}
+\includegraphics[width=0.5\textwidth]{figures/dalitz_permutation.pdf}
 \caption{Homogeneity statistic $\chi^2=\sum_iS_i^2$ of the $8\times8$ Dalitz grid for $2000$ random permutations of the charges (histogram), $\chi^2$ distribution with $31$ degrees of freedom (dashed) and observed value (line).}
 \label{fig:dalitz_perm}
-\end{figure}
+\end{figure*}
 
 \subsection{Asymmetry in the $\phi(1020)$ Band and in the Significant Bins}
 \label{app:dalitz_phi}
@@ -566,7 +570,7 @@ The result is shown in Figure~\ref{fig:dalitz_phi}.
 
 The result is shown in Figure~\ref{fig:dalitz_region}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_dalitz_region.pdf}
 \caption{(a) Ordered Dalitz plot of the candidates in the fit window, with the squared masses of the $\phi(1020)$, $D^0$, $J/\psi$ and $\chi_{c0}$ (dashed) and the region of the published analysis of the same data~\cite{lhcb_cpv_2013} (box). (b) Mass spectra of $B^+$ and $B^-$ candidates in that region, same binning: the $B^-$ peak is visibly smaller.}
@@ -586,6 +590,7 @@ The result is shown in Figure~\ref{fig:dalitz_region}.
 \emph{In short: the two fits agree to the quoted digits (estimates differ by $0.0002$, both uncertainties are $0.0085$, systematic uncertainties $0.0070$ and $0.0072$); sideband subtraction gives $-0.0503\pm0.0083$.}
 
 \subsection{Meaning of the Interval}
+\label{app:cmp_meaning}
 \emph{In short: the credible interval is a probability on $A$ given the data and the prior, the confidence interval a property of the procedure, which the bootstrap and the toy experiments verified.}
 
 \subsection{Profile Likelihood, Posterior and the Two Polarities}
@@ -593,7 +598,8 @@ The result is shown in Figure~\ref{fig:dalitz_region}.
 \emph{In short: profiling and marginalizing the nuisance parameters give the same distribution of $A$; the two magnet polarities agree with each other, and combining their likelihoods reproduces the joint fit.}
 The result is shown in Table~\ref{tab:checks_polarity}.
 
-\begin{table}[h]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\begin{tabular}{lcc}
 \toprule
@@ -607,33 +613,37 @@ Joint fit & $-0.0441\pm0.0085$ & $-0.0443\pm0.0085$ \\
 \end{tabular}}
 \caption{$\Araw$ for the two magnet polarities and their combination, by the two methods; the frequentist combination is the sum of the profile likelihoods of the two polarities, the Bayesian one the sequential update of the posterior.}
 \label{tab:checks_polarity}
-\end{table}
+\end{figure*}
 
 \subsection{Confidence and Credible Regions in $(A,A_b)$}
 \label{sec:checks_region}
 \emph{In short: the $68\%$ and $95\%$ regions of the frequentist profile ($\Delta\mathrm{NLL}$ at the $\chi^2_2$ values $2.30$ and $5.99$) and of the Bayesian highest posterior density coincide, and $A=0$ lies outside both.}
 The result is shown in Figure~\ref{fig:checks_region}.
 
-\begin{figure}[h]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/validation_region_Ab.pdf}
+\includegraphics[width=0.5\textwidth]{figures/validation_region_Ab.pdf}
 \caption{$68\%$ (solid) and $95\%$ (dashed) regions in $(A,A_b)$: frequentist, from the profile likelihood with $\chi^2_2$ thresholds, and Bayesian, highest-posterior-density regions of the chain. Dots: best-fit and posterior median.}
 \label{fig:checks_region}
-\end{figure}
+\end{figure*}
 
 \subsection{Hypothesis Test}
+\label{app:cmp_test}
 \emph{In short: the exact binomial test on all candidates gives $6.1\sigma$, the test of the fit $p=2\times10^{-7}$ ($5.2\sigma$) and the Bayes factor $BF_{10}\approx9\times10^3$; they answer different questions.}
 
 \subsection{Goodness of Fit}
+\label{app:cmp_gof}
 \emph{In short: the same fit has $p=0.03$ in $2.5\,\MeV$ bins and $p\approx5\times10^{-6}$ in $10\,\MeV$ bins: the $p$-value of the binned $\chi^2$ is a property of the binning as much as of the model.}
 
 \subsection{Nuisance Parameters and Validation}
 \emph{In short: the frequentist analysis profiles the eleven nuisance parameters and the Bayesian one marginalizes them; the results coincide because $A$ is almost uncorrelated with them.}
 
 \subsection{Published Analysis: Samples and Models}
+\label{app:cmp_pubsamples}
 \emph{In short: the published analysis has $22{,}119\pm164$ signal candidates, a Cruijff signal and misidentified and partially reconstructed backgrounds; with the same $D^0$ veto the Bayesian fit gives $-0.0496\pm0.0088$.}
 
 \subsection{Published Analysis: Raw versus CP Asymmetry}
+\label{app:cmp_pubraw}
 \emph{In short: $\ACP\approx\Araw-A_P-A_D$; the corrections move the published result from $-0.060$ to $-0.043\pm0.009\pm0.003\pm0.007$ and cannot be assumed for a different selection.}
 
 \subsection{Machine-Learning Cross-Check}
@@ -644,7 +654,7 @@ The result is shown in Figure~\ref{fig:checks_region}.
 \emph{In short: credible and confidence intervals coincide for $\sim2\times10^4$ candidates with flat priors, and stay equal, in value and coverage, down to $50$ candidates.}
 The result is shown in Figure~\ref{fig:bayes_lowstat}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/bayes_nominal_lowstat.pdf}
 \caption{Coverage of the (a) 68\% and (b) 95\% intervals on $A$ vs the number of candidates, for the Bayesian credible interval, the profile-likelihood (Minos) interval and the Hesse interval of the same likelihood; 300 toy-MC datasets per point, binomial uncertainties. The dashed lines mark the nominal coverage ($1\sigma$, $2\sigma$; the Bayesian 95\% interval is the 2.5--97.5\% one).}
@@ -675,7 +685,61 @@ The result is shown in Figure~\ref{fig:bayes_lowstat}.
 \emph{In short: six classifiers; the tree ensembles and the neural network reach test AUC $0.857$--$0.864$, about $0.09$ above the linear models and indistinguishable from each other within the test-set uncertainty ($0.012$); gradient boosting, best in cross-validation, is the reference.}
 The result is shown in Table~\ref{tab:ml_models}.
 
-\begin{table}[h]
+The result is shown in Figure~\ref{fig:ml_roc}.
+
+The result is shown in Figure~\ref{fig:ml_features}.
+
+\subsection{Regularization, Bias-Variance, and Calibration}
+\label{sec:ml_regcal}
+\emph{In short: the linear model does not overfit, gradient boosting overfits beyond $\sim$150 stages without losing test AUC, and class weights bias the probabilities, which an isotonic recalibration corrects (Brier score $0.122\to0.062$) without changing the ranking.}
+The result is shown in Figure~\ref{fig:ml_regularization}.
+
+The result is shown in Figure~\ref{fig:ml_bias_variance}.
+
+The result is shown in Figure~\ref{fig:ml_calibration}.
+
+\subsection{Uncertainty Quantification}
+\label{sec:ml_uncertainty}
+\emph{In short: the three estimators give mean per-candidate uncertainties of $0.178$ (Random Forest), $0.095$ (MC dropout) and $0.050$ (deep ensemble); they measure different sources of variability, and only the Random Forest spread visibly decreases with the training-set size.}
+The result is shown in Figure~\ref{fig:ml_uncertainty}.
+
+\subsection{K-means on the Dalitz Plot}
+\label{sec:ml_kmeans}
+\emph{In short: for $K=8$ two clusters deviate by more than $3\sigma$ ($\chi^2=46.4$ for $7$ degrees of freedom): a negative asymmetry at low $m^2_{\mathrm{lo}}$ and positive ones at high $m^2_{\mathrm{hi}}$, as in the fixed binning.}
+The result is shown in Figure~\ref{fig:ml_kmeans_sel}.
+
+\subsection{Stability of $\Araw$ under ML Selection}
+\label{sec:ml_stability}
+\emph{In short: a cut on the score at $0.5$ keeps $92\%$ of the signal and $36\%$ of the background and leaves $\Araw$ within its expected statistical spread with both fits and with counting; it does not improve the precision and cannot remove the misidentified background.}
+The result is shown in Figure~\ref{fig:ml_threshold}.
+
+The result is shown in Table~\ref{tab:three_methods}. The tighter cut at the maximum of the significance improvement (score $>0.73$, $\varepsilon_S=0.66$, $\varepsilon_B=0.13$, Fig.~\ref{fig:ml_roc}b) gives shifts of $+0.004$ to $+0.005$, $0.9$ times their expected spread, and $A\neq0$ is still $4.1\sigma$; this cut is not an optimum for the measurement, since $\varepsilon_S/\sqrt{\varepsilon_B}$ holds for a signal small against the background, while here the precision follows $S/\sqrt{S+B}$ and worsens from $0.0085$ to $0.0097$.
+
+The result is shown in Figure~\ref{fig:ml_mass_cut}.
+
+The result is shown in Figure~\ref{fig:ml_high_bkg}.
+
+\subsection{Hyperparameter Optimization}
+\label{sec:ml_hyper}
+\emph{In short: the best configurations improve the test AUC by at most $0.005$, less than its uncertainty, and the cross-validated maximum overestimates the test AUC (winner's curse).}
+The result is shown in Figure~\ref{fig:ml_ffnn_search}.
+
+The result is shown in Table~\ref{tab:ml_hyperparams}.
+
+The result is shown in Table~\ref{tab:ml_ffnn_search}.
+
+\subsection{Machine Learning and the Fits}
+\label{sec:comparison_ml}
+\emph{In short: the machine-learning selection is a cross-check: a cut at $0.5$ leaves $\Araw$ within its expected spread with both methods, does not improve the precision, and cannot remove the misidentified decays.}
+
+\subsection{Local Asymmetries: Fixed Binning and $K$-Means}
+\label{sec:comparison_local}
+\emph{In short: the fixed grid and the $K$-means partition show the same pattern, a negative asymmetry at low $m^2_{\mathrm{lo}}$ and positive ones at high $m^2_{\mathrm{hi}}$ ($\chi^2=80.8/31$ and $46.4/7$).}
+
+\FloatBarrier
+% ---- figures and tables of this appendix, in the order in which they are cited ----
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \begin{tabular}{lccc}
 \toprule
@@ -691,134 +755,107 @@ FFNN                      & --                & $0.857 \pm 0.012$ & $0.134$ \\
 \end{tabular}
 \caption{Cross-validated AUC (mean and standard deviation over the folds), test-set AUC (with bootstrap uncertainty) and test-set Brier score of the raw scores. Gradient boosting, best in cross-validation, is the reference model. The FFNN is validated on the validation set instead of by cross-validation.}
 \label{tab:ml_models}
-\end{table}
-The result is shown in Figure~\ref{fig:ml_roc}.
+\end{figure*}
 
-\begin{figure}[h]
+
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/ml_nominal_roc.pdf}
-\caption{ROC curves on the test set, with the test AUC of each model in the legend (Table~\ref{tab:ml_models}); the reference model is drawn thicker, and the two logistic regressions overlap. The circle marks the cut on the reference score used in Appendix~\ref{sec:ml_stability}.}
+\includegraphics[width=0.95\textwidth]{figures/ml_nominal_roc.pdf}
+\caption{Test-set performance of the classifiers: (a) ROC curves, with the test AUC of each model in the legend (Table~\ref{tab:ml_models}); (b) significance improvement $\varepsilon_S/\sqrt{\varepsilon_B}$ of a cut on the score as a function of the signal-like efficiency, where $1$ is no selection and $\varepsilon_{S,B}$ are the fractions of signal-like and background-like candidates kept. The reference model is drawn thicker, and the two logistic regressions overlap. The circle marks the cut on the reference score used in Appendix~\ref{sec:ml_stability}.}
 \label{fig:ml_roc}
-\end{figure}
-The result is shown in Figure~\ref{fig:ml_features}.
+\end{figure*}
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_features.pdf}
 \caption{Random Forest feature importance (Gini, a) and magnitude of the Lasso coefficient of the standardized feature (b) for the 20 features, both ordered by Random Forest importance; the two $B$-candidate variables are highlighted.}
 \label{fig:ml_features}
 \end{figure*}
 
-\subsection{Regularization, Bias-Variance, and Calibration}
-\label{sec:ml_regcal}
-\emph{In short: the linear model does not overfit, gradient boosting overfits beyond $\sim$150 stages without losing test AUC, and class weights bias the probabilities, which an isotonic recalibration corrects (Brier score $0.122\to0.062$) without changing the ranking.}
-The result is shown in Figure~\ref{fig:ml_regularization}.
-
-\begin{figure}[h]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/ml_regularization.pdf}
+\includegraphics[width=0.5\textwidth]{figures/ml_regularization.pdf}
 \caption{Cross-validated AUC of the logistic regression against the inverse regularization strength $C=1/\alpha$ ($30$ log-spaced values), for the $L_1$ (Lasso) and $L_2$ (Ridge) penalties; the dotted lines mark the optimum of each.}
 \label{fig:ml_regularization}
-\end{figure}
-The result is shown in Figure~\ref{fig:ml_bias_variance}.
+\end{figure*}
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_bias_variance.pdf}
 \caption{Gradient boosting: (a) accuracy at the $0.5$ threshold and (b) AUC on the training and test sets as a function of the number of boosting stages. The dotted line is the accuracy of always predicting the signal-like class.}
 \label{fig:ml_bias_variance}
 \end{figure*}
-The result is shown in Figure~\ref{fig:ml_calibration}.
 
-\begin{figure}[t]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/ml_nominal_calibration.pdf}
+\includegraphics[width=0.5\textwidth]{figures/ml_nominal_calibration.pdf}
 \caption{Reliability diagram of the Random Forest on the test set: observed fraction of signal-like candidates vs.\ predicted probability, for the raw score (with binomial uncertainties) and for the isotonic-recalibrated one. Bottom: distribution of the raw score for the two weak-label classes; the low-probability bins contain few candidates.}
 \label{fig:ml_calibration}
-\end{figure}
+\end{figure*}
 
-\subsection{Uncertainty Quantification}
-\label{sec:ml_uncertainty}
-\emph{In short: the three estimators give mean per-candidate uncertainties of $0.178$ (Random Forest), $0.095$ (MC dropout) and $0.050$ (deep ensemble); they measure different sources of variability, and only the Random Forest spread visibly decreases with the training-set size.}
-The result is shown in Figure~\ref{fig:ml_uncertainty}.
-
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_uncertainty.pdf}
 \caption{(a) Spread across the Random Forest trees vs.\ mean tree score, median and 16--84\% band of the test candidates of each weak-label class. (b) Distributions of the per-candidate uncertainty from the Random Forest trees, MC dropout and the deep ensemble. (c) Mean Random Forest spread vs.\ training-set size, for all, background-like and signal-like test candidates.}
 \label{fig:ml_uncertainty}
 \end{figure*}
 
-\subsection{K-means on the Dalitz Plot}
-\label{sec:ml_kmeans}
-\emph{In short: for $K=8$ two clusters deviate by more than $3\sigma$ ($\chi^2=46.4$ for $7$ degrees of freedom): a negative asymmetry at low $m^2_{\mathrm{lo}}$ and positive ones at high $m^2_{\mathrm{hi}}$, as in the fixed binning.}
-The result is shown in Figure~\ref{fig:ml_kmeans_sel}.
-
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/ml_kmeans_selection.pdf}
 \caption{(a) Inertia and (b) mean silhouette of the $K$-means partition of the Dalitz plane for $K=2$--$12$; the dashed line marks the $K=8$ fixed in advance and the dash-dotted line the maximum of the silhouette, $K=3$.}
 \label{fig:ml_kmeans_sel}
 \end{figure*}
 
-\subsection{Stability of $\Araw$ under ML Selection}
-\label{sec:ml_stability}
-\emph{In short: a cut on the score at $0.5$ keeps $92\%$ of the signal and $36\%$ of the background and leaves $\Araw$ within its expected statistical spread with both fits and with counting; it does not improve the precision and cannot remove the misidentified background.}
-The result is shown in Figure~\ref{fig:ml_threshold}.
-
-\begin{figure}[h]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/ml_nominal_threshold.pdf}
+\includegraphics[width=0.5\textwidth]{figures/ml_nominal_threshold.pdf}
 \caption{Counting asymmetry after a cut on the gradient-boosting score, vs.\ threshold, with its binomial uncertainty. Dotted line: counting asymmetry of the full fit window; band: expected statistical spread of a nested subsample around it, $\pm\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$.}
 \label{fig:ml_threshold}
-\end{figure}
-The result is shown in Table~\ref{tab:three_methods}.
+\end{figure*}
 
-\begin{table*}[t]
+
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
-\begin{tabular}{lccc}
+\begin{tabular}{lccccc}
 \toprule
-Method & Full sample & Score $>0.5$ & Shift (expected) \\
+Method & Full sample & Score $>0.5$ & Shift (expected) & Score $>0.73$ & Shift (expected) \\
 \midrule
-Bayesian fit    & $-0.0443\pm0.0085$ & $-0.0451\pm0.0087$ & $-0.0008\,(0.0018)$ \\
-Frequentist fit & $-0.0441\pm0.0085$ & $-0.0447\pm0.0086$ & $-0.0006\,(0.0012)$ \\
-Counting        & $-0.0432\pm0.0071$ & $-0.0446\pm0.0080$ & $-0.0014\,(0.0036)$ \\
+Bayesian fit    & $-0.0443\pm0.0085$ & $-0.0451\pm0.0087$ & $-0.0008\,(0.0018)$ & $-0.0404\pm0.0097$ & $+0.0039\,(0.0047)$ \\
+Frequentist fit & $-0.0441\pm0.0085$ & $-0.0447\pm0.0086$ & $-0.0006\,(0.0012)$ & $-0.0401\pm0.0097$ & $+0.0040\,(0.0048)$ \\
+Counting        & $-0.0432\pm0.0071$ & $-0.0446\pm0.0080$ & $-0.0014\,(0.0036)$ & $-0.0381\pm0.0093$ & $+0.0051\,(0.0059)$ \\
 \bottomrule
 \end{tabular}
-\caption{$\Araw$ on the full fit window ($19{,}731$ candidates) and after the cut on the gradient-boosting score ($15{,}709$), by the three methods. The expected shift is the statistical spread of a nested subsample, $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$. Counting includes the background.}
+\caption{$\Araw$ on the full fit window ($19{,}731$ candidates) and after the cuts on the gradient-boosting score at $0.5$ ($15{,}709$ candidates) and at $0.73$ ($11{,}658$), the maximum of the significance improvement of Fig.~\ref{fig:ml_roc}, by the three methods. The expected shift is the statistical spread of a nested subsample, $\sqrt{\sigma_{\mathrm{sub}}^2-\sigma_{\mathrm{full}}^2}$. Counting includes the background.}
 \label{tab:three_methods}
-\end{table*}
-The result is shown in Figure~\ref{fig:ml_mass_cut}.
+\end{figure*}
 
-\begin{figure*}[t]
+
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_mass_after_cut.pdf}
 \caption{(a) Mass spectrum of all candidates and of those with gradient-boosting score $>0.5$, for the 20-feature classifier and for one trained without the kaon momentum components (25\,MeV bins). (b) Fraction of candidates passing the cut. Hatched: the region below $5150\,\MeV$ excluded from the background-like labels; grey: the signal-like window.}
 \label{fig:ml_mass_cut}
 \end{figure*}
-The result is shown in Figure~\ref{fig:ml_high_bkg}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=0.95\textwidth]{figures/ml_nominal_high_background.pdf}
 \caption{High-background sample ($\texttt{ProbK}>0.3$): (a) statistical uncertainty and (b) value of $\Araw$ from the frequentist fit vs signal efficiency, for tighter identification cuts ($\texttt{ProbK}>0.3,\dots,0.8$) and for cuts on the score of the classifier retrained on this sample ($0,\dots,0.9$). The dotted line marks the nominal selection ($\texttt{ProbK}>0.5$). The samples are nested, so their uncertainties are correlated.}
 \label{fig:ml_high_bkg}
 \end{figure*}
 
-\subsection{Hyperparameter Optimization}
-\label{sec:ml_hyper}
-\emph{In short: the best configurations improve the test AUC by at most $0.005$, less than its uncertainty, and the cross-validated maximum overestimates the test AUC (winner's curse).}
-The result is shown in Figure~\ref{fig:ml_ffnn_search}.
-
-\begin{figure}[h]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/ml_ffnn_search.pdf}
+\includegraphics[width=0.5\textwidth]{figures/ml_ffnn_search.pdf}
 \caption{Cross-validated AUC of the $168$ FFNN configurations (dots) for each of the seven architectures, ordered by number of units; the black segment marks the best configuration of each architecture.}
 \label{fig:ml_ffnn_search}
-\end{figure}
-The result is shown in Table~\ref{tab:ml_hyperparams}.
+\end{figure*}
 
-\begin{table*}[t]
+
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \begin{tabular}{lllc}
 \toprule
@@ -830,10 +867,10 @@ Gradient Boosting & \pcell{7cm}{\texttt{n\_estimators} $100$--$500$, \texttt{max
 \end{tabular}
 \caption{Hyperparameter search for the tree ensembles ($120$ and $100$ configurations, 5-fold cross-validation repeated 10 times, balanced class weights). The test AUC of the best configuration is compared with that of the default of Table~\ref{tab:ml_models} (in parentheses); the bootstrap uncertainty of each test AUC is $0.012$.}
 \label{tab:ml_hyperparams}
-\end{table*}
-The result is shown in Table~\ref{tab:ml_ffnn_search}.
+\end{figure*}
 
-\begin{table*}[t]
+\begin{figure*}[!t]
+\makeatletter\def\@captype{table}\makeatother
 \centering
 \begin{tabular}{llccc}
 \toprule
@@ -848,15 +885,7 @@ Architecture & Layers & Dropout & Learning rate & CV AUC \\
 \end{tabular}
 \caption{Top five of the $168$ FFNN configurations ($7$ architectures from one hidden layer of 8 units to five layers $[128,64,32,16,8]$, dropout $0.1$--$0.4$, learning rates $0.0002$--$0.005$; 5-fold cross-validation repeated twice). The five are within $0.0007$ of each other, far below the fold-to-fold spread: the optimum is a plateau. The best configuration has test AUC $0.8606$, against $0.8568$ for the default architecture ($\pm0.005$ over initializations).}
 \label{tab:ml_ffnn_search}
-\end{table*}
-
-\subsection{Machine Learning and the Fits}
-\label{sec:comparison_ml}
-\emph{In short: the machine-learning selection is a cross-check: a cut at $0.5$ leaves $\Araw$ within its expected spread with both methods, does not improve the precision, and cannot remove the misidentified decays.}
-
-\subsection{Local Asymmetries: Fixed Binning and $K$-Means}
-\label{sec:comparison_local}
-\emph{In short: the fixed grid and the $K$-means partition show the same pattern, a negative asymmetry at low $m^2_{\mathrm{lo}}$ and positive ones at high $m^2_{\mathrm{hi}}$ ($\chi^2=80.8/31$ and $46.4/7$).}
+\end{figure*}
 
 \FloatBarrier
 

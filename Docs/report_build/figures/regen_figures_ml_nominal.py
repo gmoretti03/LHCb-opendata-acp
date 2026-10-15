@@ -53,23 +53,31 @@ ps.use(); C = ps.COLORS
 def save(fig, name):
     fig.savefig(os.path.join(OUT, name)); plt.close(fig); print("saved", name)
 
-# ---------------- ROC curves, AUC in the legend, working point of the selection used later
+# ---------------- ROC curves (a) and significance improvement eps_S/sqrt(eps_B) (b), working point of the selection used later
 from sklearn.metrics import roc_curve, roc_auc_score
 y = scores[:, 0]
 ref = models["reference_model"]
 styles = {n_: (ps.MODELS[n_], "--" if n_.endswith("(L1)") else "-") for n_ in ps.MODELS}
-fig, ax = plt.subplots(figsize=(ps.SINGLE, 5.4))
+fig, ax = plt.subplots(1, 2, figsize=(ps.DOUBLE, 5.0))
 for k, name in enumerate(models["order"], 1):
     fpr, tpr, _ = roc_curve(y, scores[:, k]); col, ls_ = styles[name]
-    ax.plot(fpr, tpr, color=col, ls=ls_, lw=2.2 if name == ref else 1.1,
-            label=f"{name} ({roc_auc_score(y, scores[:, k]):.3f})")
+    lw = 2.2 if name == ref else 1.1
+    ax[0].plot(fpr, tpr, color=col, ls=ls_, lw=lw, label=f"{name} ({roc_auc_score(y, scores[:, k]):.3f})")
+    ok = fpr >= 1e-3                                  # below eps_B = 1e-3 too few background-like candidates survive
+    ax[1].plot(tpr[ok], tpr[ok] / np.sqrt(fpr[ok]), color=col, ls=ls_, lw=lw, label=name)
 k_ref = models["order"].index(ref) + 1
 sel_ = scores[:, k_ref] > 0.5
 wp_fpr, wp_tpr = np.mean(sel_[y == 0]), np.mean(sel_[y == 1])
-ax.plot([wp_fpr], [wp_tpr], "o", ms=8, mfc="white", mec="k", mew=1.5, label=f"{ref}, score $>0.5$")
-ax.plot([0, 1], [0, 1], "k:", alpha=0.5)
-ax.set_xlabel("Background-like efficiency (false positive rate)"); ax.set_ylabel("Signal-like efficiency (true positive rate)")
-ax.legend(loc="lower right", fontsize=10, title="Test AUC", title_fontsize=10)
+ax[0].plot([wp_fpr], [wp_tpr], "o", ms=8, mfc="white", mec="k", mew=1.5, label=f"{ref}, score $>0.5$")
+ax[1].plot([wp_tpr], [wp_tpr / np.sqrt(wp_fpr)], "o", ms=8, mfc="white", mec="k", mew=1.5)
+ax[0].plot([0, 1], [0, 1], "k:", alpha=0.5)
+ax[1].axhline(1, color="k", ls=":", alpha=0.5)       # no selection: significance unchanged
+ax[0].set_xlabel("Background-like efficiency $\\varepsilon_B$"); ax[0].set_ylabel("Signal-like efficiency $\\varepsilon_S$")
+ax[1].set_xlabel("Signal-like efficiency $\\varepsilon_S$"); ax[1].set_ylabel("Significance improvement $\\varepsilon_S/\\sqrt{\\varepsilon_B}$")
+ax[0].legend(loc="lower right", fontsize=10, title="Test AUC", title_fontsize=10)
+for a_, t_ in zip(ax, "ab"):
+    a_.text(0.03, 0.96, f"({t_})", transform=a_.transAxes, va="top", fontweight="bold")
+fig.tight_layout()
 save(fig, "ml_nominal_roc.pdf")
 
 # ---------------- feature importance (RF, Gini) and |Lasso coefficient|: two panels, same feature order
@@ -182,17 +190,20 @@ ax.set_xlabel(f"{models['reference_model']} score threshold"); ax.set_ylabel(r"$
 ax.legend(loc="lower left")
 save(fig, "ml_nominal_threshold.pdf")
 
-# ---------------- three approaches, full vs selected sample
-fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.2))
+# ---------------- three approaches, full vs selected samples (score > 0.5 and at the maximum of the significance improvement)
+fig, ax = plt.subplots(figsize=(ps.SINGLE, 4.6))
 _ab, _sb = three["bayes"]["full"]["A"], three["bayes"]["full"]["sd"]
 ax.axvspan(_ab - _sb, _ab + _sb, color=C["shade"], alpha=0.6, zorder=0, label=r"Bayesian, full sample, $\pm1\sigma$")
 ax.axvline(_ab, color=C["background"], ls=":", lw=1, zorder=0)
 lab = [("bayes", "Bayesian fit", "sd"), ("frequentist", "Frequentist fit", "A_err"), ("counting", "Counting", "sd")]
+mx = js("maxsic_selected.json")
 for i, (k, name, e) in enumerate(lab):
-    f, s_ = three[k]["full"], three[k]["selected"]
-    ax.errorbar([f["A"]], [i + 0.12], xerr=[f[e]], fmt="o", color="k", capsize=3, label="Full sample" if i == 0 else None)
-    ax.errorbar([s_["A"]], [i - 0.12], xerr=[s_[e]], fmt="s", color=C["ml"], capsize=3,
+    f, s_, s2 = three[k]["full"], three[k]["selected"], mx[k]["selected"]
+    ax.errorbar([f["A"]], [i + 0.22], xerr=[f[e]], fmt="o", color="k", capsize=3, label="Full sample" if i == 0 else None)
+    ax.errorbar([s_["A"]], [i], xerr=[s_[e]], fmt="s", color=C["ml"], capsize=3,
                 label=f"Selected (score > {three['threshold']})" if i == 0 else None)
+    ax.errorbar([s2["A"]], [i - 0.22], xerr=[s2[e]], fmt="D", color="#6a3d9a", capsize=3,
+                label=f"Selected (score > {mx['threshold']}, max. SIC)" if i == 0 else None)
 ax.set_yticks(range(len(lab))); ax.set_yticklabels([n for _, n, _ in lab])
 ax.set_xlabel(r"$A_{\mathrm{raw}}$"); ax.invert_yaxis()
 ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(6))
