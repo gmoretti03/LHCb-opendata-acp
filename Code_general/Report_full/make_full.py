@@ -6,6 +6,7 @@ import json, os, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.abspath(os.path.join(HERE, "..", "Report"))
 SMOKE = len(sys.argv) > 1 and sys.argv[1] == "smoke"
+ONLY = [a for a in sys.argv[1:] if a != "smoke"]            # optional: build only these notebooks (without touching the others)
 DST = os.path.abspath(os.path.join(HERE, "..", "Report_smoke")) if SMOKE else HERE
 os.makedirs(DST, exist_ok=True)
 for f in ("plot_style.py", "environment.yml"):
@@ -98,6 +99,8 @@ banner = ("> **Production run.** Same notebook with the numbers of replicas, toy
           "Run with `run_full.sh`; expect several hours.\n\n" if not SMOKE else "> **Smoke test.** Tiny counts: only checks that the code runs.\n\n")
 bad = 0
 for name, reps in R.items():
+    if ONLY and name not in ONLY:
+        continue
     nb = json.load(open(os.path.join(SRC, name + ".ipynb")))
     found = {old: 0 for old, _ in reps}
     for c in nb["cells"]:

@@ -1,0 +1,9 @@
+[2026-10-15 19:48:47] start 02_Frequentist_validation
+[2026-10-15 21:34:38] done 02_Frequentist_validation (exit 0)
+[2026-10-15 21:34:38] start 03_Frequentist_systematics
+[2026-10-15 21:41:24] done 03_Frequentist_systematics (exit 0)
+[2026-10-15 21:41:24] start 01_Frequentist_fit
+[2026-10-15 21:42:28] done 01_Frequentist_fit (exit 0)
+[2026-10-15 21:42:28] start 04_Dalitz_plane
+[2026-10-15 21:42:45] done 04_Dalitz_plane (exit 0)
+STREAMDONE

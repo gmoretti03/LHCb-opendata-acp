@@ -1,0 +1,2 @@
+n_window,n_signal_like,n_background_like,n_train,n_val,n_test,mu,sigma
+19731,15132,1939,10242,3414,3415,5284.378282795861,18.002660043949973

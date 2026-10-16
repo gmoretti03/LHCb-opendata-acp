@@ -1,0 +1,3 @@
+[NbConvertApp] Converting notebook 03_Frequentist_systematics.ipynb to notebook
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+[NbConvertApp] Writing 351636 bytes to 03_Frequentist_systematics.ipynb

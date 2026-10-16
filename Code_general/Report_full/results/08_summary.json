@@ -1,0 +1,43 @@
+{
+ "labels": {
+  "mu": 5284.378282795861,
+  "sigma": 18.002660043949973,
+  "n_signal_like": 15132,
+  "n_background_like": 1939
+ },
+ "cv_auc": {
+  "Logistic Regression": [
+   0.7802238946214965,
+   0.007182276785205386
+  ],
+  "Logistic Regression (L1)": [
+   0.7804162437318978,
+   0.007340138683896755
+  ],
+  "Decision Tree": [
+   0.824085160328738,
+   0.01109043181192255
+  ],
+  "Random Forest": [
+   0.8697447529855393,
+   0.013855898605727349
+  ],
+  "Gradient Boosting": [
+   0.8697995415198208,
+   0.014390133623533976
+  ]
+ },
+ "test_auc": {
+  "Logistic Regression": 0.7773245260013828,
+  "Logistic Regression (L1)": 0.7766552913810074,
+  "Decision Tree": 0.8247184276221907,
+  "Random Forest": 0.8659504323630285,
+  "Gradient Boosting": 0.8720935974851762,
+  "FFNN": 0.8581844158586467
+ },
+ "uncertainty": {
+  "forest": 0.18114403491944142,
+  "mc_dropout": 0.09467902034521103,
+  "deep_ensemble": 0.04707759991288185
+ }
+}
