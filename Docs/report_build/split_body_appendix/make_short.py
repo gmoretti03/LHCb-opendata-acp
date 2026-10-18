@@ -616,10 +616,19 @@ if os.path.isdir(CUT) and os.path.exists(CUT + '/sections/appendix.tex') and not
 _FINAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cut_final')
 _BODY = ('introduction', 'data', 'model', 'frequentist', 'bayesian', 'systematics', 'validation', 'dalitz', 'ml', 'conclusions')
 if os.path.isdir(_FINAL):
+    # a parenthesis that contains only appendix pointers would be empty here: remove it together with the space before it
+    _PTR = (r'\\(?:appfigs?|apprefsf?|apprefs?|apponly)\{[^{}]*\}(?:\{(?:[^{}]|\{[^{}]*\})*\}){0,3}')
+    _EMPTY = re.compile(r'[ \t]*\(\s*(?:' + _PTR + r'\s*)+\)')
     for _n in _BODY:
         _src = os.path.join(_FINAL, _n + '.tex')
         if os.path.exists(_src):
-            shutil.copy(_src, f'{OUT}/sections/{_n}.tex')
+            with open(_src) as _fh:
+                _t = _fh.read()
+            _t, _k = _EMPTY.subn('', _t)
+            if _k:
+                print(f'short: {_k} empty parenthesis of appendix pointers removed in {_n}')
+            with open(f'{OUT}/sections/{_n}.tex', 'w') as _fh:
+                _fh.write(_t)
     _m = open(OUT + '/main.tex').read()
     _old = '\\newcommand{\\apponly}[1]{--}'
     if '\\appfig' not in _m and _old in _m:

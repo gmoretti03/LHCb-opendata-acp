@@ -17,7 +17,7 @@ The priors are uniform, with independent ranges except for the ordering of the b
 and inside it the posterior is proportional to the likelihood. With $\sim$$2\times10^4$ events the posterior is dominated by the likelihood, as a prior-sensitivity check\appfig{sec:checks_prior}{Table~\ref{tab:checks_prior}} confirms for $A$. The evidence $p(D)$ is a constant: the MCMC samples $\mathcal{L}\,\pi$ without it, and the Savage-Dickey ratio of Sec.~\ref{sec:bayes_factor} avoids it as well; the marginal posterior of $A$ is the histogram of the $A$ component of the chain.
 \subsection{MCMC Sampling and Convergence Diagnostics}
 \label{sec:bayes_mcmc}
-The posterior was sampled with the affine-invariant ensemble sampler of Goodman and Weare~\cite{goodman_weare} as implemented in \texttt{emcee}~\cite{emcee}\appref{app:theory}: 32 walkers started around the maximum of the posterior, $25{,}000$ steps with the first $1/6$ discarded as burn-in ($6.7\times10^5$ samples, acceptance $0.38$). The integrated autocorrelation time is $\tau\in[147,183]$ steps, so the chain is $N/\tau\geq113$ autocorrelation times long for every parameter, above the threshold of $50$~\cite{emcee} ($\gtrsim3600$ effectively independent samples). Two runs started uniformly over the whole prior box converge to the same single mode ($\Araw=-0.0446$ and $-0.0442$\appfig{sec:appendix}{Fig.~\ref{fig:bayes_trace}}).
+The posterior was sampled with the affine-invariant ensemble sampler of Goodman and Weare~\cite{goodman_weare} as implemented in \texttt{emcee}~\cite{emcee}\appref{app:theory}: 32 walkers started around the maximum of the posterior, $25{,}000$ steps with the first $1/6$ discarded as burn-in ($6.7\times10^5$ samples, acceptance $0.38$). The integrated autocorrelation time is $\tau\in[147,183]$ steps, so the chain is $N/\tau\geq113$ autocorrelation times long for every parameter, above the threshold of $50$~\cite{emcee} ($\gtrsim3600$ effectively independent samples). Two runs started uniformly over the whole prior box converge to the same single mode.
 \subsection{Posterior Results and Credible Intervals}
 \label{sec:bayes_posterior}
 
@@ -41,7 +41,7 @@ The Bayes factor compares two hypotheses through their evidences, $BF_{10}=P(D\m
 \[
 BF_{01} = \frac{p(A=0\mid D)}{\pi(A=0)}, \qquad \pi(A=0)=\tfrac12 .
 \]
-$A=0$ lies $5.2$ posterior standard deviations from the median, where the chain has essentially no samples, so $p(A=0\mid D)$ was taken from the Gaussian approximation of the marginal posterior: \bnum{BF_{01}\approx1.1\times10^{-4}} ($BF_{10}\approx9\times10^{3}$; Fig.~\ref{fig:bayes_sd}a), \textbf{decisive evidence} against $A=0$ on Jeffreys' scale~\cite{jeffreys}. The value scales with the prior width (Ockham factor): with $A\in(-0.3,0.3)$, $BF_{01}$ drops by a factor $3.3$ and the conclusion is unchanged.
+$A=0$ lies $5.2$ posterior standard deviations from the median, where the chain has essentially no samples, so $p(A=0\mid D)$ was taken from the Gaussian approximation of the marginal posterior: \bnum{BF_{01}\approx1.1\times10^{-4}} ($BF_{10}\approx9\times10^{3}$; Fig.~\ref{fig:bayes_sd}a), \textbf{decisive evidence} against $A=0$ on Jeffreys' scale~\cite{jeffreys}. The value scales with the prior width (Ockham factor): with $A\in(-0.3,0.3)$, $BF_{01}$ drops by a factor $3.3$ and the conclusion is unchanged\appfig{sec:checks_prior}{Fig.~\ref{fig:checks_bf}}.
 
 \begin{figure*}[!t]
 \centering
@@ -50,7 +50,8 @@ $A=0$ lies $5.2$ posterior standard deviations from the median, where the chain 
 \label{fig:bayes_sd}
 \end{figure*}
 
-The same test on the background asymmetry shows the Ockham factor at work: $A_b=-0.040\pm0.018$ is $2.3$ standard deviations from zero, yet $BF_{01}(A_b=0)\approx3.5$ (Fig.~\ref{fig:bayes_sd}b)\appref{app:sd_densities}, because the likelihood gain does not compensate for spreading the prior over $(-1,1)$; unlike for $A$, the preference changes sign with the prior width (crossing at $W\approx0.3$). Of the Bayesian results \emph{only the Bayes factor} depends on the prior; the interval of $A$ does not (Sec.~\ref{sec:bayes_posterior}). A negative $A_b$ is plausible given the misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $\pi^\pm K^+K^-$ decays; $A_b$ is kept free in the nominal model and fixing it to zero is one of the systematic variants (Sec.~\ref{sec:syst}).
+The same test on the background asymmetry shows the Ockham factor at work: $A_b=-0.040\pm0.018$ is $2.3$ standard deviations from zero, yet $BF_{01}(A_b=0)\approx3.5$ (Fig.~\ref{fig:bayes_sd}b)\appref{app:sd_densities}, because the likelihood gain does not compensate for spreading the prior over $(-1,1)$; unlike for $A$, the preference changes sign with the prior width (crossing at $W\approx0.3$). Of the Bayesian results \emph{only the Bayes factor} depends on the prior; the interval of $A$ does not (Sec.~\ref{sec:bayes_posterior}). %A negative $A_b$ is plausible given the misidentified $B^\pm\to K^\pm\pi^+\pi^-$ and $\pi^\pm K^+K^-$ decays;
+$A_b$ is kept free in the nominal model and fixing it to zero is one of the systematic variants (Sec.~\ref{sec:syst}).
 \subsection{Additional Results}
 \emph{Sampler.} An own Metropolis-Hastings sampler reproduces the posterior of the ensemble sampler.
 \emph{Intervals.} Equal-tailed and highest-posterior-density $68\%$ intervals coincide for $A$ and $A_b$ and differ for the skewed parameters; the profile likelihood is tabulated for combination with other results\appfig{sec:checks_hpd}{Table~\ref{tab:checks_hpd}}.

@@ -203,6 +203,7 @@ The result is shown in Table~\ref{tab:checks_hpd}.
 \label{sec:checks_prior}
 \emph{In short: no change of the prior on the nuisance parameters or of its parametrization moves $A$ by more than $0.0002$; the Bayes factor of $A=0$ scales with the prior width, and the evidence computed by direct integration agrees in order of magnitude with the Savage-Dickey ratio.}
 The result is shown in Table~\ref{tab:checks_prior}.
+The result is shown in Figure~\ref{fig:checks_bf}.
 
 
 \subsection{Model Adequacy: Goodness of Fit and Posterior Predictive Check}
@@ -279,6 +280,13 @@ Flat in $(N_s^\pm)$ and $(N_b^\pm)$ & $-0.0442$ & $[-0.0529,-0.0358]$ & $19993$ 
 \caption{Posterior of $A$ under alternative priors, by importance reweighting of the chain; ESS: effective sample size of the $20{,}000$ thinned samples.}
 \label{tab:checks_prior}
 \end{table}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.5\textwidth]{figures/validation_bf_prior_width.pdf}
+\caption{$BF_{01}$ of $A=0$ and of $A_b=0$ as a function of the half-width $W$ of the uniform prior $(-W,W)$ (Gaussian approximation of the posterior, Savage-Dickey). The vertical line marks the nominal prior.}
+\label{fig:checks_bf}
+\end{figure*}
 
 \begin{table}[!t]
 \centering
