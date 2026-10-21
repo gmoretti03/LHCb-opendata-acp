@@ -1,4 +1,7 @@
-"""Builds report_short from report_cut: the body only (no appendix) and no reference to the appendix.
+"""SUPERSEDED by make_short_from_cut.py (report_short = the cut without the appendix and without its citations);
+this long pipeline is kept for history and must not be run to rebuild report_short.
+
+Builds report_short from report_cut: the body only (no appendix) and no reference to the appendix.
 
 report_short = report_cut with (i) the appendix removed, (ii) every pointer to the appendix removed or rephrased so that
 the result is still stated (the REWRITES list below, exact strings, each one must be found), (iii) the three statements

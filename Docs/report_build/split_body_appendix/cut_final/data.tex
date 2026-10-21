@@ -3,11 +3,11 @@
 \emph{In short: the record, the common preselection ($23{,}895$ candidates) and the fit window ($19{,}731$ candidates); the spectrum peaks at $5284\,\MeV$ for both charges and both polarities, and the counting asymmetry is $-0.043\pm0.007$.}
 \subsection{Dataset, Preselection and Mass}
 \label{sec:data_presel}
-The dataset is the CERN Open Data record 4900~\cite{opendata_record}: $B^{\pm}\to h^{\pm}h^{+}h^{-}$ candidates collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, already through trigger and offline selection, split by magnet polarity ($8{,}556{,}118$ candidates), and a phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ ($50{,}000$ decays, no asymmetry) used only to test the local-asymmetry procedure (Sec.~\ref{sec:dalitz}). The same preselection is used in all analyses,
+The dataset is the CERN Open Data record 4900~\cite{opendata_record}: $B^{\pm}\to h^{\pm}h^{+}h^{-}$ candidates collected by LHCb in 2011 at $\sqrt{s}=7$\,TeV, already through trigger and offline selection, split by magnet polarity ($8{,}556{,}118$ candidates), and a detector-free phase-space simulation of $B^{\pm}\to K^{\pm}K^{+}K^{-}$ ($50{,}000$ decays, no asymmetry) used only to test the local-asymmetry procedure (Sec.~\ref{sec:dalitz}). The same preselection is used in all analyses,
 \[
 \texttt{H*\_ProbPi} < 0.5 \ \wedge\ \texttt{H*\_ProbK} > 0.5 \ \wedge\ \lnot\texttt{H*\_isMuon},
 \]
-for each of the three tracks, and retains $23{,}895$ candidates ($0.28\%$)\appref{app:ext_data}. $H1$ is always the kaon of charge opposite to the $B$, so the Dalitz variables are $m^2(H1,H2)$ and $m^2(H1,H3)$.
+for each of the three tracks, and retains $23{,}895$ candidates ($0.28\%$)\appref{app:branches}. $H1$ is always the kaon of charge opposite to the $B$ and $H2$, $H3$ are the same-sign pair, so the Dalitz variables are the two opposite-sign invariant masses $m^2(H1,H2)$ and $m^2(H1,H3)$.
 \label{sec:data_mass}
 The three tracks are assigned the charged-kaon mass and their four-momenta are summed to reconstruct $m(KKK)$. The \textbf{nominal fit window}, common to the two analyses, is $[5100,5600]\,\MeV$ and contains $19{,}731$ candidates ($11{,}636$ magnet down, $8095$ magnet up). Below $\sim$5150\,\MeV\ the background rises, which a single exponential cannot describe; the window includes the start of this rise, described by a second exponential in the background model (Secs.~\ref{sec:frequentist}--\ref{sec:bayesian}).
 \subsection{Data Exploration}
@@ -24,4 +24,4 @@ Figure~\ref{fig:mass_spectrum} shows the spectrum in the fit window. The peak at
 
 \subsection{Additional Results}
 
-\emph{Selection.} The kaon-identification requirement on the three tracks is by far the most selective step of the preselection, and only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate; all are kept\apprefs{app:cutflow}{app:shared_track}.
+\emph{Selection.} The kaon-identification requirement on the three tracks is by far the most selective step of the preselection, and only $42$ candidates of the fit window ($0.2\%$) share a track with another candidate; all are kept\appfig{app:cutflow}{Table~\ref{tab:cutflow}}.
