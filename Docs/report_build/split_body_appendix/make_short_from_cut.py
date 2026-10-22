@@ -7,7 +7,8 @@ The rule is just that:
   (iii) the two things of the appendix that sit in the body source are dropped: the plain pointer to the notation
         appendix of the introduction and the cut-flow table of Appendix A (called from the conclusions of the cut to share
         a page with Fig. XIV);
-  (iv)  nothing else is edited: the text, the floats and the figures are those of the cut.
+  (iv)  the few edits that belong to the short only are listed in SHORT_TWEAKS below (figure widths and one sentence);
+        nothing else is edited: the text, the floats and the figures are those of the cut.
 
 The text of the cut is edited in cut_final/ (copied over report_cut/sections, see cut_final/README.txt).
 
@@ -80,6 +81,16 @@ def drop_appendix_items(s, name):
     return s
 
 
+# edits that belong to the short only: (section, text of the cut, text of the short); each must be found exactly once
+SHORT_TWEAKS = [
+    ('ml', '\\includegraphics[width=\\columnwidth]{figures/short_ml_three.pdf}',
+           '\\includegraphics[width=0.9\\columnwidth]{figures/short_ml_three.pdf}'),
+    ('systematics', '\\includegraphics[width=0.80\\textwidth]{figures/short_pid_scan.pdf}',
+                    '\\includegraphics[width=0.75\\textwidth]{figures/short_pid_scan.pdf}'),
+    ('conclusions', 'its $68\\%$ is a property of the procedure that the bootstrap and the toy experiments verified.',
+                    'its $68\\%$ is verified by the bootstrap and the toy experiments.'),
+]
+
 main = open(os.path.join(CUT, 'main.tex')).read()
 main = main.replace('\\input{sections/appendix}\n\n', '').replace('\\input{sections/appendix}\n', '')
 assert 'sections/appendix' not in main
@@ -97,6 +108,10 @@ for name in re.findall(r'\\input\{sections/([^}]+)\}', main):
     s = open(os.path.join(CUT, 'sections', name + '.tex')).read()
     s, n = strip_citations(s, name)
     s = drop_appendix_items(s, name)
+    for sec, a, b in SHORT_TWEAKS:
+        if sec == name:
+            assert s.count(a) == 1, f'{name}: tweak not found: {a[:50]}'
+            s = s.replace(a, b, 1)
     assert 'Appendix' not in s and 'tab:cutflow' not in s, f'{name}: appendix left in the text'
     open(os.path.join(OUT, 'sections', name + '.tex'), 'w').write(s)
     total += n

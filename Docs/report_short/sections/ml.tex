@@ -22,7 +22,7 @@ The uncertainty of a prediction was estimated from the spread of the $300$ trees
 \subsection{Effect on the Measurement and Dalitz Partition}
 \label{sec:ml_stability_body}
 \label{sec:ml_kmeans_body}
-A cut at $0.5$ on the score keeps $92\%$ of the fitted signal and $36\%$ of the background ($15{,}709$ candidates). The raw asymmetry is \textbf{stable} (Fig.~\ref{fig:ml_three}): $-0.0451\pm0.0087$ (Bayesian) and $-0.0447\pm0.0086$ (Frequentist), against $-0.0443$ and $-0.0441$ for the full window, all shifts within the spread expected for a subsample and $5.2\sigma$ from zero in both samples. The precision does not improve, because the nominal sample has little background to remove ($\approx4\%$ in the signal window). The mass spectrum, instead, changes ($\chi^2$ from $164/88$ to $253/88$ in the Bayesian fit): the classifier does not sculpt the mass, since without the nine momentum components the degradation is the same ($\chi^2=533/388$ in the Frequentist fit), but the selection changes the composition of the background, keeping partially reconstructed decays that the model does not describe. Finally, $K$-means with $K=8$ on $(m^2_{\mathrm{lo}},m^2_{\mathrm{hi}})$, an \emph{unsupervised} partition learned from the density of the candidates and stable between initializations, finds two clusters beyond $3\sigma$ ($\chi^2=46.4$ for $7$ degrees of freedom) with the pattern of the fixed binning ($\chi^2=80.8$ for $31$ degrees of freedom, Sec.~\ref{sec:dalitz}): negative at low $m^2_{\mathrm{lo}}$ ($-0.127\pm0.017$) and positive at high $m^2_{\mathrm{hi}}$ (Fig.~\ref{fig:ml_kmeans}).
+A cut at $0.5$ on the score keeps $92\%$ of the fitted signal and $36\%$ of the background ($15{,}709$ candidates). The raw asymmetry is \textbf{stable} (Fig.~\ref{fig:ml_three}): $-0.0451\pm0.0087$ (Bayesian) and $-0.0447\pm0.0086$ (Frequentist), against $-0.0443$ and $-0.0441$ for the full window. The precision does not improve, because the nominal sample has little background to remove ($\approx4\%$ in the signal window). The mass spectrum, instead, changes ($\chi^2$ from $164/88$ to $253/88$ in the Bayesian fit): the classifier does not sculpt the mass, since without the nine momentum components the degradation is the same ($\chi^2=533/388$ in the Frequentist fit), but the selection changes the composition of the background, keeping partially reconstructed decays that the model does not describe. Finally, $K$-means with $K=8$ on $(m^2_{\mathrm{lo}},m^2_{\mathrm{hi}})$, an \emph{unsupervised} partition learned from the density of the candidates and stable between initializations, finds two clusters beyond $3\sigma$ ($\chi^2=46.4$ for $7$ degrees of freedom) with the pattern of the fixed binning ($\chi^2=80.8$ for $31$ degrees of freedom, Sec.~\ref{sec:dalitz}): negative at low $m^2_{\mathrm{lo}}$ ($-0.127\pm0.017$) and positive at high $m^2_{\mathrm{hi}}$ (Fig.~\ref{fig:ml_kmeans}).
 
 \begin{figure}[h]
 \centering
@@ -33,8 +33,10 @@ A cut at $0.5$ on the score keeps $92\%$ of the fitted signal and $36\%$ of the 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\columnwidth]{figures/short_ml_three.pdf}
+\includegraphics[width=0.9\columnwidth]{figures/short_ml_three.pdf}
 \caption{$\Araw$ from the Bayesian fit, the Frequentist fit and counting, for the full sample and the ML-selected ones, at a score cut of $0.5$ and at $0.73$, the maximum of the significance improvement.}
 \label{fig:ml_three}
 \end{figure}
 
+\subsection{Additional Results}
+\emph{Machine learning: hyperparameters and features.} The hyperparameter search gains at most $0.005$ in AUC, less than its uncertainty, and the cross-validated maximum overestimates the test AUC (winner's curse); the Random Forest importance and the Lasso coefficients of the features agree only partly and both rank the two vertex variables of the $B$ among the top five.
