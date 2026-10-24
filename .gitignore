@@ -13,7 +13,5 @@ __pycache__/
 Code_general/Report/data/
 *.root
 
-# course material: large data files and the merged slides (redundant) are not tracked
-Statistics_course/**/*.npz
-Statistics_course/**/*.npy
-Statistics_course/00_Reference/All_slides_merged.pdf
+# course material (third-party, not redistributed)
+Statistics_course/

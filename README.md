@@ -10,7 +10,6 @@ Code_general/
   Report/      the notebooks that accompany the report (9 notebooks, self-contained, already executed)
   Analysis/    the complete analysis: modules, long runs, saved results (Frequentist, Bayesian, Machine_Learning)
 Docs/          the report (sources and PDF), the papers used and the project proposals
-Statistics_course/   material of the course
 opendata-project/    CERN Open Data record 4900 (data, not tracked by git)
 environment.yml      conda environment of all the code
 ```
